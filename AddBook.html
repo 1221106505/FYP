@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Book</title>
+  <link rel="stylesheet" href="Main.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Add New Book</h2>
+
+    <input type="text" id="title" placeholder="Book Title" required>
+    <input type="text" id="author" placeholder="Author" required>
+    <input type="number" id="price" placeholder="Price (RM)" required>
+
+    <button onclick="addBook()">Save Book</button>
+    <button class="back-btn" onclick="window.location.href='index.html'">Back to Main</button>
+  </div>
+
+  <script>
+    function addBook() {
+      const title = document.getElementById('title').value;
+      const author = document.getElementById('author').value;
+      const price = document.getElementById('price').value;
+
+      if (!title || !author || !price) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const books = JSON.parse(localStorage.getItem('books')) || [];
+      books.push({ title, author, price });
+      localStorage.setItem('books', JSON.stringify(books));
+
+      alert("Book added successfully!");
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

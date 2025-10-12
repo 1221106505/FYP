@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Store Search</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="search-container">
+    <h1>📚 Virtual Book Store</h1>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search for a book..." onkeyup="showSuggestions()">
+      <div id="suggestions" class="suggestions-box"></div>
+    </div>
+  </div>
+
+  <div class="book-results" id="bookResults"></div>
+
+  <script>
+    // Example book data (you can load from LocalStorage if you prefer)
+    const books = JSON.parse(localStorage.getItem('books')) || [
+      { title: "The Great Gatsby", author: "F. Scott Fitzgerald", price: "25" },
+      { title: "Harry Potter and the Sorcerer’s Stone", author: "J.K. Rowling", price: "35" },
+      { title: "To Kill a Mockingbird", author: "Harper Lee", price: "28" },
+      { title: "The Art of War", author: "Sun Tzu", price: "18" },
+      { title: "1984", author: "George Orwell", price: "30" },
+      { title: "The Hobbit", author: "J.R.R. Tolkien", price: "32" }
+    ];
+
+    function showSuggestions() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      const suggestions = document.getElementById("suggestions");
+      suggestions.innerHTML = ""; // clear old
+
+      if (input === "") {
+        suggestions.style.display = "none";
+        return;
+      }
+
+      // filter books by title or author
+      const filtered = books.filter(b =>
+        b.title.toLowerCase().includes(input) ||
+        b.author.toLowerCase().includes(input)
+      );
+
+      // if nothing found
+      if (filtered.length === 0) {
+        suggestions.innerHTML = "<p class='no-result'>No results found</p>";
+        suggestions.style.display = "block";
+        return;
+      }
+
+      // create suggestion list
+      filtered.forEach(book => {
+        const div = document.createElement("div");
+        div.className = "suggestion-item";
+        div.textContent = `${book.title} — ${book.author}`;
+        div.onclick = () => showBook(book);
+        suggestions.appendChild(div);
+      });
+
+      suggestions.style.display = "block";
+    }
+
+    function showBook(book) {
+      const results = document.getElementById("bookResults");
+      const suggestions = document.getElementById("suggestions");
+      document.getElementById("searchInput").value = book.title;
+      suggestions.style.display = "none";
+
+      results.innerHTML = `
+        <div class="book-card">
+          <h2>${book.title}</h2>
+          <p><b>Author:</b> ${book.author}</p>
+          <p><b>Price:</b> RM ${book.price}</p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
