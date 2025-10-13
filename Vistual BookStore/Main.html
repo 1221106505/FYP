@@ -138,16 +138,13 @@
           return response.json();
         })
         .then(data => {
+          console.log('Login status data:', data); // 调试信息
           updateUserInterface(data);
           updateServicesBasedOnRole(data);
           loadBestsellers(); // 从数据库加载畅销书数据
-          
-          // 如果用户已登录，根据角色更新导航
-          if (data.logged_in) {
-            updateNavigationBasedOnRole(data.role);
-          }
         })
         .catch(error => {
+          console.error('Error checking login status:', error);
           // 如果check_login.php不存在，使用URL参数回退
           fallbackToURLParams();
           loadBestsellers(); // 从数据库加载畅销书数据
@@ -159,6 +156,8 @@
       const servicesContainer = document.getElementById('servicesContainer');
       
       if (!servicesContainer) return;
+      
+      console.log('Updating services for role:', userData.role); // 调试信息
       
       if (!userData.logged_in) {
         // 未登录用户只能看到搜索和关于我们
@@ -179,10 +178,10 @@
           </div>
         `;
       } else if (userData.role === 'admin') {
-        // 管理员看到的服务选项
+        // 管理员看到的服务选项 - 修复管理员面板链接
         servicesContainer.innerHTML = `
           <div class="service-item">
-            <a href="admin_panel.html" class="service-link">
+            <a href="admin_panel.html" class="service-link" onclick="trackLinkClick('admin_panel')">
               <div class="service-icon">⚙️</div>
               <h3>Admin Panel</h3>
               <p>Access administrative functions and system management.</p>
@@ -203,17 +202,17 @@
             </a>
           </div>
           <div class="service-item">
+            <a href="Searching.html" class="service-link">
+              <div class="service-icon">🔍</div>
+              <h3>Search Books</h3>
+              <p>Find exactly what you're looking for with our powerful search tool.</p>
+            </a>
+          </div>
+          <div class="service-item">
             <a href="user_profile.html" class="service-link">
               <div class="service-icon">👤</div>
               <h3>My Profile</h3>
               <p>Manage your administrator account settings.</p>
-            </a>
-          </div>
-          <div class="service-item">
-            <a href="About.html" class="service-link">
-              <div class="service-icon">ℹ️</div>
-              <h3>About Us</h3>
-              <p>Learn more about our bookstore system.</p>
             </a>
           </div>
         `;
@@ -252,7 +251,70 @@
       }
     }
 
-    // 从数据库加载畅销书数据 - 使用您的get_books.php API
+    // 更新用户界面 - 修复管理员链接
+    function updateUserInterface(userData) {
+      const userInfo = document.getElementById('userInfo');
+      
+      if (!userInfo) return;
+
+      if (userData.logged_in) {
+        // 获取用户头像数据
+        const userProfile = getUserAvatarData(userData.username);
+        
+        console.log('Updating user interface for:', userData.username, 'Role:', userData.role); // 调试信息
+        
+        // 根据用户角色决定个人资料链接
+        let profileLink = 'user_profile.html';
+        let displayText = userData.username;
+        
+        if (userData.role === 'admin') {
+          profileLink = 'admin_panel.html'; // 管理员去管理员面板
+          displayText = userData.username + ' (Admin)';
+          console.log('Admin user detected, setting profile link to:', profileLink); // 调试信息
+        }
+        
+        // 用户已登录，显示头像和用户名
+        userInfo.innerHTML = `
+          <a href="${profileLink}" id="userProfileLink" onclick="trackLinkClick('${profileLink}')">
+            <button class="user-button">
+              <div class="main-avatar">
+                ${userProfile.avatarType === 'image' && userProfile.avatarImage ? 
+                  `<img src="${userProfile.avatarImage}" class="main-avatar-img" alt="Avatar">` : 
+                  `<div class="main-avatar-emoji">${userProfile.avatarValue}</div>`
+                }
+              </div>
+              ${displayText}
+            </button>
+          </a>
+        `;
+        
+        // 设置头像背景颜色（如果是emoji）
+        if (userProfile.avatarType === 'emoji') {
+          const avatarElement = userInfo.querySelector('.main-avatar');
+          const colors = ['#6a11cb', '#2575fc', '#28a745', '#dc3545', '#fd7e14', '#6f42c1'];
+          const color = colors[userProfile.avatarValue.charCodeAt(0) % colors.length];
+          avatarElement.style.background = `linear-gradient(135deg, ${color} 0%, ${color}99 100%)`;
+        }
+      } else {
+        // 用户未登录，显示登录按钮
+        userInfo.innerHTML = `
+          <a href="../Login/Login.html">
+            <button class="login-button">Login</button>
+          </a>
+        `;
+      }
+    }
+
+    // 链接点击跟踪函数
+    function trackLinkClick(linkName) {
+      console.log('=== LINK CLICK DEBUG ===');
+      console.log('Link clicked:', linkName);
+      console.log('Expected URL:', window.location.origin + window.location.pathname.replace('Main.html', '') + linkName);
+      console.log('Current page:', window.location.href);
+      console.log('=====================');
+    }
+
+    // 从数据库加载畅销书数据
     function loadBestsellers() {
       // 获取评分最高的4本书作为畅销书
       fetch('get_books.php?sort=rating&limit=4')
@@ -279,7 +341,7 @@
         });
     }
 
-    // 更新书籍显示 - 每个书籍都是可点击的链接，使用get_book_detail.php
+    // 更新书籍显示
     function updateBooksDisplay(books) {
       const booksGrid = document.getElementById('booksGrid');
       if (!booksGrid) return;
@@ -311,48 +373,6 @@
       addBooksInteractivity();
     }
 
-    // 更新用户界面
-    function updateUserInterface(userData) {
-      const userInfo = document.getElementById('userInfo');
-      
-      if (!userInfo) return;
-
-      if (userData.logged_in) {
-        // 获取用户头像数据
-        const userProfile = getUserAvatarData(userData.username);
-        
-        // 用户已登录，显示头像和用户名
-        userInfo.innerHTML = `
-          <a href="user_profile.html">
-            <button class="user-button">
-              <div class="main-avatar">
-                ${userProfile.avatarType === 'image' && userProfile.avatarImage ? 
-                  `<img src="${userProfile.avatarImage}" class="main-avatar-img" alt="Avatar">` : 
-                  `<div class="main-avatar-emoji">${userProfile.avatarValue}</div>`
-                }
-              </div>
-              ${userData.username}
-            </button>
-          </a>
-        `;
-        
-        // 设置头像背景颜色（如果是emoji）
-        if (userProfile.avatarType === 'emoji') {
-          const avatarElement = userInfo.querySelector('.main-avatar');
-          const colors = ['#6a11cb', '#2575fc', '#28a745', '#dc3545', '#fd7e14', '#6f42c1'];
-          const color = colors[userProfile.avatarValue.charCodeAt(0) % colors.length];
-          avatarElement.style.background = `linear-gradient(135deg, ${color} 0%, ${color}99 100%)`;
-        }
-      } else {
-        // 用户未登录，显示登录按钮
-        userInfo.innerHTML = `
-          <a href="../Login/Login.html">
-            <button class="login-button">Login</button>
-          </a>
-        `;
-      }
-    }
-
     // 获取用户头像数据
     function getUserAvatarData(username) {
       const savedData = localStorage.getItem(`userProfile_${username}`);
@@ -378,15 +398,23 @@
       const urlParams = new URLSearchParams(window.location.search);
       const loginSuccess = urlParams.get('login_success');
       const username = urlParams.get('username');
-      const role = urlParams.get('role') || 'customer'; // 默认为顾客角色
+      const role = urlParams.get('role') || 'customer';
       
       if (loginSuccess === '1' && username) {
         const userInfo = document.getElementById('userInfo');
         if (userInfo) {
           const userProfile = getUserAvatarData(username);
           
+          let profileLink = 'user_profile.html';
+          let displayText = decodeURIComponent(username);
+          
+          if (role === 'admin') {
+            profileLink = 'admin_panel.html';
+            displayText = decodeURIComponent(username) + ' (Admin)';
+          }
+          
           userInfo.innerHTML = `
-            <a href="user_profile.html">
+            <a href="${profileLink}">
               <button class="user-button">
                 <div class="main-avatar">
                   ${userProfile.avatarType === 'image' && userProfile.avatarImage ? 
@@ -394,12 +422,11 @@
                     `<div class="main-avatar-emoji">${userProfile.avatarValue}</div>`
                   }
                 </div>
-                ${decodeURIComponent(username)}
+                ${displayText}
               </button>
             </a>
           `;
           
-          // 设置头像背景颜色（如果是emoji）
           if (userProfile.avatarType === 'emoji') {
             const avatarElement = userInfo.querySelector('.main-avatar');
             const colors = ['#6a11cb', '#2575fc', '#28a745', '#dc3545', '#fd7e14', '#6f42c1'];
@@ -408,10 +435,8 @@
           }
         }
         
-        // 根据角色更新服务选项
         updateServicesBasedOnRole({ logged_in: true, role: role });
       } else {
-        // 未登录用户
         updateServicesBasedOnRole({ logged_in: false });
       }
     }
@@ -443,6 +468,7 @@
 
     // 页面加载时执行
     document.addEventListener('DOMContentLoaded', function() {
+      console.log('Main page loaded'); // 调试信息
       checkLoginStatus();
       checkURLParams();
       
@@ -523,6 +549,49 @@
       padding: 20px;
       color: #666;
       grid-column: 1 / -1;
+    }
+
+    /* 用户按钮样式 */
+    .user-button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .user-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .main-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .main-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .main-avatar-emoji {
+      font-size: 16px;
     }
   </style>
 </body>

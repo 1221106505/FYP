@@ -34,23 +34,24 @@
 
         /* Sidebar */
         .sidebar {
-            width: 250px;
+            width: 280px;
             background: var(--primary);
             color: white;
             padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
 
         .logo {
-            padding: 0 20px 20px;
+            padding: 0 25px 25px;
             border-bottom: 1px solid var(--secondary);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .logo h2 {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 1.2rem;
+            gap: 12px;
+            font-size: 1.3rem;
         }
 
         .nav-links {
@@ -58,42 +59,46 @@
         }
 
         .nav-links li {
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .nav-links a {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
+            gap: 15px;
+            padding: 15px 25px;
             color: #bdc3c7;
             text-decoration: none;
             transition: all 0.3s;
+            border-left: 4px solid transparent;
         }
 
         .nav-links a:hover, .nav-links a.active {
             background: var(--secondary);
             color: white;
-            border-left: 4px solid var(--accent);
+            border-left-color: var(--accent);
+            transform: translateX(5px);
         }
 
         .nav-links i {
             width: 20px;
             text-align: center;
+            font-size: 1.1em;
         }
 
         /* Main Content */
         .main-content {
             flex: 1;
-            padding: 20px;
+            padding: 25px;
+            background: #f8f9fa;
         }
 
         .header {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -101,33 +106,48 @@
 
         .header h1 {
             color: var(--primary);
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 600;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
+            font-weight: 500;
         }
 
         .logout-btn {
             background: var(--danger);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 6px;
             cursor: pointer;
             text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
         }
 
         /* Content Sections */
         .content-section {
             display: none;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .content-section.active {
@@ -138,25 +158,34 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
         }
 
         .section-header h2 {
             color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 600;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 500;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .btn-primary {
@@ -164,9 +193,17 @@
             color: white;
         }
 
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
         .btn-success {
             background: var(--success);
             color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
         }
 
         .btn-danger {
@@ -174,20 +211,31 @@
             color: white;
         }
 
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
         /* Tables */
         .table-container {
             overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         .data-table th,
         .data-table td {
-            padding: 12px;
+            padding: 15px;
             text-align: left;
             border-bottom: 1px solid #eee;
         }
@@ -196,6 +244,9 @@
             background: #f8f9fa;
             font-weight: 600;
             color: var(--primary);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .data-table tr:hover {
@@ -204,86 +255,102 @@
 
         .action-buttons {
             display: flex;
-            gap: 5px;
+            gap: 8px;
         }
 
         .btn-sm {
-            padding: 6px 12px;
-            font-size: 0.85rem;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            border-radius: 4px;
         }
 
         /* Forms */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: 500;
             color: var(--primary);
         }
 
         .form-control {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
             font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         }
 
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 20px;
         }
 
         /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             text-align: center;
+            border-top: 4px solid var(--accent);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
         }
 
         .stat-number {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: var(--primary);
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .stat-label {
             color: #666;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 500;
         }
 
         /* Charts */
         .chart-container {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
         }
 
         .chart-placeholder {
-            height: 300px;
-            background: #f8f9fa;
-            border: 2px dashed #ddd;
-            border-radius: 4px;
+            height: 320px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #666;
+            color: #6c757d;
+            font-size: 1.1em;
         }
 
         /* Modal */
@@ -298,68 +365,119 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             width: 90%;
             max-width: 700px;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid #eee;
+            padding: 25px;
+            border-bottom: 2px solid #eee;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
         }
 
         .modal-body {
-            padding: 20px;
+            padding: 25px;
         }
 
         .modal-footer {
-            padding: 20px;
-            border-top: 1px solid #eee;
+            padding: 20px 25px;
+            border-top: 2px solid #eee;
             display: flex;
             justify-content: flex-end;
-            gap: 10px;
+            gap: 12px;
+            background: #f8f9fa;
+            border-radius: 0 0 12px 12px;
         }
 
         .close {
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
-            color: #666;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #bdc3c7;
         }
 
         .loading {
             text-align: center;
-            padding: 20px;
-            color: #666;
+            padding: 40px;
+            color: #6c757d;
+            font-size: 1.1em;
         }
 
         .error {
             color: var(--danger);
             text-align: center;
-            padding: 20px;
+            padding: 40px;
+            font-size: 1.1em;
         }
 
-        .low-stock-warning {
+        .success {
+            color: var(--success);
+            text-align: center;
+            padding: 40px;
+            font-size: 1.1em;
+        }
+
+        .low-stock {
             color: var(--danger);
             font-weight: bold;
+            background: #ffeaa7;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
         }
 
-        .stock-ok {
+        .in-stock {
             color: var(--success);
+            font-weight: 500;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .admin-container {
                 flex-direction: column;
             }
@@ -371,6 +489,32 @@
             .form-row {
                 grid-template-columns: 1fr;
             }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -379,14 +523,16 @@
         <!-- Sidebar -->
         <nav class="sidebar">
             <div class="logo">
-                <h2>📊 Admin Panel</h2>
+                <h2>🎯 Admin Panel</h2>
+                <p style="color: #bdc3c7; font-size: 0.9em; margin-top: 5px;">Virtual BookStore</p>
             </div>
             <ul class="nav-links">
-                <li><a href="#" class="nav-link active" data-section="dashboard"><i>📈</i> Dashboard</a></li>
+                <li><a href="#" class="nav-link active" data-section="dashboard"><i>📊</i> Dashboard</a></li>
                 <li><a href="#" class="nav-link" data-section="books"><i>📚</i> Book Management</a></li>
-                <li><a href="#" class="nav-link" data-section="orders"><i>🛒</i> Customer Orders</a></li>
-                <li><a href="#" class="nav-link" data-section="analytics"><i>📊</i> Sales Analytics</a></li>
                 <li><a href="#" class="nav-link" data-section="inventory"><i>📦</i> Inventory</a></li>
+                <li><a href="#" class="nav-link" data-section="categories"><i>🏷️</i> Categories</a></li>
+                <li><a href="#" class="nav-link" data-section="analytics"><i>📈</i> Analytics</a></li>
+                <li><a href="#" class="nav-link" data-section="settings"><i>⚙️</i> Settings</a></li>
             </ul>
         </nav>
 
@@ -396,8 +542,8 @@
             <div class="header">
                 <h1 id="sectionTitle">Admin Dashboard</h1>
                 <div class="user-info">
-                    <span id="adminWelcome">Welcome, Admin</span>
-                    <a href="logout.html" class="logout-btn">Logout</a>
+                    <span id="adminWelcome">Welcome, Administrator</span>
+                    <a href="logout.php" class="logout-btn">🚪 Logout</a>
                 </div>
             </div>
 
@@ -409,56 +555,61 @@
                         <div class="stat-label">Total Books</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="totalOrders">0</div>
-                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-number" id="totalCategories">0</div>
+                        <div class="stat-label">Categories</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="totalRevenue">RM 0</div>
-                        <div class="stat-label">Total Revenue</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="lowStock">0</div>
+                        <div class="stat-number" id="lowStockCount">0</div>
                         <div class="stat-label">Low Stock Items</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="outOfStock">0</div>
+                        <div class="stat-label">Out of Stock</div>
                     </div>
                 </div>
 
                 <div class="chart-container">
-                    <h3>Sales Overview</h3>
+                    <h3>📈 Sales Overview</h3>
                     <div class="chart-placeholder">
-                        Sales Chart Will Be Displayed Here
+                        📊 Sales analytics dashboard will be implemented here
                     </div>
                 </div>
 
                 <div class="section-header">
-                    <h3>Recent Orders</h3>
+                    <h3>🚀 Quick Actions</h3>
                 </div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentOrders">
-                            <tr><td colspan="6" class="loading">Loading recent orders...</td></tr>
-                        </tbody>
-                    </table>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <button class="btn btn-primary" onclick="loadSectionData('books')">
+                        <i>📚</i> Manage Books
+                    </button>
+                    <button class="btn btn-success" onclick="openAddBookModal()">
+                        <i>➕</i> Add New Book
+                    </button>
+                    <button class="btn btn-warning" onclick="loadSectionData('inventory')">
+                        <i>📦</i> View Inventory
+                    </button>
+                    <button class="btn btn-primary" onclick="loadSectionData('categories')">
+                        <i>🏷️</i> Manage Categories
+                    </button>
                 </div>
             </section>
 
             <!-- Book Management Section -->
             <section id="books" class="content-section">
                 <div class="section-header">
-                    <h2>Book Management</h2>
+                    <h2>📚 Book Management</h2>
                     <button class="btn btn-primary" onclick="openAddBookModal()">
                         <i>➕</i> Add New Book
                     </button>
                 </div>
+
+                <div class="search-box">
+                    <input type="text" id="bookSearch" class="search-input" placeholder="🔍 Search books by title, author, or ISBN..." onkeyup="searchBooks()">
+                    <select id="categoryFilter" class="form-control" style="width: 200px;" onchange="filterBooks()">
+                        <option value="all">All Categories</option>
+                    </select>
+                </div>
+
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -474,70 +625,41 @@
                             </tr>
                         </thead>
                         <tbody id="booksTable">
-                            <tr><td colspan="8" class="loading">Loading books...</td></tr>
+                            <tr><td colspan="8" class="loading">Loading books data...</td></tr>
                         </tbody>
                     </table>
-                </div>
-            </section>
-
-            <!-- Customer Orders Section -->
-            <section id="orders" class="content-section">
-                <div class="section-header">
-                    <h2>Customer Orders</h2>
-                </div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Items</th>
-                                <th>Total</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ordersTable">
-                            <tr><td colspan="7" class="loading">Loading orders...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Sales Analytics Section -->
-            <section id="analytics" class="content-section">
-                <div class="section-header">
-                    <h2>Sales Analytics</h2>
-                </div>
-                
-                <div class="chart-container">
-                    <h3>Sales Trend (Last 30 Days)</h3>
-                    <div class="chart-placeholder">
-                        Sales Trend Chart Will Be Displayed Here
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <h3>Top Selling Books</h3>
-                    <div class="chart-placeholder">
-                        Top Sellers Chart Will Be Displayed Here
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <h3>Revenue by Category</h3>
-                    <div class="chart-placeholder">
-                        Category Revenue Chart Will Be Displayed Here
-                    </div>
                 </div>
             </section>
 
             <!-- Inventory Section -->
             <section id="inventory" class="content-section">
                 <div class="section-header">
-                    <h2>Inventory Management</h2>
+                    <h2>📦 Inventory Management</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-warning" onclick="loadLowStockItems()">
+                            <i>⚠️</i> Low Stock
+                        </button>
+                        <button class="btn btn-danger" onclick="loadOutOfStockItems()">
+                            <i>❌</i> Out of Stock
+                        </button>
+                    </div>
                 </div>
+
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                    <div class="stat-card" style="border-top-color: var(--success);">
+                        <div class="stat-number" id="inStockCount">0</div>
+                        <div class="stat-label">In Stock</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--warning);">
+                        <div class="stat-number" id="inventoryLowStock">0</div>
+                        <div class="stat-label">Low Stock</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--danger);">
+                        <div class="stat-number" id="inventoryOutOfStock">0</div>
+                        <div class="stat-label">Out of Stock</div>
+                    </div>
+                </div>
+
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -545,16 +667,96 @@
                                 <th>Book ID</th>
                                 <th>Title</th>
                                 <th>Current Stock</th>
-                                <th>Low Stock Alert</th>
+                                <th>Price</th>
+                                <th>Status</th>
                                 <th>Last Updated</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="inventoryTable">
-                            <tr><td colspan="6" class="loading">Loading inventory data...</td></tr>
+                            <tr><td colspan="7" class="loading">Loading inventory data...</td></tr>
                         </tbody>
                     </table>
                 </div>
+            </section>
+
+            <!-- Categories Section -->
+            <section id="categories" class="content-section">
+                <div class="section-header">
+                    <h2>🏷️ Category Management</h2>
+                    <button class="btn btn-primary" onclick="openAddCategoryModal()">
+                        <i>➕</i> Add Category
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Category Name</th>
+                                <th>Book Count</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTable">
+                            <tr><td colspan="4" class="loading">Loading categories...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="content-section">
+                <div class="section-header">
+                    <h2>📈 Sales Analytics</h2>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>📊 Sales Trend (Last 30 Days)</h3>
+                    <div class="chart-placeholder">
+                        Sales trend chart will be displayed here
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>🔥 Top Selling Books</h3>
+                    <div class="chart-placeholder">
+                        Top sellers chart will be displayed here
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>🏷️ Revenue by Category</h3>
+                    <div class="chart-placeholder">
+                        Category revenue chart will be displayed here
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="section-header">
+                    <h2>⚙️ System Settings</h2>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Store Name</label>
+                        <input type="text" class="form-control" value="Virtual BookStore">
+                    </div>
+                    <div class="form-group">
+                        <label>Admin Email</label>
+                        <input type="email" class="form-control" value="admin@virtualbookstore.com">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Store Description</label>
+                    <textarea class="form-control" rows="3">Your ultimate online book destination</textarea>
+                </div>
+                
+                <button class="btn btn-primary">💾 Save Settings</button>
             </section>
         </main>
     </div>
@@ -571,82 +773,82 @@
                     <input type="hidden" id="bookId">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="bookTitle">Title *</label>
+                            <label for="bookTitle">📖 Title *</label>
                             <input type="text" id="bookTitle" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label for="bookAuthor">Author *</label>
+                            <label for="bookAuthor">✍️ Author *</label>
                             <input type="text" id="bookAuthor" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="bookCategory">Category *</label>
+                            <label for="bookCategory">🏷️ Category *</label>
                             <select id="bookCategory" class="form-control" required>
                                 <option value="">Select Category</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="bookPrice">Price (RM) *</label>
+                            <label for="bookPrice">💰 Price (RM) *</label>
                             <input type="number" id="bookPrice" class="form-control" step="0.01" min="0" required>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="bookStock">Stock Quantity *</label>
+                            <label for="bookStock">📦 Stock Quantity *</label>
                             <input type="number" id="bookStock" class="form-control" min="0" required>
                         </div>
                         <div class="form-group">
-                            <label for="bookISBN">ISBN</label>
+                            <label for="bookISBN">🔢 ISBN</label>
                             <input type="text" id="bookISBN" class="form-control">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="bookPublisher">Publisher</label>
+                            <label for="bookPublisher">🏢 Publisher</label>
                             <input type="text" id="bookPublisher" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label for="bookPublishDate">Publish Date</label>
+                            <label for="bookPublishDate">📅 Publish Date</label>
                             <input type="date" id="bookPublishDate" class="form-control">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="bookDescription">Description</label>
-                        <textarea id="bookDescription" class="form-control" rows="3"></textarea>
+                        <label for="bookDescription">📝 Description</label>
+                        <textarea id="bookDescription" class="form-control" rows="4" placeholder="Enter book description..."></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveBook()">Save Book</button>
+                <button class="btn" onclick="closeModal()">❌ Cancel</button>
+                <button class="btn btn-primary" onclick="saveBook()">💾 Save Book</button>
             </div>
         </div>
     </div>
 
-    <!-- Quick Stock Update Modal -->
+    <!-- Stock Update Modal -->
     <div class="modal" id="stockModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Update Stock</h3>
+                <h3>📦 Update Stock</h3>
                 <button class="close" onclick="closeStockModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="stockForm">
                     <input type="hidden" id="stockBookId">
                     <div class="form-group">
-                        <label for="stockBookTitle">Book Title</label>
+                        <label>📖 Book Title</label>
                         <input type="text" id="stockBookTitle" class="form-control" readonly>
                     </div>
                     <div class="form-group">
-                        <label for="newStockQuantity">New Stock Quantity *</label>
+                        <label for="newStockQuantity">🔄 New Stock Quantity *</label>
                         <input type="number" id="newStockQuantity" class="form-control" min="0" required>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn" onclick="closeStockModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="updateStock()">Update Stock</button>
+                <button class="btn" onclick="closeStockModal()">❌ Cancel</button>
+                <button class="btn btn-primary" onclick="updateStock()">💾 Update Stock</button>
             </div>
         </div>
     </div>
@@ -654,20 +856,18 @@
     <script>
         // API endpoints
         const API_ENDPOINTS = {
-            books: '../api/get_books.php',
-            bookDetail: '../api/get_book_detail.php',
-            categories: '../api/get_categories.php',
-            stock: '../api/get_stock_data.php',
-            saveBook: '../api/save_book.php',
-            deleteBook: '../api/delete_book.php',
-            updateStock: '../api/update_stock.php'
+            books: 'get_books.php',
+            bookDetail: 'get_book_detail.php',
+            categories: 'get_categories.php',
+            stock: 'get_stock_data.php',
+            saveBook: 'save_book.php',
+            deleteBook: 'delete_book.php',
+            updateStock: 'update_stock.php'
         };
 
-        // Current user info (you can get this from localStorage or session)
-        let currentUser = {
-            username: 'Admin',
-            role: 'admin'
-        };
+        // Current state
+        let currentBooks = [];
+        let currentCategories = [];
 
         // Navigation
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -686,19 +886,287 @@
                 document.getElementById(sectionId).classList.add('active');
                 
                 // Update page title
-                document.getElementById('sectionTitle').textContent = this.textContent.trim();
+                const sectionTitles = {
+                    'dashboard': 'Dashboard',
+                    'books': 'Book Management',
+                    'inventory': 'Inventory Management',
+                    'categories': 'Category Management',
+                    'analytics': 'Sales Analytics',
+                    'settings': 'System Settings'
+                };
+                document.getElementById('sectionTitle').textContent = sectionTitles[sectionId];
                 
                 // Load section data
                 loadSectionData(sectionId);
             });
         });
 
+        // Load section data
+        function loadSectionData(sectionId) {
+            switch(sectionId) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'books':
+                    loadBooksData();
+                    break;
+                case 'inventory':
+                    loadInventoryData();
+                    break;
+                case 'categories':
+                    loadCategoriesData();
+                    break;
+                case 'analytics':
+                    loadAnalyticsData();
+                    break;
+                case 'settings':
+                    loadSettingsData();
+                    break;
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const [booksResponse, categoriesResponse] = await Promise.all([
+                    fetch(API_ENDPOINTS.books),
+                    fetch(API_ENDPOINTS.categories)
+                ]);
+
+                const booksData = await booksResponse.json();
+                const categoriesData = await categoriesResponse.json();
+
+                if (booksData.success) {
+                    const books = booksData.books;
+                    document.getElementById('totalBooks').textContent = books.length;
+                    
+                    const lowStockCount = books.filter(book => book.stock_quantity <= 5 && book.stock_quantity > 0).length;
+                    const outOfStockCount = books.filter(book => book.stock_quantity === 0).length;
+                    
+                    document.getElementById('lowStockCount').textContent = lowStockCount;
+                    document.getElementById('outOfStock').textContent = outOfStockCount;
+                }
+
+                if (categoriesData.success) {
+                    document.getElementById('totalCategories').textContent = categoriesData.categories.length;
+                }
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Load books data
+        async function loadBooksData() {
+            try {
+                const response = await fetch(API_ENDPOINTS.books);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentBooks = data.books;
+                    displayBooks(currentBooks);
+                    loadCategoryFilter();
+                } else {
+                    document.getElementById('booksTable').innerHTML = '<tr><td colspan="8" class="error">Error loading books</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading books:', error);
+                document.getElementById('booksTable').innerHTML = '<tr><td colspan="8" class="error">Error loading books</td></tr>';
+            }
+        }
+
+        // Display books in table
+        function displayBooks(books) {
+            const booksTable = document.getElementById('booksTable');
+            
+            if (books.length === 0) {
+                booksTable.innerHTML = '<tr><td colspan="8" class="loading">No books found</td></tr>';
+                return;
+            }
+
+            booksTable.innerHTML = books.map(book => `
+                <tr>
+                    <td>${book.book_id}</td>
+                    <td><strong>${book.title}</strong></td>
+                    <td>${book.author}</td>
+                    <td>${book.category_name || 'N/A'}</td>
+                    <td>RM ${parseFloat(book.price).toFixed(2)}</td>
+                    <td>${book.stock_quantity}</td>
+                    <td>
+                        <span class="${getStockStatusClass(book.stock_quantity)}">
+                            ${getStockStatusText(book.stock_quantity)}
+                        </span>
+                    </td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-primary" onclick="openEditBookModal(${book.book_id})">✏️ Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteBook(${book.book_id})">🗑️ Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Get stock status class
+        function getStockStatusClass(stock) {
+            if (stock === 0) return 'low-stock';
+            if (stock <= 5) return 'low-stock';
+            return 'in-stock';
+        }
+
+        // Get stock status text
+        function getStockStatusText(stock) {
+            if (stock === 0) return 'Out of Stock';
+            if (stock <= 5) return 'Low Stock';
+            return 'In Stock';
+        }
+
+        // Load category filter
+        async function loadCategoryFilter() {
+            try {
+                const response = await fetch(API_ENDPOINTS.categories);
+                const data = await response.json();
+                
+                const categoryFilter = document.getElementById('categoryFilter');
+                categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+                
+                if (data.success) {
+                    currentCategories = data.categories;
+                    data.categories.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = category.name;
+                        categoryFilter.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Search books
+        function searchBooks() {
+            const searchTerm = document.getElementById('bookSearch').value.toLowerCase();
+            const filteredBooks = currentBooks.filter(book => 
+                book.title.toLowerCase().includes(searchTerm) ||
+                book.author.toLowerCase().includes(searchTerm) ||
+                (book.isbn && book.isbn.toLowerCase().includes(searchTerm))
+            );
+            displayBooks(filteredBooks);
+        }
+
+        // Filter books by category
+        function filterBooks() {
+            const categoryId = document.getElementById('categoryFilter').value;
+            if (categoryId === 'all') {
+                displayBooks(currentBooks);
+            } else {
+                const filteredBooks = currentBooks.filter(book => book.category_id == categoryId);
+                displayBooks(filteredBooks);
+            }
+        }
+
+        // Load inventory data
+        async function loadInventoryData() {
+            try {
+                const response = await fetch(API_ENDPOINTS.stock);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const books = data.books;
+                    updateInventoryStats(books);
+                    displayInventory(books);
+                }
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+            }
+        }
+
+        // Update inventory statistics
+        function updateInventoryStats(books) {
+            const inStockCount = books.filter(book => book.stock_quantity > 5).length;
+            const lowStockCount = books.filter(book => book.stock_quantity <= 5 && book.stock_quantity > 0).length;
+            const outOfStockCount = books.filter(book => book.stock_quantity === 0).length;
+            
+            document.getElementById('inStockCount').textContent = inStockCount;
+            document.getElementById('inventoryLowStock').textContent = lowStockCount;
+            document.getElementById('inventoryOutOfStock').textContent = outOfStockCount;
+        }
+
+        // Display inventory
+        function displayInventory(books) {
+            const inventoryTable = document.getElementById('inventoryTable');
+            
+            inventoryTable.innerHTML = books.map(book => `
+                <tr>
+                    <td>${book.book_id}</td>
+                    <td><strong>${book.title}</strong></td>
+                    <td>${book.stock_quantity}</td>
+                    <td>RM ${parseFloat(book.price).toFixed(2)}</td>
+                    <td>
+                        <span class="${getStockStatusClass(book.stock_quantity)}">
+                            ${getStockStatusText(book.stock_quantity)}
+                        </span>
+                    </td>
+                    <td>${book.updated_at || 'N/A'}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-primary" onclick="openStockModal(${book.book_id}, '${book.title.replace(/'/g, "\\'")}', ${book.stock_quantity})">
+                            📦 Update Stock
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Load low stock items
+        function loadLowStockItems() {
+            const lowStockBooks = currentBooks.filter(book => book.stock_quantity <= 5 && book.stock_quantity > 0);
+            displayInventory(lowStockBooks);
+            updateInventoryStats(lowStockBooks);
+        }
+
+        // Load out of stock items
+        function loadOutOfStockItems() {
+            const outOfStockBooks = currentBooks.filter(book => book.stock_quantity === 0);
+            displayInventory(outOfStockBooks);
+            updateInventoryStats(outOfStockBooks);
+        }
+
+        // Load categories data
+        async function loadCategoriesData() {
+            try {
+                const response = await fetch(API_ENDPOINTS.categories);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayCategories(data.categories);
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Display categories
+        function displayCategories(categories) {
+            const categoriesTable = document.getElementById('categoriesTable');
+            
+            categoriesTable.innerHTML = categories.map(category => `
+                <tr>
+                    <td>${category.id}</td>
+                    <td><strong>${category.name}</strong></td>
+                    <td>${currentBooks.filter(book => book.category_id == category.id).length}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-warning">✏️ Edit</button>
+                        <button class="btn btn-sm btn-danger">🗑️ Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
         // Modal functions
         function openAddBookModal() {
             document.getElementById('modalTitle').textContent = 'Add New Book';
             document.getElementById('bookForm').reset();
             document.getElementById('bookId').value = '';
-            loadCategories();
+            loadCategoriesForModal();
             document.getElementById('bookModal').style.display = 'flex';
         }
 
@@ -720,15 +1188,13 @@
                     document.getElementById('bookPublishDate').value = book.publish_date || '';
                     document.getElementById('bookDescription').value = book.description || '';
                     
-                    await loadCategories();
+                    await loadCategoriesForModal();
                     document.getElementById('bookCategory').value = book.category_id;
                     
                     document.getElementById('bookModal').style.display = 'flex';
-                } else {
-                    alert('Error loading book data: ' + data.error);
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error loading book:', error);
                 alert('Error loading book data');
             }
         }
@@ -748,8 +1214,8 @@
             document.getElementById('stockModal').style.display = 'none';
         }
 
-        // Load categories for dropdown
-        async function loadCategories() {
+        // Load categories for modal
+        async function loadCategoriesForModal() {
             try {
                 const response = await fetch(API_ENDPOINTS.categories);
                 const data = await response.json();
@@ -770,7 +1236,7 @@
             }
         }
 
-        // Save book function
+        // Save book
         async function saveBook() {
             const bookData = {
                 id: document.getElementById('bookId').value,
@@ -794,9 +1260,7 @@
             try {
                 const response = await fetch(API_ENDPOINTS.saveBook, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(bookData)
                 });
                 
@@ -815,7 +1279,7 @@
             }
         }
 
-        // Update stock function
+        // Update stock
         async function updateStock() {
             const stockData = {
                 book_id: document.getElementById('stockBookId').value,
@@ -825,9 +1289,7 @@
             try {
                 const response = await fetch(API_ENDPOINTS.updateStock, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(stockData)
                 });
                 
@@ -846,15 +1308,13 @@
             }
         }
 
-        // Delete book function
+        // Delete book
         async function deleteBook(bookId) {
             if (confirm('Are you sure you want to delete this book?')) {
                 try {
                     const response = await fetch(API_ENDPOINTS.deleteBook, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ id: bookId })
                     });
                     
@@ -873,183 +1333,28 @@
             }
         }
 
-        // Load section data
-        function loadSectionData(sectionId) {
-            switch(sectionId) {
-                case 'dashboard':
-                    loadDashboardData();
-                    break;
-                case 'books':
-                    loadBooksData();
-                    break;
-                case 'orders':
-                    loadOrdersData();
-                    break;
-                case 'analytics':
-                    loadAnalyticsData();
-                    break;
-                case 'inventory':
-                    loadInventoryData();
-                    break;
-            }
+        // Placeholder functions
+        function openAddCategoryModal() {
+            alert('Add category functionality will be implemented here');
         }
 
-        // Load dashboard data from API
-        async function loadDashboardData() {
-            try {
-                // Load books count
-                const booksResponse = await fetch(API_ENDPOINTS.books);
-                const booksData = await booksResponse.json();
-                
-                if (booksData.success) {
-                    document.getElementById('totalBooks').textContent = booksData.books.length;
-                    
-                    // Calculate low stock items
-                    const lowStockCount = booksData.books.filter(book => book.stock_quantity <= 5).length;
-                    document.getElementById('lowStock').textContent = lowStockCount;
-
-                    // Calculate total revenue (placeholder)
-                    const totalRevenue = booksData.books.reduce((sum, book) => sum + (book.price * 10), 0);
-                    document.getElementById('totalRevenue').textContent = 'RM ' + totalRevenue.toFixed(2);
-                }
-
-                // Load recent orders (placeholder)
-                document.getElementById('totalOrders').textContent = '25';
-                
-                document.getElementById('recentOrders').innerHTML = `
-                    <tr>
-                        <td>#ORD-001</td>
-                        <td>John Doe</td>
-                        <td>2024-01-15</td>
-                        <td>RM 125.50</td>
-                        <td>Completed</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary">View</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-002</td>
-                        <td>Jane Smith</td>
-                        <td>2024-01-14</td>
-                        <td>RM 89.99</td>
-                        <td>Processing</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary">View</button>
-                        </td>
-                    </tr>
-                `;
-
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-                document.getElementById('recentOrders').innerHTML = `
-                    <tr><td colspan="6" class="error">Error loading data</td></tr>
-                `;
-            }
-        }
-
-        // Load books data from API
-        async function loadBooksData() {
-            try {
-                const response = await fetch(API_ENDPOINTS.books);
-                const data = await response.json();
-                
-                const booksTable = document.getElementById('booksTable');
-                
-                if (data.success && data.books.length > 0) {
-                    booksTable.innerHTML = data.books.map(book => `
-                        <tr>
-                            <td>${book.book_id}</td>
-                            <td><strong>${book.title}</strong></td>
-                            <td>${book.author}</td>
-                            <td>${book.category_name || 'N/A'}</td>
-                            <td>RM ${parseFloat(book.price).toFixed(2)}</td>
-                            <td>${book.stock_quantity}</td>
-                            <td>
-                                <span class="${book.stock_quantity <= 5 ? 'low-stock-warning' : 'stock-ok'}">
-                                    ${book.stock_quantity <= 5 ? 'Low Stock' : 'In Stock'}
-                                </span>
-                            </td>
-                            <td class="action-buttons">
-                                <button class="btn btn-sm btn-primary" onclick="openEditBookModal(${book.book_id})">Edit</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteBook(${book.book_id})">Delete</button>
-                            </td>
-                        </tr>
-                    `).join('');
-                } else {
-                    booksTable.innerHTML = '<tr><td colspan="8" class="loading">No books found</td></tr>';
-                }
-            } catch (error) {
-                console.error('Error loading books:', error);
-                document.getElementById('booksTable').innerHTML = `
-                    <tr><td colspan="8" class="error">Error loading books</td></tr>
-                `;
-            }
-        }
-
-        // Load inventory data from API
-        async function loadInventoryData() {
-            try {
-                const response = await fetch(API_ENDPOINTS.stock);
-                const data = await response.json();
-                
-                const inventoryTable = document.getElementById('inventoryTable');
-                
-                if (data.success && data.books.length > 0) {
-                    inventoryTable.innerHTML = data.books.map(book => `
-                        <tr>
-                            <td>${book.book_id}</td>
-                            <td><strong>${book.title}</strong></td>
-                            <td>${book.stock_quantity}</td>
-                            <td>
-                                <span class="${book.stock_quantity <= 5 ? 'low-stock-warning' : 'stock-ok'}">
-                                    ${book.stock_quantity <= 5 ? 'LOW STOCK' : 'OK'}
-                                </span>
-                            </td>
-                            <td>${book.updated_at || 'N/A'}</td>
-                            <td class="action-buttons">
-                                <button class="btn btn-sm btn-primary" onclick="openStockModal(${book.book_id}, '${book.title}', ${book.stock_quantity})">
-                                    Update Stock
-                                </button>
-                            </td>
-                        </tr>
-                    `).join('');
-                } else {
-                    inventoryTable.innerHTML = '<tr><td colspan="6" class="loading">No inventory data available</td></tr>';
-                }
-            } catch (error) {
-                console.error('Error loading inventory:', error);
-                document.getElementById('inventoryTable').innerHTML = `
-                    <tr><td colspan="6" class="error">Error loading inventory data</td></tr>
-                `;
-            }
-        }
-
-        // Placeholder functions for other sections
-        async function loadOrdersData() {
-            document.getElementById('ordersTable').innerHTML = `
-                <tr><td colspan="7" class="loading">Orders functionality coming soon</td></tr>
-            `;
-        }
-
-        async function loadAnalyticsData() {
+        function loadAnalyticsData() {
             // Analytics functionality can be implemented later
         }
 
-        // Initialize user info
-        function initUserInfo() {
-            // Try to get user info from localStorage or URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const username = urlParams.get('username') || currentUser.username;
-            const role = urlParams.get('role') || currentUser.role;
-            
-            document.getElementById('adminWelcome').textContent = `Welcome, ${username} (${role})`;
+        function loadSettingsData() {
+            // Settings functionality can be implemented later
         }
 
-        // Initialize dashboard on load
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Admin panel loaded');
-            initUserInfo();
+            console.log('Admin panel initialized');
             loadDashboardData();
+            
+            // Set welcome message with current time
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('adminWelcome').textContent = `Welcome, Admin • ${timeString}`;
         });
 
         // Close modal when clicking outside
@@ -1057,12 +1362,8 @@
             const modal = document.getElementById('bookModal');
             const stockModal = document.getElementById('stockModal');
             
-            if (event.target === modal) {
-                closeModal();
-            }
-            if (event.target === stockModal) {
-                closeStockModal();
-            }
+            if (event.target === modal) closeModal();
+            if (event.target === stockModal) closeStockModal();
         }
     </script>
 </body>
