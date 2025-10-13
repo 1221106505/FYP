@@ -512,6 +512,87 @@
             localStorage.setItem(`userProfile_${username}`, JSON.stringify(userProfileData));
         }
 
+        // 检查登录状态并显示用户信息
+function loadUserProfile() {
+    console.log('Loading user profile...');
+    
+    fetch('check_login.php', {
+        credentials: 'include' // 重要：包含cookies
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Login check result:', data);
+        
+        const loginPrompt = document.getElementById('loginPrompt');
+        const userProfile = document.getElementById('userProfile');
+        
+        if (data.logged_in) {
+            console.log('User is logged in:', data.username);
+            // 显示用户信息
+            loginPrompt.classList.add('hidden');
+            userProfile.classList.remove('hidden');
+            
+            // 设置基本信息
+            document.getElementById('profileUsername').textContent = data.username;
+            document.getElementById('accountUsername').textContent = data.username;
+            document.getElementById('profileUserType').textContent = data.user_type;
+            document.getElementById('accountType').textContent = data.user_type;
+            
+            // 设置用户资料数据（从localStorage或使用默认值）
+            loadUserData(data.username);
+            
+            document.getElementById('loginTime').textContent = new Date().toLocaleString();
+        } else {
+            console.log('User is not logged in');
+            // 显示登录提示
+            loginPrompt.classList.remove('hidden');
+            userProfile.classList.add('hidden');
+            
+            // 检查URL参数，可能刚刚登录
+            checkURLParamsForLogin();
+        }
+    })
+    .catch(error => {
+        console.error('Error loading user profile:', error);
+        // 如果check_login失败，尝试使用URL参数
+        checkURLParamsForLogin();
+    });
+}
+
+        // 检查URL参数中的登录信息
+        function checkURLParamsForLogin() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const loginSuccess = urlParams.get('login_success');
+            const username = urlParams.get('username');
+            
+            if (loginSuccess === '1' && username) {
+                console.log('URL parameters indicate login success for:', username);
+                // 手动设置用户界面
+                const loginPrompt = document.getElementById('loginPrompt');
+                const userProfile = document.getElementById('userProfile');
+                
+                loginPrompt.classList.add('hidden');
+                userProfile.classList.remove('hidden');
+                
+                document.getElementById('profileUsername').textContent = username;
+                document.getElementById('accountUsername').textContent = username;
+                document.getElementById('profileUserType').textContent = 'User';
+                document.getElementById('accountType').textContent = 'User';
+                
+                loadUserData(username);
+                
+                // 清除URL参数
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+            }
+        }
+
         // 编辑字段
         function editField(field) {
             const currentValue = userProfileData[field === 'displayName' ? 'displayName' : 
