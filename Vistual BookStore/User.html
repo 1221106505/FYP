@@ -1,0 +1,26 @@
+<h2>Search Books</h2>
+<input type="text" id="searchBox" placeholder="Type book title..." onkeyup="searchBook()">
+<div id="bookList"></div>
+
+<script>
+let books = [];
+
+async function loadBooks() {
+  const res = await fetch("http://localhost:3000/books");
+  books = await res.json();
+  displayBooks(books);
+}
+
+function displayBooks(list){
+  const div = document.getElementById("bookList");
+  div.innerHTML = list.map(b=>`<p>${b.title} by ${b.author} - RM ${b.price}</p>`).join("");
+}
+
+function searchBook() {
+  const input = document.getElementById("searchBox").value.toLowerCase();
+  const filtered = books.filter(b => b.title.toLowerCase().includes(input));
+  displayBooks(filtered);
+}
+
+loadBooks();
+</script>

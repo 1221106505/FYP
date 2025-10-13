@@ -1,0 +1,22 @@
+<h2>Admin Dashboard - All Books</h2>
+<table border="1" id="bookTable">
+  <tr><th>ID</th><th>Title</th><th>Author</th><th>Price</th></tr>
+</table>
+
+<script>
+async function loadBooks() {
+  const res = await fetch("http://localhost:3000/books");
+  const books = await res.json();
+  const table = document.getElementById("bookTable");
+
+  books.forEach(b => {
+    const row = table.insertRow();
+    row.insertCell(0).innerText = b.id;
+    row.insertCell(1).innerText = b.title;
+    row.insertCell(2).innerText = b.author;
+    row.insertCell(3).innerText = b.price;
+  });
+}
+
+loadBooks();
+</script>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Book</title>
+  <link rel="stylesheet" href="Main.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Add New Book</h2>
+
+   <input type="text" id="title" placeholder="Book Title">
+<input type="text" id="author" placeholder="Author">
+<input type="number" id="price" placeholder="Price">
+<button onclick="addBook()">Add Book</button>
+<div id="bookList"></div>
+
+<script>
+async function loadBooks() {
+  const res = await fetch("http://localhost:3000/books");
+  const books = await res.json();
+  const list = document.getElementById("bookList");
+  list.innerHTML = books.map(b => `<p>${b.id}. ${b.title} by ${b.author} - RM ${b.price}</p>`).join("");
+}
+
+async function addBook() {
+  const title = document.getElementById("title").value;
+  const author = document.getElementById("author").value;
+  const price = document.getElementById("price").value;
+
+  await fetch("http://localhost:3000/books", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ title, author, price })
+  });
+
+  loadBooks(); // refresh the list
+}
+
+loadBooks(); // initial load
+</script>
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+body {
+  background-color: lightblue;
+  font-family: Arial, sans-serif;
+  width: 2000px;
+  height: 1000px;
+  margin: 0 auto;
+}
+
+.mainbackground{
+  background-image: url("MainBackground.png"); /* image path */
+  background-attachment: fixed;   /* 👈 makes it stay fixed */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;                 /* full screen height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+.content {
+  padding: 40px;
+  background-color: white;
+  color: black;
+}
+h1 {
+  padding : 23px;
+  width: 100%;
+  font-size: 40px;
+  color: red;
+  font-weight: bolder;
+  text-align: center;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0);
+  margin-top: 0;
+  padding-top: 0;
+  position: absolute;
+  top: 3px;
+  left: 0;
+
+}
+p {
+  font-size: 15px;
+  line-height: 1;
+  color: black;
+}
+button {
+  position: absolute;   /* allows custom positioning */
+      top: 13px;            /* distance from top */
+      right: 18px;          /* distance from right */
+      background-color:#0984e3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+}
+ button:hover {
+      background-color: #74b9ff;
+    }
+
+
+    
