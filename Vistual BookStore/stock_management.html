@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    
+    <title>BookStock Pro - Inventory Management</title>
+    
+    <style>
+        :root {
+            --primary: #6d28d9;
+            --primary-dark: #5b21b6;
+            --secondary: #f1f5f9;
+            --accent: #10b981;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Search Section */
+        .search-section {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background-color: white;
+            min-width: 180px;
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.primary {
+            background-color: rgba(109, 40, 217, 0.1);
+            color: var(--primary);
+        }
+
+        .stat-icon.success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .stat-icon.warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .stat-icon.danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Books Grid */
+        .books-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .books-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .view-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .view-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            background-color: var(--secondary);
+            color: var(--text-light);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .view-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .book-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .book-image {
+            height: 200px;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .book-placeholder {
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+
+        .stock-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .stock-badge.in-stock {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .stock-badge.low-stock {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .stock-badge.out-of-stock {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .book-info {
+            padding: 20px;
+        }
+
+        .book-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .book-author {
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .book-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .book-category {
+            background-color: var(--secondary);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: var(--text-light);
+        }
+
+        .book-price {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .book-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .book-actions button {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .edit-btn {
+            background-color: var(--secondary);
+            color: var(--text);
+        }
+
+        .edit-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        .delete-btn {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .delete-btn:hover {
+            background-color: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .books-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .search-controls {
+                flex-direction: column;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .books-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .books-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-book"></i>
+                <h1>BookStock Pro</h1>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="active"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="#"><i class="fas fa-book"></i> Books</a>
+                <a href="#"><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="#"><i class="fas fa-cog"></i> Settings</a>
+            </div>
+            <div class="user-actions">
+                <button class="btn btn-outline"><i class="fas fa-sync-alt"></i> Sync Data</button>
+                <button class="btn btn-primary" id="addBookBtn"><i class="fas fa-plus"></i> Add Book</button>
+            </div>
+        </header>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-header">
+                <h2>Book Inventory</h2>
+                <div class="search-controls">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search by title, author, or ISBN...">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                    <select class="filter-select" id="categoryFilter">
+                        <option value="all">All Categories</option>
+                        <option value="fiction">Fiction</option>
+                        <option value="non-fiction">Non-Fiction</option>
+                        <option value="science">Science</option>
+                        <option value="technology">Technology</option>
+                        <option value="business">Business</option>
+                    </select>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="all">All Status</option>
+                        <option value="in-stock">In Stock</option>
+                        <option value="low-stock">Low Stock</option>
+                        <option value="out-of-stock">Out of Stock</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Cards -->
+        <section class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalBooks">0</h3>
+                    <p>Total Books</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="inStock">0</h3>
+                    <p>In Stock</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="lowStock">0</h3>
+                    <p>Low Stock</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon danger">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="outOfStock">0</h3>
+                    <p>Out of Stock</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Books Grid -->
+        <section class="books-section">
+            <div class="books-header">
+                <h2>Book Collection</h2>
+                <div class="view-options">
+                    <button class="view-btn active" id="gridView"><i class="fas fa-th"></i></button>
+                    <button class="view-btn" id="listView"><i class="fas fa-list"></i></button>
+                </div>
+            </div>
+            <div class="books-grid" id="booksContainer">
+                <!-- Books will be dynamically loaded here -->
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>BookStock Pro &copy; 2023 - Modern Inventory Management System</p>
+        </footer>
+    </div>
+
+    <script>
+        // Sample book data
+        const books = [
+            {
+                id: 1,
+                title: "The Great Gatsby",
+                author: "F. Scott Fitzgerald",
+                category: "fiction",
+                price: 12.99,
+                stock: 15,
+                image: ""
+            },
+            {
+                id: 2,
+                title: "To Kill a Mockingbird",
+                author: "Harper Lee",
+                category: "fiction",
+                price: 10.50,
+                stock: 5,
+                image: ""
+            },
+            {
+                id: 3,
+                title: "1984",
+                author: "George Orwell",
+                category: "fiction",
+                price: 9.99,
+                stock: 0,
+                image: ""
+            },
+            {
+                id: 4,
+                title: "Pride and Prejudice",
+                author: "Jane Austen",
+                category: "fiction",
+                price: 8.75,
+                stock: 20,
+                image: ""
+            },
+            {
+                id: 5,
+                title: "The Hobbit",
+                author: "J.R.R. Tolkien",
+                category: "fantasy",
+                price: 14.25,
+                stock: 8,
+                image: ""
+            },
+            {
+                id: 6,
+                title: "Sapiens: A Brief History of Humankind",
+                author: "Yuval Noah Harari",
+                category: "non-fiction",
+                price: 18.99,
+                stock: 12,
+                image: ""
+            },
+            {
+                id: 7,
+                title: "Educated: A Memoir",
+                author: "Tara Westover",
+                category: "non-fiction",
+                price: 13.50,
+                stock: 3,
+                image: ""
+            },
+            {
+                id: 8,
+                title: "Dune",
+                author: "Frank Herbert",
+                category: "science fiction",
+                price: 11.99,
+                stock: 25,
+                image: ""
+            }
+        ];
+
+        // DOM Elements
+        const booksContainer = document.getElementById('booksContainer');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const totalBooksEl = document.getElementById('totalBooks');
+        const inStockEl = document.getElementById('inStock');
+        const lowStockEl = document.getElementById('lowStock');
+        const outOfStockEl = document.getElementById('outOfStock');
+        const gridViewBtn = document.getElementById('gridView');
+        const listViewBtn = document.getElementById('listView');
+        const addBookBtn = document.getElementById('addBookBtn');
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderBooks(books);
+            updateStatistics(books);
+            setupEventListeners();
+        });
+
+        // Render books to the page
+        function renderBooks(booksToRender) {
+            booksContainer.innerHTML = '';
+            
+            if (booksToRender.length === 0) {
+                booksContainer.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-light);">
+                        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <h3>No books found</h3>
+                        <p>Try adjusting your search or filter criteria</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            booksToRender.forEach(book => {
+                const bookCard = createBookCard(book);
+                booksContainer.appendChild(bookCard);
+            });
+        }
+
+        // Create a book card element
+        function createBookCard(book) {
+            const card = document.createElement('div');
+            card.className = 'book-card';
+            
+            let stockStatus, stockClass;
+            if (book.stock === 0) {
+                stockStatus = 'Out of Stock';
+                stockClass = 'out-of-stock';
+            } else if (book.stock < 10) {
+                stockStatus = 'Low Stock';
+                stockClass = 'low-stock';
+            } else {
+                stockStatus = 'In Stock';
+                stockClass = 'in-stock';
+            }
+            
+            card.innerHTML = `
+                <div class="book-image">
+                    ${book.image ? 
+                        `<img src="${book.image}" alt="${book.title}">` : 
+                        `<div class="book-placeholder"><i class="fas fa-book"></i></div>`
+                    }
+                    <span class="stock-badge ${stockClass}">${stockStatus}</span>
+                </div>
+                <div class="book-info">
+                    <h3 class="book-title">${book.title}</h3>
+                    <p class="book-author">${book.author}</p>
+                    <div class="book-meta">
+                        <span class="book-category">${book.category}</span>
+                        <span class="book-price">$${book.price.toFixed(2)}</span>
+                    </div>
+                    <div class="book-actions">
+                        <button class="edit-btn" onclick="editBook(${book.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="delete-btn" onclick="deleteBook(${book.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Update statistics
+        function updateStatistics(booksData) {
+            const totalBooks = booksData.length;
+            const inStock = booksData.filter(book => book.stock >= 10).length;
+            const lowStock = booksData.filter(book => book.stock > 0 && book.stock < 10).length;
+            const outOfStock = booksData.filter(book => book.stock === 0).length;
+            
+            totalBooksEl.textContent = totalBooks;
+            inStockEl.textContent = inStock;
+            lowStockEl.textContent = lowStock;
+            outOfStockEl.textContent = outOfStock;
+        }
+
+        // Filter books based on search and filters
+        function filterBooks() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const category = categoryFilter.value;
+            const status = statusFilter.value;
+            
+            const filteredBooks = books.filter(book => {
+                const matchesSearch = book.title.toLowerCase().includes(searchTerm) || 
+                                     book.author.toLowerCase().includes(searchTerm);
+                
+                const matchesCategory = category === 'all' || book.category === category;
+                
+                let matchesStatus = true;
+                if (status !== 'all') {
+                    if (status === 'in-stock') matchesStatus = book.stock >= 10;
+                    else if (status === 'low-stock') matchesStatus = book.stock > 0 && book.stock < 10;
+                    else if (status === 'out-of-stock') matchesStatus = book.stock === 0;
+                }
+                
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+            
+            renderBooks(filteredBooks);
+            updateStatistics(filteredBooks);
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            searchInput.addEventListener('input', filterBooks);
+            categoryFilter.addEventListener('change', filterBooks);
+            statusFilter.addEventListener('change', filterBooks);
+            
+            gridViewBtn.addEventListener('click', function() {
+                gridViewBtn.classList.add('active');
+                listViewBtn.classList.remove('active');
+                booksContainer.className = 'books-grid';
+            });
+            
+            listViewBtn.addEventListener('click', function() {
+                listViewBtn.classList.add('active');
+                gridViewBtn.classList.remove('active');
+                booksContainer.className = 'books-list';
+            });
+            
+            addBookBtn.addEventListener('click', function() {
+                alert('Add Book functionality would open a modal here');
+                // In a real application, this would open a modal to add a new book
+            });
+        }
+
+        // Book actions (placeholder functions)
+        function editBook(bookId) {
+            alert(`Edit book with ID: ${bookId}`);
+            // In a real application, this would open an edit modal
+        }
+
+        function deleteBook(bookId) {
+            if (confirm('Are you sure you want to delete this book?')) {
+                alert(`Book with ID: ${bookId} would be deleted`);
+                // In a real application, this would remove the book from the database
+            }
+        }
+    </script>
+</body>
+</html>

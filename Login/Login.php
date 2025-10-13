@@ -39,7 +39,7 @@ if ($admin_stmt->rowCount() > 0) {
         error_log("Session data set: " . print_r($_SESSION, true));
         
         // 重定向到Main.html
-        header("Location: ../Vistual BookStore/Main.html?login_success=1&username=" . urlencode($user['username']));
+        header("Location: ../Vistual BookStore/Admin_panel.html?login_success=1&username=" . urlencode($user['username']));
         exit();
     }
 }
@@ -63,7 +63,7 @@ if ($customer_stmt->rowCount() > 0) {
         error_log("Session data set: " . print_r($_SESSION, true));
         
         // 重定向到Main.html
-        header("Location: ../Vistual BookStore/Main.html?login_success=1&username=" . urlencode($user['username']));
+        header("Location: ../Vistual BookStore/customer_view.html?login_success=1&username=" . urlencode($user['username']));
         exit();
     }
 }
