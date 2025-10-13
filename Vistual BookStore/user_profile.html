@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .profile-container {
+            max-width: 700px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f1f3f4;
+            padding-bottom: 20px;
+        }
+        .avatar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .avatar:hover {
+            transform: scale(1.05);
+        }
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .avatar-edit {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px;
+            text-align: center;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .avatar:hover .avatar-edit {
+            opacity: 1;
+        }
+        .avatar-options {
+            display: none;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .avatar-option {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .avatar-option:hover {
+            border-color: #6a11cb;
+            transform: scale(1.1);
+        }
+        .avatar-option.selected {
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 2px #6a11cb;
+        }
+        .avatar-upload-btn {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        .avatar-upload-btn:hover {
+            background: #2575fc;
+            transform: translateY(-2px);
+        }
+        #avatarUpload {
+            display: none;
+        }
+        .user-basic-info {
+            text-align: center;
+        }
+        .user-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .user-type {
+            font-size: 16px;
+            color: #666;
+            background: #f8f9fa;
+            padding: 4px 12px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+        .user-info {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        .info-section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .info-item {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #6a11cb;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            color: #666;
+        }
+        .edit-btn {
+            background: none;
+            border: 1px solid #6a11cb;
+            color: #6a11cb;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+        .edit-btn:hover {
+            background: #6a11cb;
+            color: white;
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 8px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-feature {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        .btn-logout {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .hidden {
+            display: none;
+        }
+        .login-prompt {
+            text-align: center;
+            padding: 40px;
+        }
+        .feature-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .emoji-options {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        .emoji-option {
+            font-size: 24px;
+            padding: 10px;
+            border: 2px solid transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        .emoji-option:hover {
+            border-color: #6a11cb;
+            transform: scale(1.2);
+        }
+        .emoji-option.selected {
+            border-color: #6a11cb;
+            background: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div id="profileContent">
+            <div class="login-prompt" id="loginPrompt">
+                <h2>Please Login</h2>
+                <p>You need to be logged in to view your profile.</p>
+                <a href="../Login/Login.html" class="btn btn-primary">Go to Login</a>
+            </div>
+            
+            <div id="userProfile" class="hidden">
+                <div class="profile-header">
+                    <div class="avatar-container">
+                        <div class="avatar" id="userAvatar" onclick="toggleAvatarOptions()">
+                            <div id="avatarContent">👤</div>
+                            <div class="avatar-edit">Click to Change</div>
+                        </div>
+                        
+                        <div class="avatar-options" id="avatarOptions">
+                            <h4>Choose Avatar Type:</h4>
+                            
+                            <div class="emoji-options">
+                                <div class="emoji-option" onclick="selectEmojiAvatar('👤')">👤</div>
+                                <div class="emoji-option" onclick="selectEmojiAvatar('😊')">😊</div>
+                                <div class="emoji-option" onclick="selectEmojiAvatar('🎨')">🎨</div>
+                                <div class="emoji-option" onclick="selectEmojiAvatar('📚')">📚</div>
+                                <div class="emoji-option" onclick="selectEmojiAvatar('🌟')">🌟</div>
+                                <div class="emoji-option" onclick="selectEmojiAvatar('🦄')">🦄</div>
+                            </div>
+                            
+                            <div style="margin: 15px 0;">
+                                <strong>OR</strong>
+                            </div>
+                            
+                            <button class="avatar-upload-btn" onclick="document.getElementById('avatarUpload').click()">
+                                📁 Upload Photo
+                            </button>
+                            <input type="file" id="avatarUpload" accept="image/*" onchange="handleImageUpload(event)">
+                            
+                            <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                                Supported: JPG, PNG, GIF (Max 2MB)
+                            </div>
+                        </div>
+                        
+                        <div class="user-basic-info">
+                            <div class="user-name" id="profileUsername"></div>
+                            <div class="user-type" id="profileUserType"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="user-info">
+                    <div class="info-section">
+                        <div class="section-title">Personal Information</div>
+                        <div class="info-item">
+                            <span class="info-label">Display Name</span>
+                            <span class="info-value" id="displayName"></span>
+                            <button class="edit-btn" onclick="editField('displayName')">Edit</button>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email Address</span>
+                            <span class="info-value" id="userEmail"></span>
+                            <button class="edit-btn" onclick="editField('userEmail')">Edit</button>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Shipping Address</span>
+                            <span class="info-value" id="userAddress"></span>
+                            <button class="edit-btn" onclick="editField('userAddress')">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <div class="section-title">Account Information</div>
+                        <div class="info-item">
+                            <span class="info-label">Username</span>
+                            <span class="info-value" id="accountUsername"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Account Type</span>
+                            <span class="info-value" id="accountType"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Member Since</span>
+                            <span class="info-value" id="memberSince"></span>
+                        </div>
+                    </div>
+
+                    <div class="feature-buttons">
+                        <a href="shopping_cart.html" class="btn btn-feature">
+                            🛒 View Shopping Cart
+                        </a>
+                        <a href="order_history.html" class="btn btn-feature">
+                            📋 View Order History
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <a href="Main.html" class="btn btn-primary">Back to Main</a>
+                    <a href="logout.php" class="btn btn-logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 用户数据（在实际应用中应从服务器获取）
+        let userProfileData = {
+            displayName: '',
+            email: '',
+            address: '',
+            memberSince: '2024-01-01',
+            avatarType: 'emoji', // 'emoji' or 'image'
+            avatarValue: '👤',
+            avatarImage: null
+        };
+
+        // 检查登录状态并显示用户信息
+        function loadUserProfile() {
+            fetch('check_login.php')
+                .then(response => response.json())
+                .then(data => {
+                    const loginPrompt = document.getElementById('loginPrompt');
+                    const userProfile = document.getElementById('userProfile');
+                    
+                    if (data.logged_in) {
+                        // 显示用户信息
+                        loginPrompt.classList.add('hidden');
+                        userProfile.classList.remove('hidden');
+                        
+                        // 设置基本信息
+                        document.getElementById('profileUsername').textContent = data.username;
+                        document.getElementById('accountUsername').textContent = data.username;
+                        document.getElementById('profileUserType').textContent = data.user_type;
+                        document.getElementById('accountType').textContent = data.user_type;
+                        
+                        // 设置用户资料数据（从localStorage或使用默认值）
+                        loadUserData(data.username);
+                        
+                        document.getElementById('loginTime').textContent = new Date().toLocaleString();
+                    } else {
+                        // 显示登录提示
+                        loginPrompt.classList.remove('hidden');
+                        userProfile.classList.add('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading user profile:', error);
+                    document.getElementById('loginPrompt').classList.remove('hidden');
+                });
+        }
+
+        // 加载用户数据
+        function loadUserData(username) {
+            const savedData = localStorage.getItem(`userProfile_${username}`);
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                userProfileData = { ...userProfileData, ...parsedData };
+            }
+            
+            // 设置默认显示名称（如果没有设置过）
+            if (!userProfileData.displayName) {
+                userProfileData.displayName = username;
+            }
+            if (!userProfileData.email) {
+                userProfileData.email = `${username}@bookstore.com`;
+            }
+            if (!userProfileData.address) {
+                userProfileData.address = 'No address provided';
+            }
+            
+            updateProfileDisplay();
+            updateAvatarDisplay();
+        }
+
+        // 更新资料显示
+        function updateProfileDisplay() {
+            document.getElementById('displayName').textContent = userProfileData.displayName;
+            document.getElementById('userEmail').textContent = userProfileData.email;
+            document.getElementById('userAddress').textContent = userProfileData.address;
+            document.getElementById('memberSince').textContent = userProfileData.memberSince;
+        }
+
+        // 更新头像显示
+        function updateAvatarDisplay() {
+            const avatarContent = document.getElementById('avatarContent');
+            const avatar = document.getElementById('userAvatar');
+            
+            if (userProfileData.avatarType === 'image' && userProfileData.avatarImage) {
+                avatarContent.innerHTML = `<img src="${userProfileData.avatarImage}" class="avatar-img" alt="User Avatar">`;
+            } else {
+                avatarContent.textContent = userProfileData.avatarValue;
+                // 设置头像背景颜色
+                const colors = ['#6a11cb', '#2575fc', '#28a745', '#dc3545', '#fd7e14', '#6f42c1'];
+                const color = colors[userProfileData.avatarValue.charCodeAt(0) % colors.length];
+                avatar.style.background = `linear-gradient(135deg, ${color} 0%, ${color}99 100%)`;
+            }
+        }
+
+        // 切换头像选项显示
+        function toggleAvatarOptions() {
+            const options = document.getElementById('avatarOptions');
+            options.style.display = options.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // 选择emoji头像
+        function selectEmojiAvatar(emoji) {
+            userProfileData.avatarType = 'emoji';
+            userProfileData.avatarValue = emoji;
+            userProfileData.avatarImage = null;
+            
+            updateAvatarDisplay();
+            saveUserData();
+            toggleAvatarOptions();
+            
+            // 更新选中状态
+            document.querySelectorAll('.emoji-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        // 处理图片上传
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // 检查文件大小（2MB限制）
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('File size must be less than 2MB');
+                    return;
+                }
+                
+                // 检查文件类型
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file (JPG, PNG, GIF)');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    userProfileData.avatarType = 'image';
+                    userProfileData.avatarImage = e.target.result;
+                    userProfileData.avatarValue = '';
+                    
+                    updateAvatarDisplay();
+                    saveUserData();
+                    toggleAvatarOptions();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 保存用户数据
+        function saveUserData() {
+            const username = document.getElementById('accountUsername').textContent;
+            localStorage.setItem(`userProfile_${username}`, JSON.stringify(userProfileData));
+        }
+
+        // 编辑字段
+        function editField(field) {
+            const currentValue = userProfileData[field === 'displayName' ? 'displayName' : 
+                                              field === 'userEmail' ? 'email' : 'address'];
+            
+            const newValue = prompt(`Enter new ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}:`, currentValue);
+            if (newValue !== null && newValue.trim() !== '') {
+                if (field === 'displayName') {
+                    userProfileData.displayName = newValue;
+                } else if (field === 'userEmail') {
+                    userProfileData.email = newValue;
+                } else if (field === 'userAddress') {
+                    userProfileData.address = newValue;
+                }
+                
+                saveUserData();
+                updateProfileDisplay();
+            }
+        }
+
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', loadUserProfile);
+    </script>
+</body>
+</html>

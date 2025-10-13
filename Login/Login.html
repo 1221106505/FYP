@@ -1,50 +1,344 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Login & Register</title>
-  <link rel="stylesheet" href="Login.css">
+    <meta charset="UTF-8">
+    
+    <title>User Login & Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+        }
+        
+        .form-container {
+            padding: 40px;
+        }
+        
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus {
+            border-color: #2575fc;
+            outline: none;
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .switch-form {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .switch-form a {
+            color: #2575fc;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .switch-form a:hover {
+            text-decoration: underline;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .back-button {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #2575fc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-button:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-
-<div class="container">
-  <!-- Error Box -->
-  <div id="errorBox" class="error" role="alert"></div>
-
-  <!-- Login Form -->
-  <div id="loginForm">
-    <h2>Login</h2>
-    <div class="field">
-      <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
+    <div class="container">
+        <div class="form-container">
+            <!-- Login Form -->
+            <div id="login-form">
+                <h2>User Login</h2>
+                <div id="login-message" class="message hidden"></div>
+                <form id="loginForm" action="Login.php" method="POST">
+                    <div class="form-group">
+                        <label for="login-username">Username</label>
+                        <input type="text" id="login-username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <div class="password-container">
+                            <input type="password" id="login-password" name="password" required>
+                            <button type="button" class="toggle-password" id="toggle-login-password">👁️</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                </form>
+                <div class="switch-form">
+                    Don't have an account? <a id="show-register">Register Now</a>
+                </div>
+                <a href="../Main.html" class="back-button">← Back to Main Page</a>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="register-form" class="hidden">
+                <h2>User Registration</h2>
+                <div id="register-message" class="message hidden"></div>
+                <form id="registerForm" action="Register.php" method="POST">
+                    <div class="form-group">
+                        <label for="register-username">Username</label>
+                        <input type="text" id="register-username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <div class="password-container">
+                            <input type="password" id="register-password" name="password" required>
+                            <button type="button" class="toggle-password" id="toggle-register-password">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password">Confirm Password</label>
+                        <div class="password-container">
+                            <input type="password" id="register-confirm-password" name="confirm_password" required>
+                            <button type="button" class="toggle-password" id="toggle-confirm-password">👁️</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Register</button>
+                </form>
+                <div class="switch-form">
+                    Already have an account? <a id="show-login">Login Now</a>
+                </div>
+                <a href="../Main.html" class="back-button">← Back to Main Page</a>
+            </div>
+        </div>
     </div>
-    <div class="field">
-      <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
-      <button class="pwd-toggle" type="button" onclick="togglePassword('loginPass', this)">👁️</button>
-    </div>
-    <button class="primary" onclick="login()">Login</button>
-    <button class="back-btn" onclick="backToMain()">Back to Main</button>
-    <p class="toggle" onclick="showRegister()">Don't have an account? Register</p>
-  </div>
 
-  <!-- Register Form -->
-  <div id="registerForm" class="hidden">
-    <h2>Register</h2>
-    <div class="field">
-      <input type="text" id="regUser" placeholder="Username" autocomplete="username">
-    </div>
-    <div class="field">
-      <input type="password" id="regPass" placeholder="Password" autocomplete="new-password">
-      <button class="pwd-toggle" type="button" onclick="togglePassword('regPass', this)">👁️</button>
-    </div>
-    <select id="regIdentity" aria-label="Select identity">
-      <option value="user">User</option>
-    </select>
-    <button class="primary" onclick="register()">Register</button>
-    <button class="back-btn" onclick="backToMain()">Back to Main</button>
-    <p class="toggle" onclick="showLogin()">Already have an account? Login</p>
-  </div>
-</div>
+    <script>
+        // Toggle password visibility
+        document.getElementById('toggle-login-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('login-password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🔒';
+        });
+        
+        document.getElementById('toggle-register-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('register-password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🔒';
+        });
+        
+        document.getElementById('toggle-confirm-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('register-confirm-password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🔒';
+        });
+        
+        // Switch between login and register forms
+        document.getElementById('show-register').addEventListener('click', function() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+            clearMessages();
+        });
+        
+        document.getElementById('show-login').addEventListener('click', function() {
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+            clearMessages();
+        });
+        
+        // Login form validation
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!username || !password) {
+                e.preventDefault();
+                showMessage('login-message', 'Please fill in all fields', 'error');
+                return;
+            }
+        });
+        
+        // Register form validation
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            if (!username || !password || !confirmPassword) {
+                e.preventDefault();
+                showMessage('register-message', 'Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                showMessage('register-message', 'Passwords do not match', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                e.preventDefault();
+                showMessage('register-message', 'Password must be at least 6 characters', 'error');
+                return;
+            }
+        });
+        
+        // Show message
+        function showMessage(elementId, message, type) {
+            const messageElement = document.getElementById(elementId);
+            messageElement.textContent = message;
+            messageElement.className = `message ${type}`;
+            messageElement.classList.remove('hidden');
+        }
+        
+        // Clear messages
+        function clearMessages() {
+            document.getElementById('login-message').classList.add('hidden');
+            document.getElementById('register-message').classList.add('hidden');
+        }
 
-<script src="Login.js"></script>
+        // Check for URL parameters to show messages
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const loginError = urlParams.get('login_error');
+            const registerError = urlParams.get('register_error');
+            const registerSuccess = urlParams.get('register_success');
+            
+            if (loginError) {
+                showMessage('login-message', loginError, 'error');
+            }
+            if (registerError) {
+                showMessage('register-message', registerError, 'error');
+            }
+            if (registerSuccess) {
+                showMessage('register-message', registerSuccess, 'success');
+            }
+        });
+        window.addEventListener('load', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const loginError = urlParams.get('login_error');
+    const registerError = urlParams.get('register_error');
+    const registerSuccess = urlParams.get('register_success');
+    
+    if (loginError) {
+        showMessage('login-message', loginError, 'error');
+    }
+    if (registerError) {
+        // 如果注册失败，显示注册表单并显示错误
+        document.getElementById('login-form').classList.add('hidden');
+        document.getElementById('register-form').classList.remove('hidden');
+        showMessage('register-message', registerError, 'error');
+    }
+    if (registerSuccess) {
+        // 如果注册成功，显示登录表单并显示成功消息
+        document.getElementById('register-form').classList.add('hidden');
+        document.getElementById('login-form').classList.remove('hidden');
+        showMessage('login-message', registerSuccess, 'success');
+    }
+});
+    </script>
 </body>
 </html>
