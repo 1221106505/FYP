@@ -22,7 +22,7 @@ if ($conn->connect_error) {
     exit();
 }
 
-// Get all books with category information
+// Get all books with category information, rating, and sales data
 $sql = "SELECT b.*, c.category_name 
         FROM books b 
         LEFT JOIN categories c ON b.category_id = c.category_id 

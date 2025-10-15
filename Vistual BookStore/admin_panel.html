@@ -614,42 +614,43 @@
             </section>
 
             <!-- Book Management Section -->
-            <section id="books" class="content-section">
-                <div class="section-header">
-                    <h2>📚 Book Management</h2>
-                    <button class="btn btn-primary" onclick="openAddBookModal()">
-                        <i>➕</i> Add New Book
-                    </button>
-                </div>
+<section id="books" class="content-section">
+    <div class="section-header">
+        <h2>📚 Book Management</h2>
+        <button class="btn btn-primary" onclick="openAddBookModal()">
+            <i>➕</i> Add New Book
+        </button>
+    </div>
 
-                <div class="search-box">
-                    <input type="text" id="bookSearch" class="search-input" placeholder="🔍 Search books by title, author, or ISBN..." onkeyup="searchBooks()">
-                    <select id="categoryFilter" class="form-control" style="width: 200px;" onchange="filterBooks()">
-                        <option value="all">All Categories</option>
-                    </select>
-                </div>
+    <div class="search-box">
+        <input type="text" id="bookSearch" class="search-input" placeholder="🔍 Search books by title, author, or ISBN..." onkeyup="searchBooks()">
+        <select id="categoryFilter" class="form-control" style="width: 200px;" onchange="filterBooks()">
+            <option value="all">All Categories</option>
+        </select>
+    </div>
 
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Title</th>
-                                <th>Author</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Stock</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="booksTable">
-                            <tr><td colspan="8" class="loading">Loading books data...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Rating</th>
+                    <th>Total Sales</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="booksTable">
+                <tr><td colspan="10" class="loading">Loading books data...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
             <!-- Inventory Section -->
             <section id="inventory" class="content-section">
                 <div class="section-header">
@@ -996,35 +997,42 @@
             }
         }
 
-        // Display books in table
-        function displayBooks(books) {
-            const booksTable = document.getElementById('booksTable');
-            
-            if (books.length === 0) {
-                booksTable.innerHTML = '<tr><td colspan="8" class="loading">No books found</td></tr>';
-                return;
-            }
+        // 在displayBooks函数中添加销量信息显示
+function displayBooks(books) {
+    const booksTable = document.getElementById('booksTable');
+    
+    if (books.length === 0) {
+        booksTable.innerHTML = '<tr><td colspan="10" class="loading">No books found</td></tr>';
+        return;
+    }
 
-            booksTable.innerHTML = books.map(book => `
-                <tr>
-                    <td>${book.book_id}</td>
-                    <td><strong>${book.title}</strong></td>
-                    <td>${book.author}</td>
-                    <td>${book.category_name || 'N/A'}</td>
-                    <td>RM ${parseFloat(book.price).toFixed(2)}</td>
-                    <td>${book.stock_quantity}</td>
-                    <td>
-                        <span class="${getStockStatusClass(book.stock_quantity)}">
-                            ${getStockStatusText(book.stock_quantity)}
-                        </span>
-                    </td>
-                    <td class="action-buttons">
-                        <button class="btn btn-sm btn-primary" onclick="openEditBookModal(${book.book_id})">✏️ Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteBook(${book.book_id})">🗑️ Delete</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+    booksTable.innerHTML = books.map(book => `
+        <tr>
+            <td>${book.book_id}</td>
+            <td><strong>${book.title}</strong></td>
+            <td>${book.author}</td>
+            <td>${book.category_name || 'N/A'}</td>
+            <td>RM ${parseFloat(book.price).toFixed(2)}</td>
+            <td>${book.stock_quantity}</td>
+            <td>
+                <span class="${getStockStatusClass(book.stock_quantity)}">
+                    ${getStockStatusText(book.stock_quantity)}
+                </span>
+            </td>
+            <td>${book.rating || '0.0'}</td>
+            <td>${book.total_sales || '0'}</td>
+            <td class="action-buttons">
+                <button class="btn btn-sm btn-primary" onclick="openEditBookModal(${book.book_id})">✏️ Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteBook(${book.book_id})">🗑️ Delete</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// 更新表格表头以包含销量信息
+// 在Book Management Section中更新表头：
+// <th>Rating</th>
+// <th>Total Sales</th>
 
         // Get stock status class
         function getStockStatusClass(stock) {
@@ -1388,9 +1396,39 @@
             alert('Add category functionality will be implemented here');
         }
 
-        function loadAnalyticsData() {
-            // Analytics functionality can be implemented later
+        // 添加获取销量分析数据的函数
+async function loadAnalyticsData() {
+    try {
+        const response = await fetch(API_ENDPOINTS.books);
+        const data = await response.json();
+        
+        if (data.success) {
+            const books = data.books || data.data || [];
+            updateAnalyticsCharts(books);
         }
+    } catch (error) {
+        console.error('Error loading analytics data:', error);
+    }
+}
+
+// 更新分析图表
+function updateAnalyticsCharts(books) {
+    // 按销量排序
+    const topSellers = [...books].sort((a, b) => (b.total_sales || 0) - (a.total_sales || 0)).slice(0, 10);
+    
+    // 按分类统计销量
+    const categorySales = {};
+    books.forEach(book => {
+        const category = book.category_name || 'Uncategorized';
+        categorySales[category] = (categorySales[category] || 0) + (book.total_sales || 0);
+    });
+    
+    console.log('Top Selling Books:', topSellers);
+    console.log('Sales by Category:', categorySales);
+    
+    // 这里可以集成图表库如Chart.js来显示数据
+    // 目前先用控制台输出验证数据
+}
 
         function loadSettingsData() {
             // Settings functionality can be implemented later

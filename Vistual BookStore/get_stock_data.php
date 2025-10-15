@@ -8,7 +8,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 $host = 'localhost';
 $username = 'root';
 $password = '';
-$database = 'Bookstore'; // 更新为 Bookstore
+$database = 'Bookstore';
 
 // Create connection
 $conn = new mysqli($host, $username, $password, $database);
@@ -22,7 +22,7 @@ if ($conn->connect_error) {
     exit();
 }
 
-// Get all books with stock information
+// Get all books with stock information, rating, and sales data
 $sql = "SELECT b.*, c.category_name 
         FROM books b 
         LEFT JOIN categories c ON b.category_id = c.category_id 

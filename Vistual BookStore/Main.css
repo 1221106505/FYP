@@ -29,7 +29,7 @@ body {
   position: relative;
 }
 
-h1 {
+.mainbackground h1 {
   padding: 23px;
   width: 100%;
   font-size: 4em;
@@ -61,6 +61,14 @@ h1 {
   color: #2c3e50;
   font-size: 2.5em;
   margin-bottom: 10px;
+}
+
+.content-body p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 /* 功能网格 */
@@ -99,6 +107,7 @@ h1 {
 .feature-card p {
   color: #666;
   line-height: 1.6;
+  text-align: center;
 }
 
 /* 服务区域 */
@@ -157,9 +166,12 @@ h1 {
 .service-item p {
   opacity: 0.9;
   line-height: 1.6;
+  color: white;
 }
 
-/* 畅销书区域 - 修复部分 */
+/* 保持所有原有样式不变，只修改畅销书部分 */
+
+/* 畅销书区域 */
 .bestsellers {
   padding: 60px 20px;
   background: white;
@@ -174,39 +186,48 @@ h1 {
 
 .books-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 25px;
-  max-width: 1000px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 .book-card {
   background: #f8f9fa;
-  padding: 20px;
+  padding: 25px 20px;
   border-radius: 12px;
   text-align: center;
   transition: all 0.3s ease;
   border: 1px solid #e9ecef;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: space-between;
-  min-height: 320px;
+  min-height: 280px;
 }
 
 .book-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
 .book-cover {
-  font-size: 3.5em;
-  margin-bottom: 15px;
-  color: #2c3e50;
+  width: 80px;
+  height: 100px;
+  background: #2c3e50;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.8em;
+  font-weight: bold;
 }
 
 .book-card h4 {
   color: #2c3e50;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-size: 1.1em;
   line-height: 1.3;
   min-height: 2.6em;
@@ -215,18 +236,45 @@ h1 {
   justify-content: center;
 }
 
-.book-card p {
+.book-author {
   color: #666;
-  margin-bottom: 8px;
-  font-size: 0.9em;
+  font-size: 0.95em;
+  margin-bottom: 15px;
   line-height: 1.4;
+  font-style: italic;
 }
 
 .book-price {
   color: #e74c3c;
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.3em;
   margin-top: auto;
+}
+
+/* 保持所有其他原有样式不变 */
+
+.book-rating {
+  color: #ffa500;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+
+.low-stock {
+  color: #e74c3c;
+  font-size: 0.8em;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+/* 书籍链接样式 */
+.book-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.book-link:hover {
+  text-decoration: none;
 }
 
 /* 页脚 */
@@ -285,24 +333,24 @@ h1 {
 }
 
 .user-button {
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  text-decoration: none;
 }
 
 .user-button:hover {
-  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .login-button {
@@ -338,10 +386,6 @@ h1 {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.hidden {
-  display: none;
-}
-
 /* 主页面头像样式 */
 .main-avatar {
   width: 32px;
@@ -350,7 +394,8 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10px;
+  font-size: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: 2px solid white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   overflow: hidden;
@@ -369,6 +414,19 @@ h1 {
   line-height: 1;
 }
 
+/* 消息样式 */
+.loading-message, .error-message, .no-books-message {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  grid-column: 1 / -1;
+}
+
+/* 隐藏类 */
+.hidden {
+  display: none !important;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .features-grid,
@@ -378,7 +436,7 @@ h1 {
     grid-template-columns: 1fr;
   }
   
-  h1 {
+  .mainbackground h1 {
     font-size: 2.5em;
   }
   
@@ -393,5 +451,31 @@ h1 {
   
   .book-cover {
     font-size: 2.5em;
+  }
+  
+  .admin-entry-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .admin-text h3 {
+    font-size: 1.2rem;
+  }
+  
+  .admin-entry-button {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .books-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .book-card {
+    max-width: 300px;
+    margin: 0 auto;
   }
 }
