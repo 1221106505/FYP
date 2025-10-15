@@ -1,38 +1,63 @@
 <?php
-session_start();
-require_once __DIR__ . '/../include/database.php';
-
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 
-// 检查管理员权限
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
-    echo json_encode(['success' => false, 'error' => 'Access denied']);
+// Database configuration
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'Bookstore'; // 更新为 Bookstore
+
+// Create connection
+$conn = new mysqli($host, $username, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Connection failed: ' . $conn->connect_error
+    ]);
     exit();
 }
 
-if (!isset($_GET['id'])) {
-    die(json_encode(['success' => false, 'error' => 'No book ID provided']));
+// Get book_id from request
+$book_id = isset($_GET['book_id']) ? intval($_GET['book_id']) : 0;
+
+if ($book_id <= 0) {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Invalid book ID'
+    ]);
+    exit();
 }
 
-$bookId = $_GET['id'];
+// Get book details
+$sql = "SELECT b.*, c.category_name 
+        FROM books b 
+        LEFT JOIN categories c ON b.category_id = c.category_id 
+        WHERE b.book_id = ?";
 
-try {
-    $sql = "SELECT b.*, c.name as category_name 
-            FROM books b 
-            LEFT JOIN categories c ON b.category_id = c.id 
-            WHERE b.book_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $book_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$bookId]);
-    $book = $stmt->fetch();
-
-    if ($book) {
-        echo json_encode(['success' => true, 'book' => $book]);
-    } else {
-        echo json_encode(['success' => false, 'error' => 'Book not found']);
-    }
-
-} catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+if ($result && $result->num_rows > 0) {
+    $book = $result->fetch_assoc();
+    
+    echo json_encode([
+        'success' => true,
+        'book' => $book
+    ]);
+} else {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Book not found'
+    ]);
 }
+
+$stmt->close();
+$conn->close();
 ?>

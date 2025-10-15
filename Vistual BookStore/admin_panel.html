@@ -134,6 +134,24 @@
             transform: translateY(-2px);
         }
 
+        .back-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .back-btn:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+        }
+
         /* Content Sections */
         .content-section {
             display: none;
@@ -542,6 +560,7 @@
             <div class="header">
                 <h1 id="sectionTitle">Admin Dashboard</h1>
                 <div class="user-info">
+                    <a href="Main.html" class="back-btn">🏠 Back to Main</a>
                     <span id="adminWelcome">Welcome, Administrator</span>
                     <a href="logout.php" class="logout-btn">🚪 Logout</a>
                 </div>
@@ -856,13 +875,14 @@
     <script>
         // API endpoints
         const API_ENDPOINTS = {
-            books: 'get_books.php',
+            books: 'get_book.php',
             bookDetail: 'get_book_detail.php',
             categories: 'get_categories.php',
             stock: 'get_stock_data.php',
-            saveBook: 'save_book.php',
+            saveBook: 'add_new_book.php',  // Updated to use add_new_book.php
             deleteBook: 'delete_book.php',
-            updateStock: 'update_stock.php'
+            updateStock: 'update_book_stock.php',
+            searchBook: 'search_book.php'  // Added search_book.php endpoint
         };
 
         // Current state
@@ -937,7 +957,7 @@
                 const categoriesData = await categoriesResponse.json();
 
                 if (booksData.success) {
-                    const books = booksData.books;
+                    const books = booksData.books || booksData.data || [];
                     document.getElementById('totalBooks').textContent = books.length;
                     
                     const lowStockCount = books.filter(book => book.stock_quantity <= 5 && book.stock_quantity > 0).length;
@@ -948,7 +968,8 @@
                 }
 
                 if (categoriesData.success) {
-                    document.getElementById('totalCategories').textContent = categoriesData.categories.length;
+                    const categories = categoriesData.categories || categoriesData.data || [];
+                    document.getElementById('totalCategories').textContent = categories.length;
                 }
 
             } catch (error) {
@@ -963,7 +984,7 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    currentBooks = data.books;
+                    currentBooks = data.books || data.data || [];
                     displayBooks(currentBooks);
                     loadCategoryFilter();
                 } else {
@@ -1029,11 +1050,11 @@
                 categoryFilter.innerHTML = '<option value="all">All Categories</option>';
                 
                 if (data.success) {
-                    currentCategories = data.categories;
-                    data.categories.forEach(category => {
+                    currentCategories = data.categories || data.data || [];
+                    currentCategories.forEach(category => {
                         const option = document.createElement('option');
-                        option.value = category.id;
-                        option.textContent = category.name;
+                        option.value = category.category_id;
+                        option.textContent = category.category_name;
                         categoryFilter.appendChild(option);
                     });
                 }
@@ -1042,15 +1063,42 @@
             }
         }
 
-        // Search books
-        function searchBooks() {
-            const searchTerm = document.getElementById('bookSearch').value.toLowerCase();
-            const filteredBooks = currentBooks.filter(book => 
-                book.title.toLowerCase().includes(searchTerm) ||
-                book.author.toLowerCase().includes(searchTerm) ||
-                (book.isbn && book.isbn.toLowerCase().includes(searchTerm))
-            );
-            displayBooks(filteredBooks);
+        // Search books using search_book.php
+        async function searchBooks() {
+            const searchTerm = document.getElementById('bookSearch').value;
+            
+            if (searchTerm.length < 2) {
+                // If search term is too short, show all books
+                displayBooks(currentBooks);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_ENDPOINTS.searchBook}?search=${encodeURIComponent(searchTerm)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const searchResults = data.books || data.data || [];
+                    displayBooks(searchResults);
+                } else {
+                    // If search fails, fall back to client-side filtering
+                    const filteredBooks = currentBooks.filter(book => 
+                        book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        (book.isbn && book.isbn.toLowerCase().includes(searchTerm.toLowerCase()))
+                    );
+                    displayBooks(filteredBooks);
+                }
+            } catch (error) {
+                console.error('Error searching books:', error);
+                // Fall back to client-side filtering
+                const filteredBooks = currentBooks.filter(book => 
+                    book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (book.isbn && book.isbn.toLowerCase().includes(searchTerm.toLowerCase()))
+                );
+                displayBooks(filteredBooks);
+            }
         }
 
         // Filter books by category
@@ -1137,7 +1185,8 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    displayCategories(data.categories);
+                    const categories = data.categories || data.data || [];
+                    displayCategories(categories);
                 }
             } catch (error) {
                 console.error('Error loading categories:', error);
@@ -1150,9 +1199,9 @@
             
             categoriesTable.innerHTML = categories.map(category => `
                 <tr>
-                    <td>${category.id}</td>
-                    <td><strong>${category.name}</strong></td>
-                    <td>${currentBooks.filter(book => book.category_id == category.id).length}</td>
+                    <td>${category.category_id}</td>
+                    <td><strong>${category.category_name}</strong></td>
+                    <td>${currentBooks.filter(book => book.category_id == category.category_id).length}</td>
                     <td class="action-buttons">
                         <button class="btn btn-sm btn-warning">✏️ Edit</button>
                         <button class="btn btn-sm btn-danger">🗑️ Delete</button>
@@ -1172,11 +1221,11 @@
 
         async function openEditBookModal(bookId) {
             try {
-                const response = await fetch(`${API_ENDPOINTS.bookDetail}?id=${bookId}`);
+                const response = await fetch(`${API_ENDPOINTS.bookDetail}?book_id=${bookId}`);
                 const data = await response.json();
                 
                 if (data.success) {
-                    const book = data.book;
+                    const book = data.book || data.data;
                     document.getElementById('modalTitle').textContent = 'Edit Book';
                     document.getElementById('bookId').value = book.book_id;
                     document.getElementById('bookTitle').value = book.title;
@@ -1224,10 +1273,11 @@
                 categorySelect.innerHTML = '<option value="">Select Category</option>';
                 
                 if (data.success) {
-                    data.categories.forEach(category => {
+                    const categories = data.categories || data.data || [];
+                    categories.forEach(category => {
                         const option = document.createElement('option');
-                        option.value = category.id;
-                        option.textContent = category.name;
+                        option.value = category.category_id;
+                        option.textContent = category.category_name;
                         categorySelect.appendChild(option);
                     });
                 }
@@ -1236,7 +1286,7 @@
             }
         }
 
-        // Save book
+        // Save book using add_new_book.php
         async function saveBook() {
             const bookData = {
                 id: document.getElementById('bookId').value,

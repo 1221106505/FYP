@@ -8,7 +8,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 $host = 'localhost';
 $username = 'root';
 $password = '';
-$database = 'Bookstore';
+$database = 'Bookstore'; // 更新为 Bookstore
 
 // Create connection
 $conn = new mysqli($host, $username, $password, $database);
@@ -22,13 +22,29 @@ if ($conn->connect_error) {
     exit();
 }
 
-// Get all books with category information
+// Get search term
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+
+if (empty($search)) {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Search term is required'
+    ]);
+    exit();
+}
+
+// Search books by title, author, or ISBN
 $sql = "SELECT b.*, c.category_name 
         FROM books b 
         LEFT JOIN categories c ON b.category_id = c.category_id 
+        WHERE b.title LIKE ? OR b.author LIKE ? OR b.isbn LIKE ?
         ORDER BY b.book_id";
 
-$result = $conn->query($sql);
+$searchTerm = "%" . $search . "%";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("sss", $searchTerm, $searchTerm, $searchTerm);
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($result) {
     $books = [];
@@ -43,9 +59,10 @@ if ($result) {
 } else {
     echo json_encode([
         'success' => false,
-        'error' => 'Error fetching books: ' . $conn->error
+        'error' => 'Error searching books: ' . $conn->error
     ]);
 }
 
+$stmt->close();
 $conn->close();
 ?>

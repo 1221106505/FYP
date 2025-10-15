@@ -1,44 +1,31 @@
 <?php
-// 直接测试数据库连接
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+// Database configuration
 $host = 'localhost';
-$dbname = 'BookStore';
-$username = 'root';
-$password = '';
+$username = 'root'; // 根据您的数据库配置修改
+$password = ''; // 根据您的数据库配置修改
+$database = 'Bookstore'; // 根据您的数据库名称修改
 
-echo "<h3>Database Connection Test (PDO)</h3>";
+// Create connection
+$conn = new mysqli($host, $username, $password, $database);
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    echo "<p style='color: green;'>✅ Database connected successfully!</p>";
-    
-    // 检查表
-    $tables = ['books', 'categories', 'users'];
-    foreach ($tables as $table) {
-        $result = $pdo->query("SHOW TABLES LIKE '$table'");
-        if ($result->rowCount() > 0) {
-            echo "<p style='color: green;'>✅ Table '$table' exists</p>";
-            
-            // 显示表结构
-            $structure = $pdo->query("DESCRIBE $table")->fetchAll();
-            echo "<p>Table $table structure:</p>";
-            echo "<ul>";
-            foreach ($structure as $column) {
-                echo "<li>{$column['Field']} - {$column['Type']}</li>";
-            }
-            echo "</ul>";
-            
-            // 显示数据数量
-            $count = $pdo->query("SELECT COUNT(*) as count FROM $table")->fetch();
-            echo "<p>Records in $table: {$count['count']}</p>";
-            
-        } else {
-            echo "<p style='color: red;'>❌ Table '$table' does not exist</p>";
-        }
-    }
-    
-} catch (PDOException $e) {
-    echo "<p style='color: red;'>❌ Connection failed: " . $e->getMessage() . "</p>";
+// Check connection
+if ($conn->connect_error) {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Connection failed: ' . $conn->connect_error
+    ]);
+    exit();
 }
+
+echo json_encode([
+    'success' => true,
+    'message' => 'Database connection successful'
+]);
+
+$conn->close();
 ?>

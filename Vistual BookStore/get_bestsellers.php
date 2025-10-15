@@ -4,16 +4,16 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Database configuration
+// 数据库配置
 $host = 'localhost';
 $username = 'root';
 $password = '';
 $database = 'Bookstore';
 
-// Create connection
+// 创建连接
 $conn = new mysqli($host, $username, $password, $database);
 
-// Check connection
+// 检查连接
 if ($conn->connect_error) {
     echo json_encode([
         'success' => false,
@@ -22,11 +22,21 @@ if ($conn->connect_error) {
     exit();
 }
 
-// Get all books with category information
-$sql = "SELECT b.*, c.category_name 
-        FROM books b 
-        LEFT JOIN categories c ON b.category_id = c.category_id 
-        ORDER BY b.book_id";
+// 获取销量最好的4本书
+$sql = "SELECT 
+            b.book_id,
+            b.title,
+            b.author,
+            b.price,
+            b.stock_quantity,
+            b.rating,
+            b.total_sales,
+            c.category_name,
+            CONCAT('https://via.placeholder.com/80x100/4A90E2/FFFFFF?text=', SUBSTRING(REPLACE(b.title, ' ', '+'), 1, 10)) as cover_image
+        FROM books b
+        LEFT JOIN categories c ON b.category_id = c.category_id
+        ORDER BY b.total_sales DESC, b.rating DESC
+        LIMIT 4";
 
 $result = $conn->query($sql);
 
@@ -43,7 +53,7 @@ if ($result) {
 } else {
     echo json_encode([
         'success' => false,
-        'error' => 'Error fetching books: ' . $conn->error
+        'error' => 'Error fetching bestsellers: ' . $conn->error
     ]);
 }
 

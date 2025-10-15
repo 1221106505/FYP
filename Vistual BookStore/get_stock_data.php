@@ -1,47 +1,51 @@
 <?php
-session_start();
-require_once __DIR__ . '/../include/database.php';
-
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 
-// 检查管理员权限
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
-    echo json_encode(['success' => false, 'error' => 'Access denied']);
+// Database configuration
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'Bookstore'; // 更新为 Bookstore
+
+// Create connection
+$conn = new mysqli($host, $username, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Connection failed: ' . $conn->connect_error
+    ]);
     exit();
 }
 
-try {
-    $search = $_GET['search'] ?? '';
-    $category = $_GET['category'] ?? '';
-    
-    $sql = "SELECT b.*, c.name as category_name 
-            FROM books b 
-            LEFT JOIN categories c ON b.category_id = c.id 
-            WHERE 1=1";
-    $params = [];
-    
-    if (!empty($search)) {
-        $sql .= " AND (b.title LIKE ? OR b.author LIKE ? OR b.isbn LIKE ?)";
-        $searchTerm = "%$search%";
-        $params[] = $searchTerm;
-        $params[] = $searchTerm;
-        $params[] = $searchTerm;
+// Get all books with stock information
+$sql = "SELECT b.*, c.category_name 
+        FROM books b 
+        LEFT JOIN categories c ON b.category_id = c.category_id 
+        ORDER BY b.stock_quantity ASC, b.book_id";
+
+$result = $conn->query($sql);
+
+if ($result) {
+    $books = [];
+    while ($row = $result->fetch_assoc()) {
+        $books[] = $row;
     }
     
-    if (!empty($category) && $category !== 'all') {
-        $sql .= " AND b.category_id = ?";
-        $params[] = $category;
-    }
-    
-    $sql .= " ORDER BY b.stock_quantity ASC, b.title ASC";
-    
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    $books = $stmt->fetchAll();
-    
-    echo json_encode(['success' => true, 'books' => $books]);
-    
-} catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    echo json_encode([
+        'success' => true,
+        'books' => $books
+    ]);
+} else {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Error fetching stock data: ' . $conn->error
+    ]);
 }
+
+$conn->close();
 ?>

@@ -17,6 +17,20 @@
     </div>
   </section>
 
+  <!-- 管理员入口 - 只有管理员登录时才显示 -->
+  <div id="adminEntry" class="admin-entry hidden">
+    <div class="admin-entry-content">
+      <div class="admin-icon">⚙️</div>
+      <div class="admin-text">
+        <h3>Administrator Access</h3>
+        <p>Access the admin panel to manage books, inventory, and system settings</p>
+      </div>
+      <a href="admin_panel.html" class="admin-entry-button" onclick="trackAdminEntry()">
+        Go to Admin Panel →
+      </a>
+    </div>
+  </div>
+
   <div id="welcomeMessage" class="welcome-message hidden"></div>
 
   <section class="content">
@@ -141,6 +155,7 @@
           console.log('Login status data:', data); // 调试信息
           updateUserInterface(data);
           updateServicesBasedOnRole(data);
+          updateAdminEntry(data); // 更新管理员入口显示
           loadBestsellers(); // 从数据库加载畅销书数据
         })
         .catch(error => {
@@ -149,6 +164,32 @@
           fallbackToURLParams();
           loadBestsellers(); // 从数据库加载畅销书数据
         });
+    }
+
+    // 更新管理员入口显示
+    function updateAdminEntry(userData) {
+      const adminEntry = document.getElementById('adminEntry');
+      
+      if (!adminEntry) return;
+      
+      console.log('Checking admin entry for role:', userData.role); // 调试信息
+      
+      if (userData.logged_in && userData.role === 'admin') {
+        adminEntry.classList.remove('hidden');
+        console.log('Admin entry displayed'); // 调试信息
+      } else {
+        adminEntry.classList.add('hidden');
+      }
+    }
+
+    // 管理员入口点击跟踪
+    function trackAdminEntry() {
+      console.log('=== ADMIN PANEL ENTRY CLICKED ===');
+      console.log('Admin user accessing admin panel');
+      console.log('Redirecting to: admin_panel.html');
+      console.log('================================');
+      
+      // 可以添加额外的跟踪逻辑，比如发送到分析服务
     }
 
     // 根据用户角色更新服务选项
@@ -178,7 +219,7 @@
           </div>
         `;
       } else if (userData.role === 'admin') {
-        // 管理员看到的服务选项 - 修复管理员面板链接
+        // 管理员看到的服务选项
         servicesContainer.innerHTML = `
           <div class="service-item">
             <a href="admin_panel.html" class="service-link" onclick="trackLinkClick('admin_panel')">
@@ -206,13 +247,6 @@
               <div class="service-icon">🔍</div>
               <h3>Search Books</h3>
               <p>Find exactly what you're looking for with our powerful search tool.</p>
-            </a>
-          </div>
-          <div class="service-item">
-            <a href="user_profile.html" class="service-link">
-              <div class="service-icon">👤</div>
-              <h3>My Profile</h3>
-              <p>Manage your administrator account settings.</p>
             </a>
           </div>
         `;
@@ -251,7 +285,7 @@
       }
     }
 
-    // 更新用户界面 - 修复管理员链接
+    // 更新用户界面
     function updateUserInterface(userData) {
       const userInfo = document.getElementById('userInfo');
       
@@ -315,31 +349,31 @@
     }
 
     // 从数据库加载畅销书数据
-    function loadBestsellers() {
-      // 获取评分最高的4本书作为畅销书
-      fetch('get_books.php?sort=rating&limit=4')
+    // 从数据库加载畅销书数据
+function loadBestsellers() {
+    fetch('get_bestsellers.php')
         .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
         })
         .then(data => {
-          if (data.success) {
-            updateBooksDisplay(data.books);
-          } else {
-            throw new Error(data.error || 'Failed to load books');
-          }
+            if (data.success) {
+                updateBooksDisplay(data.books);
+            } else {
+                throw new Error(data.error || 'Failed to load books');
+            }
         })
         .catch(error => {
-          console.error('Error loading bestsellers:', error);
-          // 如果获取失败，显示错误信息
-          const booksGrid = document.getElementById('booksGrid');
-          if (booksGrid) {
-            booksGrid.innerHTML = '<div class="error-message">Unable to load books. Please try again later.</div>';
-          }
+            console.error('Error loading bestsellers:', error);
+            // 如果获取失败，显示错误信息
+            const booksGrid = document.getElementById('booksGrid');
+            if (booksGrid) {
+                booksGrid.innerHTML = '<div class="error-message">Unable to load books. Please try again later.</div>';
+            }
         });
-    }
+}
 
     // 更新书籍显示
     function updateBooksDisplay(books) {
@@ -402,6 +436,8 @@
       
       if (loginSuccess === '1' && username) {
         const userInfo = document.getElementById('userInfo');
+        const adminEntry = document.getElementById('adminEntry');
+        
         if (userInfo) {
           const userProfile = getUserAvatarData(username);
           
@@ -411,6 +447,11 @@
           if (role === 'admin') {
             profileLink = 'admin_panel.html';
             displayText = decodeURIComponent(username) + ' (Admin)';
+            
+            // 显示管理员入口
+            if (adminEntry) {
+              adminEntry.classList.remove('hidden');
+            }
           }
           
           userInfo.innerHTML = `
@@ -507,7 +548,87 @@
   </script>
 
   <style>
-    /* 添加书籍链接的样式 */
+    /* 管理员入口样式 */
+    .admin-entry {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 1200px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .admin-entry.hidden {
+      display: none;
+    }
+
+    .admin-entry-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .admin-icon {
+      font-size: 2.5rem;
+      flex-shrink: 0;
+    }
+
+    .admin-text {
+      flex: 1;
+    }
+
+    .admin-text h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.4rem;
+    }
+
+    .admin-text p {
+      margin: 0;
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .admin-entry-button {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      border: 2px solid rgba(255,255,255,0.3);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .admin-entry-button:hover {
+      background: rgba(255,255,255,0.3);
+      border-color: rgba(255,255,255,0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .admin-entry-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+      
+      .admin-text h3 {
+        font-size: 1.2rem;
+      }
+      
+      .admin-entry-button {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    /* 书籍链接的样式 */
     .book-link {
       text-decoration: none;
       color: inherit;
@@ -592,6 +713,11 @@
 
     .main-avatar-emoji {
       font-size: 16px;
+    }
+
+    /* 隐藏类 */
+    .hidden {
+      display: none !important;
     }
   </style>
 </body>

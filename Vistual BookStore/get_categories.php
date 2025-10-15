@@ -1,23 +1,47 @@
 <?php
-session_start();
-require_once __DIR__ . '/../include/database.php';
-
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 
-// 检查管理员权限
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
-    echo json_encode(['success' => false, 'error' => 'Access denied']);
+// Database configuration
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'Bookstore'; // 更新为 Bookstore
+
+// Create connection
+$conn = new mysqli($host, $username, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Connection failed: ' . $conn->connect_error
+    ]);
     exit();
 }
 
-try {
-    $sql = "SELECT * FROM categories ORDER BY name";
-    $stmt = $pdo->query($sql);
-    $categories = $stmt->fetchAll();
+// Get all categories
+$sql = "SELECT * FROM categories ORDER BY category_id";
+$result = $conn->query($sql);
 
-    echo json_encode(['success' => true, 'categories' => $categories]);
-
-} catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+if ($result) {
+    $categories = [];
+    while ($row = $result->fetch_assoc()) {
+        $categories[] = $row;
+    }
+    
+    echo json_encode([
+        'success' => true,
+        'categories' => $categories
+    ]);
+} else {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Error fetching categories: ' . $conn->error
+    ]);
 }
+
+$conn->close();
 ?>
