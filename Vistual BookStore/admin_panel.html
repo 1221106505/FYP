@@ -466,10 +466,11 @@
             font-size: 1.1em;
         }
 
-        .low-stock {
+        /* 修复库存状态样式 */
+        .out-of-stock {
             color: var(--danger);
             font-weight: bold;
-            background: #ffeaa7;
+            background: #ffcccc;
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.8em;
@@ -478,6 +479,19 @@
         .in-stock {
             color: var(--success);
             font-weight: 500;
+            background: #ccffcc;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+
+        .low-stock {
+            color: var(--warning);
+            font-weight: bold;
+            background: #ffeaa7;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
         }
 
         .search-box {
@@ -532,6 +546,10 @@
                 flex-direction: column;
                 gap: 15px;
                 text-align: center;
+            }
+            
+            .search-box {
+                flex-direction: column;
             }
         }
     </style>
@@ -614,43 +632,50 @@
             </section>
 
             <!-- Book Management Section -->
-<section id="books" class="content-section">
-    <div class="section-header">
-        <h2>📚 Book Management</h2>
-        <button class="btn btn-primary" onclick="openAddBookModal()">
-            <i>➕</i> Add New Book
-        </button>
-    </div>
+            <section id="books" class="content-section">
+                <div class="section-header">
+                    <h2>📚 Book Management</h2>
+                    <button class="btn btn-primary" onclick="openAddBookModal()">
+                        <i>➕</i> Add New Book
+                    </button>
+                </div>
 
-    <div class="search-box">
-        <input type="text" id="bookSearch" class="search-input" placeholder="🔍 Search books by title, author, or ISBN..." onkeyup="searchBooks()">
-        <select id="categoryFilter" class="form-control" style="width: 200px;" onchange="filterBooks()">
-            <option value="all">All Categories</option>
-        </select>
-    </div>
+                <div class="search-box">
+                    <input type="text" id="bookSearch" class="search-input" placeholder="🔍 Search books by title, author, or ISBN..." onkeyup="searchBooks()">
+                    <select id="categoryFilter" class="form-control" style="width: 200px;" onchange="filterBooks()">
+                        <option value="all">All Categories</option>
+                    </select>
+                    <!-- 添加库存状态筛选按钮 -->
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-warning" onclick="filterByStock('low')">⚠️ Low Stock</button>
+                        <button class="btn btn-danger" onclick="filterByStock('out')">❌ Out of Stock</button>
+                        <button class="btn btn-success" onclick="filterByStock('all')">📦 All Stock</button>
+                    </div>
+                </div>
 
-    <div class="table-container">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Status</th>
-                    <th>Rating</th>
-                    <th>Total Sales</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="booksTable">
-                <tr><td colspan="10" class="loading">Loading books data...</td></tr>
-            </tbody>
-        </table>
-    </div>
-</section>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Rating</th>
+                                <th>Total Sales</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="booksTable">
+                            <tr><td colspan="10" class="loading">Loading books data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <!-- Inventory Section -->
             <section id="inventory" class="content-section">
                 <div class="section-header">
@@ -880,15 +905,32 @@
             bookDetail: 'get_book_detail.php',
             categories: 'get_categories.php',
             stock: 'get_stock_data.php',
-            saveBook: 'add_new_book.php',  // Updated to use add_new_book.php
+            saveBook: 'add_new_book.php',
             deleteBook: 'delete_book.php',
             updateStock: 'update_book_stock.php',
-            searchBook: 'search_book.php'  // Added search_book.php endpoint
+            searchBook: 'search_book.php'
         };
 
         // Current state
         let currentBooks = [];
         let currentCategories = [];
+
+        // 实时时钟函数
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+            document.getElementById('adminWelcome').textContent = `Welcome, Admin • ${dateString} ${timeString}`;
+        }
 
         // Navigation
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -989,62 +1031,73 @@
                     displayBooks(currentBooks);
                     loadCategoryFilter();
                 } else {
-                    document.getElementById('booksTable').innerHTML = '<tr><td colspan="8" class="error">Error loading books</td></tr>';
+                    document.getElementById('booksTable').innerHTML = '<tr><td colspan="10" class="error">Error loading books</td></tr>';
                 }
             } catch (error) {
                 console.error('Error loading books:', error);
-                document.getElementById('booksTable').innerHTML = '<tr><td colspan="8" class="error">Error loading books</td></tr>';
+                document.getElementById('booksTable').innerHTML = '<tr><td colspan="10" class="error">Error loading books</td></tr>';
             }
         }
 
-        // 在displayBooks函数中添加销量信息显示
-function displayBooks(books) {
-    const booksTable = document.getElementById('booksTable');
-    
-    if (books.length === 0) {
-        booksTable.innerHTML = '<tr><td colspan="10" class="loading">No books found</td></tr>';
-        return;
-    }
+        // Display books
+        function displayBooks(books) {
+            const booksTable = document.getElementById('booksTable');
+            
+            if (books.length === 0) {
+                booksTable.innerHTML = '<tr><td colspan="10" class="loading">No books found</td></tr>';
+                return;
+            }
 
-    booksTable.innerHTML = books.map(book => `
-        <tr>
-            <td>${book.book_id}</td>
-            <td><strong>${book.title}</strong></td>
-            <td>${book.author}</td>
-            <td>${book.category_name || 'N/A'}</td>
-            <td>RM ${parseFloat(book.price).toFixed(2)}</td>
-            <td>${book.stock_quantity}</td>
-            <td>
-                <span class="${getStockStatusClass(book.stock_quantity)}">
-                    ${getStockStatusText(book.stock_quantity)}
-                </span>
-            </td>
-            <td>${book.rating || '0.0'}</td>
-            <td>${book.total_sales || '0'}</td>
-            <td class="action-buttons">
-                <button class="btn btn-sm btn-primary" onclick="openEditBookModal(${book.book_id})">✏️ Edit</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteBook(${book.book_id})">🗑️ Delete</button>
-            </td>
-        </tr>
-    `).join('');
-}
+            booksTable.innerHTML = books.map(book => `
+                <tr>
+                    <td>${book.book_id}</td>
+                    <td><strong>${book.title}</strong></td>
+                    <td>${book.author}</td>
+                    <td>${book.category_name || 'N/A'}</td>
+                    <td>RM ${parseFloat(book.price).toFixed(2)}</td>
+                    <td>${book.stock_quantity}</td>
+                    <td>
+                        <span class="${getStockStatusClass(book.stock_quantity)}">
+                            ${getStockStatusText(book.stock_quantity)}
+                        </span>
+                    </td>
+                    <td>${book.rating || '0.0'}</td>
+                    <td>${book.total_sales || '0'}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-primary" onclick="openEditBookModal(${book.book_id})">✏️ Edit</button>
+                        <button class="btn btn-sm btn-warning" onclick="setBookOutOfStock(${book.book_id})" ${book.stock_quantity === 0 ? 'disabled' : ''}>❌ Set Out of Stock</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteBook(${book.book_id})">🗑️ Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
 
-// 更新表格表头以包含销量信息
-// 在Book Management Section中更新表头：
-// <th>Rating</th>
-// <th>Total Sales</th>
-
-        // Get stock status class
+        // 修复：Get stock status class - 确保正确处理库存为0的情况
         function getStockStatusClass(stock) {
-            if (stock === 0) return 'low-stock';
-            if (stock <= 5) return 'low-stock';
+            // 确保stock是数字类型
+            const stockNum = parseInt(stock);
+            console.log('Stock value:', stock, 'Parsed:', stockNum); // 调试用
+            
+            if (stockNum === 0) {
+                return 'out-of-stock';
+            }
+            if (stockNum <= 5) {
+                return 'low-stock';
+            }
             return 'in-stock';
         }
 
-        // Get stock status text
+        // 修复：Get stock status text - 确保正确处理库存为0的情况
         function getStockStatusText(stock) {
-            if (stock === 0) return 'Out of Stock';
-            if (stock <= 5) return 'Low Stock';
+            // 确保stock是数字类型
+            const stockNum = parseInt(stock);
+            
+            if (stockNum === 0) {
+                return 'Out of Stock';
+            }
+            if (stockNum <= 5) {
+                return 'Low Stock';
+            }
             return 'In Stock';
         }
 
@@ -1071,12 +1124,61 @@ function displayBooks(books) {
             }
         }
 
-        // Search books using search_book.php
+        // 按库存状态筛选书籍
+        function filterByStock(stockType) {
+            let filteredBooks = [];
+            
+            switch(stockType) {
+                case 'low':
+                    filteredBooks = currentBooks.filter(book => book.stock_quantity <= 5 && book.stock_quantity > 0);
+                    break;
+                case 'out':
+                    filteredBooks = currentBooks.filter(book => book.stock_quantity === 0);
+                    break;
+                case 'all':
+                default:
+                    filteredBooks = currentBooks;
+                    break;
+            }
+            
+            displayBooks(filteredBooks);
+        }
+
+        // 强制设置书籍为缺货状态
+        function setBookOutOfStock(bookId) {
+            if (confirm('Are you sure you want to set this book as Out of Stock? This will set stock quantity to 0.')) {
+                const stockData = {
+                    book_id: bookId,
+                    stock_quantity: 0
+                };
+
+                try {
+                    fetch(API_ENDPOINTS.updateStock, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(stockData)
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            loadSectionData('books');
+                            alert('Book set as Out of Stock successfully!');
+                        } else {
+                            alert('Error updating stock: ' + result.error);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error updating stock');
+                }
+            }
+        }
+
+        // Search books
         async function searchBooks() {
             const searchTerm = document.getElementById('bookSearch').value;
             
             if (searchTerm.length < 2) {
-                // If search term is too short, show all books
                 displayBooks(currentBooks);
                 return;
             }
@@ -1089,7 +1191,6 @@ function displayBooks(books) {
                     const searchResults = data.books || data.data || [];
                     displayBooks(searchResults);
                 } else {
-                    // If search fails, fall back to client-side filtering
                     const filteredBooks = currentBooks.filter(book => 
                         book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -1099,7 +1200,6 @@ function displayBooks(books) {
                 }
             } catch (error) {
                 console.error('Error searching books:', error);
-                // Fall back to client-side filtering
                 const filteredBooks = currentBooks.filter(book => 
                     book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -1147,19 +1247,31 @@ function displayBooks(books) {
             document.getElementById('inventoryOutOfStock').textContent = outOfStockCount;
         }
 
-        // Display inventory
+        // Display inventory - 修复库存状态显示
         function displayInventory(books) {
             const inventoryTable = document.getElementById('inventoryTable');
             
-            inventoryTable.innerHTML = books.map(book => `
+            if (books.length === 0) {
+                inventoryTable.innerHTML = '<tr><td colspan="7" class="loading">No inventory data found</td></tr>';
+                return;
+            }
+
+            inventoryTable.innerHTML = books.map(book => {
+                // 确保正确处理库存状态
+                const stockStatusClass = getStockStatusClass(book.stock_quantity);
+                const stockStatusText = getStockStatusText(book.stock_quantity);
+                
+                console.log(`Book: ${book.title}, Stock: ${book.stock_quantity}, Class: ${stockStatusClass}, Text: ${stockStatusText}`); // 调试用
+                
+                return `
                 <tr>
                     <td>${book.book_id}</td>
                     <td><strong>${book.title}</strong></td>
                     <td>${book.stock_quantity}</td>
                     <td>RM ${parseFloat(book.price).toFixed(2)}</td>
                     <td>
-                        <span class="${getStockStatusClass(book.stock_quantity)}">
-                            ${getStockStatusText(book.stock_quantity)}
+                        <span class="${stockStatusClass}">
+                            ${stockStatusText}
                         </span>
                     </td>
                     <td>${book.updated_at || 'N/A'}</td>
@@ -1169,7 +1281,8 @@ function displayBooks(books) {
                         </button>
                     </td>
                 </tr>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Load low stock items
@@ -1294,7 +1407,7 @@ function displayBooks(books) {
             }
         }
 
-        // Save book using add_new_book.php
+        // Save book
         async function saveBook() {
             const bookData = {
                 id: document.getElementById('bookId').value,
@@ -1396,39 +1509,9 @@ function displayBooks(books) {
             alert('Add category functionality will be implemented here');
         }
 
-        // 添加获取销量分析数据的函数
-async function loadAnalyticsData() {
-    try {
-        const response = await fetch(API_ENDPOINTS.books);
-        const data = await response.json();
-        
-        if (data.success) {
-            const books = data.books || data.data || [];
-            updateAnalyticsCharts(books);
+        function loadAnalyticsData() {
+            // Analytics functionality can be implemented later
         }
-    } catch (error) {
-        console.error('Error loading analytics data:', error);
-    }
-}
-
-// 更新分析图表
-function updateAnalyticsCharts(books) {
-    // 按销量排序
-    const topSellers = [...books].sort((a, b) => (b.total_sales || 0) - (a.total_sales || 0)).slice(0, 10);
-    
-    // 按分类统计销量
-    const categorySales = {};
-    books.forEach(book => {
-        const category = book.category_name || 'Uncategorized';
-        categorySales[category] = (categorySales[category] || 0) + (book.total_sales || 0);
-    });
-    
-    console.log('Top Selling Books:', topSellers);
-    console.log('Sales by Category:', categorySales);
-    
-    // 这里可以集成图表库如Chart.js来显示数据
-    // 目前先用控制台输出验证数据
-}
 
         function loadSettingsData() {
             // Settings functionality can be implemented later
@@ -1439,10 +1522,10 @@ function updateAnalyticsCharts(books) {
             console.log('Admin panel initialized');
             loadDashboardData();
             
-            // Set welcome message with current time
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('adminWelcome').textContent = `Welcome, Admin • ${timeString}`;
+            // 初始时间显示
+            updateClock();
+            // 每秒更新一次时间
+            setInterval(updateClock, 1000);
         });
 
         // Close modal when clicking outside
