@@ -508,6 +508,36 @@
             font-size: 14px;
         }
 
+        /* 警告横幅样式 */
+        #stock-warning-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        /* 库存警告卡片样式 */
+        .stat-card.warning {
+            animation: pulse 2s infinite;
+            background: #fff3cd;
+            border-color: #ffeaa7;
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .admin-container {
@@ -595,11 +625,11 @@
                         <div class="stat-number" id="totalCategories">0</div>
                         <div class="stat-label">Categories</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" id="lowStockCard">
                         <div class="stat-number" id="lowStockCount">0</div>
                         <div class="stat-label">Low Stock Items</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" id="outOfStockCard">
                         <div class="stat-number" id="outOfStock">0</div>
                         <div class="stat-label">Out of Stock</div>
                     </div>
@@ -681,6 +711,9 @@
                 <div class="section-header">
                     <h2>📦 Inventory Management</h2>
                     <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-success" onclick="loadAllStockItems()">
+                            <i>📦</i> All Stock
+                        </button>
                         <button class="btn btn-warning" onclick="loadLowStockItems()">
                             <i>⚠️</i> Low Stock
                         </button>
@@ -914,6 +947,7 @@
         // Current state
         let currentBooks = [];
         let currentCategories = [];
+        let currentInventoryFilter = 'all'; // Track current inventory filter
 
         // 实时时钟函数
         function updateClock() {
@@ -1003,11 +1037,22 @@
                     const books = booksData.books || booksData.data || [];
                     document.getElementById('totalBooks').textContent = books.length;
                     
-                    const lowStockCount = books.filter(book => book.stock_quantity <= 5 && book.stock_quantity > 0).length;
-                    const outOfStockCount = books.filter(book => book.stock_quantity === 0).length;
+                    // 修复：使用正确的库存范围 (Low Stock: 1-10, Out of Stock: 0)
+                    const lowStockCount = books.filter(book => {
+                        const stock = parseInt(book.stock_quantity);
+                        return stock >= 1 && stock <= 10;
+                    }).length;
+                    
+                    const outOfStockCount = books.filter(book => {
+                        const stock = parseInt(book.stock_quantity);
+                        return stock === 0;
+                    }).length;
                     
                     document.getElementById('lowStockCount').textContent = lowStockCount;
                     document.getElementById('outOfStock').textContent = outOfStockCount;
+                    
+                    // 检查并显示库存警告
+                    checkStockWarnings(lowStockCount, outOfStockCount);
                 }
 
                 if (categoriesData.success) {
@@ -1017,6 +1062,79 @@
 
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // 检查库存警告
+        function checkStockWarnings(lowStockCount, outOfStockCount) {
+            const lowStockCard = document.getElementById('lowStockCard');
+            const outOfStockCard = document.getElementById('outOfStockCard');
+            
+            // 重置警告状态
+            lowStockCard.classList.remove('warning');
+            outOfStockCard.classList.remove('warning');
+            
+            let warningMessage = '';
+            
+            if (outOfStockCount > 0) {
+                outOfStockCard.classList.add('warning');
+                warningMessage += `CRITICAL: You have ${outOfStockCount} item(s) out of stock!\n`;
+            }
+            
+            if (lowStockCount > 0) {
+                lowStockCard.classList.add('warning');
+                warningMessage += `WARNING: You have ${lowStockCount} item(s) with low stock!\n`;
+            }
+            
+            // 如果有警告，显示警告横幅
+            if (warningMessage) {
+                showWarningBanner(warningMessage);
+                
+                // 如果是第一次加载或有严重问题，显示弹窗警告
+                if (outOfStockCount > 0) {
+                    setTimeout(() => {
+                        if (confirm('STOCK ALERT:\n\n' + warningMessage + '\nClick OK to view inventory details.')) {
+                            loadSectionData('inventory');
+                        }
+                    }, 1500);
+                }
+            } else {
+                // 移除警告横幅
+                removeWarningBanner();
+            }
+        }
+
+        // 显示警告横幅
+        function showWarningBanner(message) {
+            // 移除现有的警告横幅
+            removeWarningBanner();
+            
+            // 创建新的警告横幅
+            const banner = document.createElement('div');
+            banner.id = 'stock-warning-banner';
+            
+            banner.innerHTML = `
+                ⚠️ STOCK ALERT: ${message.replace(/\n/g, ' ')}
+                <button onclick="removeWarningBanner()" style="
+                    margin-left: 20px;
+                    background: white;
+                    color: #ff6b6b;
+                    border: none;
+                    padding: 5px 10px;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    font-weight: bold;
+                ">Dismiss</button>
+            `;
+            
+            document.body.prepend(banner);
+        }
+
+        // 移除警告横幅
+        function removeWarningBanner() {
+            const existingBanner = document.getElementById('stock-warning-banner');
+            if (existingBanner) {
+                existingBanner.remove();
             }
         }
 
@@ -1072,30 +1190,27 @@
             `).join('');
         }
 
-        // 修复：Get stock status class - 确保正确处理库存为0的情况
+        // 修复：Get stock status class - 使用正确的库存范围
         function getStockStatusClass(stock) {
-            // 确保stock是数字类型
             const stockNum = parseInt(stock);
-            console.log('Stock value:', stock, 'Parsed:', stockNum); // 调试用
             
             if (stockNum === 0) {
                 return 'out-of-stock';
             }
-            if (stockNum <= 5) {
+            if (stockNum >= 1 && stockNum <= 10) {
                 return 'low-stock';
             }
             return 'in-stock';
         }
 
-        // 修复：Get stock status text - 确保正确处理库存为0的情况
+        // 修复：Get stock status text - 使用正确的库存范围
         function getStockStatusText(stock) {
-            // 确保stock是数字类型
             const stockNum = parseInt(stock);
             
             if (stockNum === 0) {
                 return 'Out of Stock';
             }
-            if (stockNum <= 5) {
+            if (stockNum >= 1 && stockNum <= 10) {
                 return 'Low Stock';
             }
             return 'In Stock';
@@ -1130,10 +1245,16 @@
             
             switch(stockType) {
                 case 'low':
-                    filteredBooks = currentBooks.filter(book => book.stock_quantity <= 5 && book.stock_quantity > 0);
+                    filteredBooks = currentBooks.filter(book => {
+                        const stock = parseInt(book.stock_quantity);
+                        return stock >= 1 && stock <= 10;
+                    });
                     break;
                 case 'out':
-                    filteredBooks = currentBooks.filter(book => book.stock_quantity === 0);
+                    filteredBooks = currentBooks.filter(book => {
+                        const stock = parseInt(book.stock_quantity);
+                        return stock === 0;
+                    });
                     break;
                 case 'all':
                 default:
@@ -1162,6 +1283,7 @@
                     .then(result => {
                         if (result.success) {
                             loadSectionData('books');
+                            loadDashboardData(); // 刷新仪表板数据
                             alert('Book set as Out of Stock successfully!');
                         } else {
                             alert('Error updating stock: ' + result.error);
@@ -1229,22 +1351,60 @@
                 if (data.success) {
                     const books = data.books;
                     updateInventoryStats(books);
-                    displayInventory(books);
+                    // 根据当前筛选状态显示数据
+                    applyInventoryFilter(books);
                 }
             } catch (error) {
                 console.error('Error loading inventory:', error);
             }
         }
 
-        // Update inventory statistics
+        // Update inventory statistics - 使用正确的库存范围
         function updateInventoryStats(books) {
-            const inStockCount = books.filter(book => book.stock_quantity > 5).length;
-            const lowStockCount = books.filter(book => book.stock_quantity <= 5 && book.stock_quantity > 0).length;
-            const outOfStockCount = books.filter(book => book.stock_quantity === 0).length;
+            const inStockCount = books.filter(book => {
+                const stock = parseInt(book.stock_quantity);
+                return stock > 10;
+            }).length;
+            
+            const lowStockCount = books.filter(book => {
+                const stock = parseInt(book.stock_quantity);
+                return stock >= 1 && stock <= 10;
+            }).length;
+            
+            const outOfStockCount = books.filter(book => {
+                const stock = parseInt(book.stock_quantity);
+                return stock === 0;
+            }).length;
             
             document.getElementById('inStockCount').textContent = inStockCount;
             document.getElementById('inventoryLowStock').textContent = lowStockCount;
             document.getElementById('inventoryOutOfStock').textContent = outOfStockCount;
+        }
+
+        // 应用库存筛选 - 使用正确的库存范围
+        function applyInventoryFilter(books) {
+            let filteredBooks = [];
+            
+            switch(currentInventoryFilter) {
+                case 'low':
+                    filteredBooks = books.filter(book => {
+                        const stock = parseInt(book.stock_quantity);
+                        return stock >= 1 && stock <= 10;
+                    });
+                    break;
+                case 'out':
+                    filteredBooks = books.filter(book => {
+                        const stock = parseInt(book.stock_quantity);
+                        return stock === 0;
+                    });
+                    break;
+                case 'all':
+                default:
+                    filteredBooks = books;
+                    break;
+            }
+            
+            displayInventory(filteredBooks);
         }
 
         // Display inventory - 修复库存状态显示
@@ -1260,8 +1420,6 @@
                 // 确保正确处理库存状态
                 const stockStatusClass = getStockStatusClass(book.stock_quantity);
                 const stockStatusText = getStockStatusText(book.stock_quantity);
-                
-                console.log(`Book: ${book.title}, Stock: ${book.stock_quantity}, Class: ${stockStatusClass}, Text: ${stockStatusText}`); // 调试用
                 
                 return `
                 <tr>
@@ -1285,18 +1443,22 @@
             }).join('');
         }
 
+        // Load all stock items
+        function loadAllStockItems() {
+            currentInventoryFilter = 'all';
+            loadInventoryData();
+        }
+
         // Load low stock items
         function loadLowStockItems() {
-            const lowStockBooks = currentBooks.filter(book => book.stock_quantity <= 5 && book.stock_quantity > 0);
-            displayInventory(lowStockBooks);
-            updateInventoryStats(lowStockBooks);
+            currentInventoryFilter = 'low';
+            loadInventoryData();
         }
 
         // Load out of stock items
         function loadOutOfStockItems() {
-            const outOfStockBooks = currentBooks.filter(book => book.stock_quantity === 0);
-            displayInventory(outOfStockBooks);
-            updateInventoryStats(outOfStockBooks);
+            currentInventoryFilter = 'out';
+            loadInventoryData();
         }
 
         // Load categories data
@@ -1440,6 +1602,7 @@
                 if (result.success) {
                     closeModal();
                     loadSectionData('books');
+                    loadDashboardData(); // 刷新仪表板数据
                     alert('Book saved successfully!');
                 } else {
                     alert('Error saving book: ' + result.error);
@@ -1469,6 +1632,7 @@
                 if (result.success) {
                     closeStockModal();
                     loadSectionData('inventory');
+                    loadDashboardData(); // 刷新仪表板数据
                     alert('Stock updated successfully!');
                 } else {
                     alert('Error updating stock: ' + result.error);
@@ -1493,6 +1657,7 @@
                     
                     if (result.success) {
                         loadSectionData('books');
+                        loadDashboardData(); // 刷新仪表板数据
                         alert('Book deleted successfully!');
                     } else {
                         alert('Error deleting book: ' + result.error);
@@ -1526,6 +1691,9 @@
             updateClock();
             // 每秒更新一次时间
             setInterval(updateClock, 1000);
+            
+            // 每2分钟自动刷新库存数据
+            setInterval(loadDashboardData, 120000);
         });
 
         // Close modal when clicking outside
