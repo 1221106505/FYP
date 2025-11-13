@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Payment</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Payment Details</h2>
+    <p class="total">Total Payment: RM <span id="paymentTotal">0.00</span></p>
+
+    <input type="text" id="cardName" placeholder="Full Name" required>
+    <input type="text" id="cardNumber" placeholder="Card Number" maxlength="16" required>
+    <input type="text" id="cvv" placeholder="CVV" maxlength="3" required>
+
+    <button onclick="confirmPayment()">Pay Now</button>
+    <button class="back-btn" onclick="goBack()">Back to Cart</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
