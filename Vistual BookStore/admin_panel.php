@@ -3,159 +3,34 @@ session_start();
 
 // 检查用户是否登录且是管理员
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
-    // 如果不是管理员，重定向到主页
     header('Location: ../Main.html');
     exit();
 }
 
-// 如果一切正常，显示管理员面板
+$admin_name = $_SESSION['username'] ?? 'Administrator';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin Panel - Virtual BookStore</title>
-    <style>
-        /* 复制您之前的管理员面板CSS样式 */
-        :root {
-            --primary: #2c3e50;
-            --secondary: #34495e;
-            --accent: #3498db;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: #f8f9fa;
-            color: #333;
-        }
-
-        .admin-container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* 复制所有之前的管理员面板CSS样式 */
-        .sidebar {
-            width: 250px;
-            background: var(--primary);
-            color: white;
-            padding: 20px 0;
-        }
-
-        .logo {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid var(--secondary);
-            margin-bottom: 20px;
-        }
-
-        .logo h2 {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.2rem;
-        }
-
-        .nav-links {
-            list-style: none;
-        }
-
-        .nav-links li {
-            margin-bottom: 5px;
-        }
-
-        .nav-links a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            color: #bdc3c7;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .nav-links a:hover, .nav-links a.active {
-            background: var(--secondary);
-            color: white;
-            border-left: 4px solid var(--accent);
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 20px;
-        }
-
-        .header {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            color: var(--primary);
-            font-size: 1.5rem;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logout-btn {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .content-section {
-            display: none;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-        /* 复制所有其他CSS样式... */
-    </style>
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
     <div class="admin-container">
         <!-- Sidebar -->
         <nav class="sidebar">
             <div class="logo">
-                <h2>📊 Admin Panel</h2>
+                <h2>🎯 Admin Panel</h2>
+                <p style="color: #bdc3c7; font-size: 0.9em; margin-top: 5px;">Virtual BookStore</p>
             </div>
             <ul class="nav-links">
-                <li><a href="#" class="nav-link active" data-section="dashboard"><i>📈</i> Dashboard</a></li>
+                <li><a href="#" class="nav-link active" data-section="dashboard"><i>📊</i> Dashboard</a></li>
                 <li><a href="#" class="nav-link" data-section="books"><i>📚</i> Book Management</a></li>
-                <li><a href="#" class="nav-link" data-section="orders"><i>🛒</i> Customer Orders</a></li>
-                <li><a href="#" class="nav-link" data-section="analytics"><i>📊</i> Sales Analytics</a></li>
                 <li><a href="#" class="nav-link" data-section="inventory"><i>📦</i> Inventory</a></li>
+                <li><a href="#" class="nav-link" data-section="categories"><i>🏷️</i> Categories</a></li>
+                <li><a href="#" class="nav-link" data-section="analytics"><i>📈</i> Analytics</a></li>
+                <li><a href="#" class="nav-link" data-section="settings"><i>⚙️</i> Settings</a></li>
             </ul>
         </nav>
 
@@ -165,8 +40,9 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type']) || $_SESSION[
             <div class="header">
                 <h1 id="sectionTitle">Admin Dashboard</h1>
                 <div class="user-info">
-                    <span>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> (Admin)</span>
-                    <a href="logout.php" class="logout-btn">Logout</a>
+                    <a href="../Main.html" class="back-btn">🏠 Back to Main</a>
+                    <span id="adminWelcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></span>
+                    <a href="../logout.php" class="logout-btn">🚪 Logout</a>
                 </div>
             </div>
 
@@ -178,68 +54,311 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type']) || $_SESSION[
                         <div class="stat-label">Total Books</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="totalOrders">0</div>
-                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-number" id="totalCategories">0</div>
+                        <div class="stat-label">Categories</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="totalRevenue">RM 0</div>
-                        <div class="stat-label">Total Revenue</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="lowStock">0</div>
+                        <div class="stat-number" id="lowStockCount">0</div>
                         <div class="stat-label">Low Stock Items</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="outOfStock">0</div>
+                        <div class="stat-label">Out of Stock</div>
                     </div>
                 </div>
 
-                <!-- 其他面板内容保持不变 -->
+                <div class="chart-container">
+                    <h3>📈 Sales Overview</h3>
+                    <div class="chart-placeholder">
+                        📊 Sales analytics dashboard will be implemented here
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <h3>🚀 Quick Actions</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <button class="btn btn-primary" onclick="loadSectionData('books')">
+                        <i>📚</i> Manage Books
+                    </button>
+                    <button class="btn btn-success" onclick="openAddBookModal()">
+                        <i>➕</i> Add New Book
+                    </button>
+                    <button class="btn btn-warning" onclick="loadSectionData('inventory')">
+                        <i>📦</i> View Inventory
+                    </button>
+                    <button class="btn btn-primary" onclick="loadSectionData('categories')">
+                        <i>🏷️</i> Manage Categories
+                    </button>
+                </div>
             </section>
 
-            <!-- 其他面板部分保持不变 -->
+            <!-- Book Management Section -->
+            <section id="books" class="content-section">
+                <div class="section-header">
+                    <h2>📚 Book Management</h2>
+                    <button class="btn btn-primary" onclick="openAddBookModal()">
+                        <i>➕</i> Add New Book
+                    </button>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" id="bookSearch" class="search-input" placeholder="🔍 Search books by title, author, or ISBN..." onkeyup="searchBooks()">
+                    <select id="categoryFilter" class="form-control" style="width: 200px;" onchange="filterBooks()">
+                        <option value="all">All Categories</option>
+                    </select>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-warning" onclick="filterByStock('low')">⚠️ Low Stock</button>
+                        <button class="btn btn-danger" onclick="filterByStock('out')">❌ Out of Stock</button>
+                        <button class="btn btn-success" onclick="filterByStock('all')">📦 All Stock</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Rating</th>
+                                <th>Total Sales</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="booksTable">
+                            <tr><td colspan="10" class="loading">Loading books data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Inventory Section -->
+            <section id="inventory" class="content-section">
+                <div class="section-header">
+                    <h2>📦 Inventory Management</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-warning" onclick="loadLowStockItems()">
+                            <i>⚠️</i> Low Stock
+                        </button>
+                        <button class="btn btn-danger" onclick="loadOutOfStockItems()">
+                            <i>❌</i> Out of Stock
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                    <div class="stat-card" style="border-top-color: var(--success);">
+                        <div class="stat-number" id="inStockCount">0</div>
+                        <div class="stat-label">In Stock</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--warning);">
+                        <div class="stat-number" id="inventoryLowStock">0</div>
+                        <div class="stat-label">Low Stock</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--danger);">
+                        <div class="stat-number" id="inventoryOutOfStock">0</div>
+                        <div class="stat-label">Out of Stock</div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Book ID</th>
+                                <th>Title</th>
+                                <th>Current Stock</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Last Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTable">
+                            <tr><td colspan="7" class="loading">Loading inventory data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Categories Section -->
+            <section id="categories" class="content-section">
+                <div class="section-header">
+                    <h2>🏷️ Category Management</h2>
+                    <button class="btn btn-primary" onclick="openAddCategoryModal()">
+                        <i>➕</i> Add Category
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Category Name</th>
+                                <th>Book Count</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTable">
+                            <tr><td colspan="4" class="loading">Loading categories...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="content-section">
+                <div class="section-header">
+                    <h2>📈 Sales Analytics</h2>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>📊 Sales Trend (Last 30 Days)</h3>
+                    <div class="chart-placeholder">
+                        Sales trend chart will be displayed here
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>🔥 Top Selling Books</h3>
+                    <div class="chart-placeholder">
+                        Top sellers chart will be displayed here
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>🏷️ Revenue by Category</h3>
+                    <div class="chart-placeholder">
+                        Category revenue chart will be displayed here
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="section-header">
+                    <h2>⚙️ System Settings</h2>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Store Name</label>
+                        <input type="text" class="form-control" value="Virtual BookStore">
+                    </div>
+                    <div class="form-group">
+                        <label>Admin Email</label>
+                        <input type="email" class="form-control" value="admin@virtualbookstore.com">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Store Description</label>
+                    <textarea class="form-control" rows="3">Your ultimate online book destination</textarea>
+                </div>
+                
+                <button class="btn btn-primary">💾 Save Settings</button>
+            </section>
         </main>
     </div>
 
     <!-- Add/Edit Book Modal -->
     <div class="modal" id="bookModal">
-        <!-- 模态框内容保持不变 -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Book</h3>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="bookForm">
+                    <input type="hidden" id="bookId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bookTitle">📖 Title *</label>
+                            <input type="text" id="bookTitle" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookAuthor">✍️ Author *</label>
+                            <input type="text" id="bookAuthor" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bookCategory">🏷️ Category *</label>
+                            <select id="bookCategory" class="form-control" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookPrice">💰 Price (RM) *</label>
+                            <input type="number" id="bookPrice" class="form-control" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bookStock">📦 Stock Quantity *</label>
+                            <input type="number" id="bookStock" class="form-control" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookISBN">🔢 ISBN</label>
+                            <input type="text" id="bookISBN" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bookPublisher">🏢 Publisher</label>
+                            <input type="text" id="bookPublisher" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="bookPublishDate">📅 Publish Date</label>
+                            <input type="date" id="bookPublishDate" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookDescription">📝 Description</label>
+                        <textarea id="bookDescription" class="form-control" rows="4" placeholder="Enter book description..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">❌ Cancel</button>
+                <button class="btn btn-primary" onclick="saveBook()">💾 Save Book</button>
+            </div>
+        </div>
     </div>
 
-    <script>
-        // API endpoints - 使用正确的相对路径
-        const API_ENDPOINTS = {
-            books: '../api/get_books.php',
-            bookDetail: '../api/get_book_detail.php',
-            categories: '../api/get_categories.php',
-            stock: '../api/get_stock_data.php'
-        };
+    <!-- Stock Update Modal -->
+    <div class="modal" id="stockModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📦 Update Stock</h3>
+                <button class="close" onclick="closeStockModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="stockForm">
+                    <input type="hidden" id="stockBookId">
+                    <div class="form-group">
+                        <label>📖 Book Title</label>
+                        <input type="text" id="stockBookTitle" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="newStockQuantity">🔄 New Stock Quantity *</label>
+                        <input type="number" id="newStockQuantity" class="form-control" min="0" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeStockModal()">❌ Cancel</button>
+                <button class="btn btn-primary" onclick="updateStock()">💾 Update Stock</button>
+            </div>
+        </div>
+    </div>
 
-        // 复制之前的所有JavaScript功能
-        // Navigation
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-                
-                const sectionId = this.getAttribute('data-section');
-                document.querySelectorAll('.content-section').forEach(section => {
-                    section.classList.remove('active');
-                });
-                document.getElementById(sectionId).classList.add('active');
-                
-                document.getElementById('sectionTitle').textContent = this.textContent.trim();
-                
-                loadSectionData(sectionId);
-            });
-        });
-
-        // 复制所有其他JavaScript函数...
-        
-        // 初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Admin panel loaded');
-            loadDashboardData();
-        });
-    </script>
+    <script src="js/admin.js"></script>
 </body>
 </html>

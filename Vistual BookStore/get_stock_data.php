@@ -32,13 +32,33 @@ $result = $conn->query($sql);
 
 if ($result) {
     $books = [];
+    $inStock = 0;
+    $lowStock = 0;
+    $outOfStock = 0;
+    
     while ($row = $result->fetch_assoc()) {
         $books[] = $row;
+        
+        // 计算库存状态
+        if ($row['stock_quantity'] > 10) {
+            $inStock++;
+        } elseif ($row['stock_quantity'] >= 1 && $row['stock_quantity'] <= 10) {
+            $lowStock++;
+        } elseif ($row['stock_quantity'] == 0) {
+            $outOfStock++;
+        }
     }
     
     echo json_encode([
         'success' => true,
-        'books' => $books
+        'books' => $books,
+        'stats' => [
+            'inStock' => $inStock,
+            'lowStock' => $lowStock,
+            'outOfStock' => $outOfStock
+        ],
+        'hasLowStockWarning' => $lowStock > 0,
+        'hasOutOfStockWarning' => $outOfStock > 0
     ]);
 } else {
     echo json_encode([
