@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Order History - Virtual BookStore</title>
+    <style>
+        /* 保持原有的CSS样式不变 */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-weight: 500;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-back {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Order Status Styles */
+        .order-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-shipped {
+            background: #cce7ff;
+            color: #004085;
+        }
+
+        .status-delivered {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Orders List */
+        .orders-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .order-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .order-id {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .order-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .order-items {
+            margin-bottom: 15px;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .item-author {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .item-quantity, .item-price {
+            font-weight: 500;
+            margin: 0 10px;
+        }
+
+        .order-total {
+            text-align: right;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary);
+            border-top: 2px solid #e9ecef;
+            padding-top: 10px;
+        }
+
+        .no-orders {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .no-orders h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .error {
+            color: var(--danger);
+            text-align: center;
+            padding: 40px;
+        }
+
+        /* Login Prompt */
+        .login-prompt {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .login-prompt h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .login-prompt p {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .order-details {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 My Order History</h1>
+            <div class="user-info">
+                <a href="user_profile.html" class="btn btn-back">👤 Back to Profile</a>
+                <a href="Main.html" class="btn btn-secondary">🏠 Back to Main</a>
+            </div>
+        </div>
+
+        <div id="orderContent">
+            <div class="login-prompt" id="loginPrompt">
+                <h2>Please Login</h2>
+                <p>You need to be logged in to view your order history.</p>
+                <a href="../Login/Login.html" class="btn btn-primary">Go to Login</a>
+            </div>
+            
+            <div id="ordersList" class="hidden">
+                <div class="orders-container">
+                    <div id="ordersContainer">
+                        <div class="loading">Loading your orders...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API endpoints
+        const API_ENDPOINTS = {
+            orders: 'get_customer_orders.php',
+            checkLogin: 'check_login.php'
+        };
+
+        // 检查登录状态并加载订单
+        async function loadOrderHistory() {
+            console.log('Starting order history load...');
+            
+            try {
+                const response = await fetch(API_ENDPOINTS.checkLogin, {
+                    credentials: 'include',
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                console.log('Login check response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Login check result:', data);
+                
+                const loginPrompt = document.getElementById('loginPrompt');
+                const ordersList = document.getElementById('ordersList');
+                
+                if (data.logged_in && data.user_id) {
+                    console.log('User is logged in with ID:', data.user_id);
+                    
+                    // 用户已登录，加载订单
+                    loginPrompt.classList.add('hidden');
+                    ordersList.classList.remove('hidden');
+                    
+                    // 加载用户订单
+                    await loadCustomerOrders(data.user_id);
+                } else {
+                    console.log('User is not logged in or missing user ID');
+                    // 用户未登录，显示登录提示
+                    loginPrompt.classList.remove('hidden');
+                    ordersList.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading order history:', error);
+                // 显示错误信息
+                document.getElementById('ordersContainer').innerHTML = 
+                    '<div class="error">Error loading orders. Please try again later.</div>';
+                
+                // 显示登录提示
+                document.getElementById('loginPrompt').classList.remove('hidden');
+                document.getElementById('ordersList').classList.add('hidden');
+            }
+        }
+
+        // 加载顾客订单
+        async function loadCustomerOrders(customerId) {
+            console.log('Loading orders for customer:', customerId);
+            
+            try {
+                const response = await fetch(`${API_ENDPOINTS.orders}?customer_id=${customerId}`, {
+                    credentials: 'include',
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                console.log('Orders response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch orders: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Orders data:', data);
+                
+                const ordersContainer = document.getElementById('ordersContainer');
+                
+                if (data.success && data.orders && data.orders.length > 0) {
+                    console.log(`Found ${data.orders.length} orders`);
+                    displayOrders(data.orders);
+                } else {
+                    console.log('No orders found or API returned error');
+                    ordersContainer.innerHTML = `
+                        <div class="no-orders">
+                            <h3>No Orders Found</h3>
+                            <p>You haven't placed any orders yet.</p>
+                            <a href="Searching.html" class="btn btn-primary" style="margin-top: 15px;">
+                                🛍️ Start Shopping
+                            </a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading customer orders:', error);
+                document.getElementById('ordersContainer').innerHTML = 
+                    '<div class="error">Error loading orders. Please try again later.</div>';
+            }
+        }
+
+        // 显示订单
+        function displayOrders(orders) {
+            const ordersContainer = document.getElementById('ordersContainer');
+            
+            ordersContainer.innerHTML = orders.map(order => {
+                // 确保订单项数据存在且格式正确
+                const orderItems = order.items || [];
+                
+                return `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <div class="order-id">Order #${order.order_id}</div>
+                            <div class="order-date">Placed on ${new Date(order.order_date).toLocaleDateString()}</div>
+                        </div>
+                        <div class="order-status ${getStatusClass(order.status)}">
+                            ${getStatusText(order.status)}
+                        </div>
+                    </div>
+                    
+                    <div class="order-details">
+                        <div>
+                            <strong>Shipping Address:</strong><br>
+                            ${order.shipping_address || 'No address provided'}
+                        </div>
+                        <div>
+                            <strong>Items:</strong><br>
+                            ${order.item_count || orderItems.length || 0} items
+                        </div>
+                        <div>
+                            <strong>Total Quantity:</strong><br>
+                            ${order.total_quantity || orderItems.reduce((sum, item) => sum + (parseInt(item.quantity) || 0), 0)}
+                        </div>
+                        <div>
+                            <strong>Contact:</strong><br>
+                            ${order.contact_phone || 'N/A'}
+                        </div>
+                    </div>
+                    
+                    ${orderItems.length > 0 ? `
+                        <div class="order-items">
+                            <strong>Order Items:</strong>
+                            ${orderItems.map(item => {
+                                // 确保书本名称正确显示
+                                const bookTitle = item.book_title || item.title || 'Unknown Book';
+                                const author = item.author || 'Unknown Author';
+                                const quantity = item.quantity || 0;
+                                const unitPrice = parseFloat(item.unit_price || item.price || 0).toFixed(2);
+                                const subtotal = parseFloat(item.subtotal || (quantity * parseFloat(unitPrice))).toFixed(2);
+                                
+                                return `
+                                <div class="order-item">
+                                    <div class="item-info">
+                                        <div class="item-title">${bookTitle}</div>
+                                        <div class="item-author">by ${author}</div>
+                                    </div>
+                                    <div class="item-quantity">Qty: ${quantity}</div>
+                                    <div class="item-price">RM ${unitPrice}</div>
+                                    <div class="item-subtotal">RM ${subtotal}</div>
+                                </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    ` : '<div class="order-items"><em>No items found for this order</em></div>'}
+                    
+                    <div class="order-total">
+                        Total Amount: RM ${parseFloat(order.total_amount || 0).toFixed(2)}
+                    </div>
+                    
+                    ${order.payment ? `
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                            Payment: ${order.payment.payment_method || 'Unknown'} - 
+                            <span class="${getPaymentStatusClass(order.payment.payment_status)}">
+                                ${order.payment.payment_status || 'Unknown'}
+                            </span>
+                        </div>
+                    ` : '<div style="margin-top: 10px; font-size: 0.9rem; color: #666;">Payment: No payment information</div>'}
+                </div>
+                `;
+            }).join('');
+        }
+
+        // 获取状态类名
+        function getStatusClass(status) {
+            const statusMap = {
+                'pending': 'status-pending',
+                'confirmed': 'status-confirmed',
+                'shipped': 'status-shipped',
+                'delivered': 'status-delivered',
+                'cancelled': 'status-cancelled'
+            };
+            return statusMap[status] || 'status-pending';
+        }
+
+        // 获取状态文本
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'Pending',
+                'confirmed': 'Confirmed',
+                'shipped': 'Shipped',
+                'delivered': 'Delivered',
+                'cancelled': 'Cancelled'
+            };
+            return statusMap[status] || status;
+        }
+
+        // 获取支付状态类名
+        function getPaymentStatusClass(status) {
+            const statusMap = {
+                'pending': 'status-pending',
+                'completed': 'status-delivered',
+                'failed': 'status-cancelled',
+                'refunded': 'status-cancelled'
+            };
+            return statusMap[status] || 'status-pending';
+        }
+
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Order History Page Loaded');
+            loadOrderHistory();
+        });
+    </script>
+</body>
+</html>

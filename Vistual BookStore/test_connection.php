@@ -1,19 +1,14 @@
 <?php
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
 
-// Database configuration
 $host = 'localhost';
-$username = 'root'; // 根据您的数据库配置修改
-$password = ''; // 根据您的数据库配置修改
-$database = 'Bookstore'; // 根据您的数据库名称修改
+$username = 'root';
+$password = '';
+$database = 'Bookstore';
 
-// Create connection
 $conn = new mysqli($host, $username, $password, $database);
 
-// Check connection
 if ($conn->connect_error) {
     echo json_encode([
         'success' => false,
@@ -22,9 +17,29 @@ if ($conn->connect_error) {
     exit();
 }
 
+// 检查表是否存在
+$tables = ['books', 'customers', 'orders', 'order_items'];
+$table_info = [];
+
+foreach ($tables as $table) {
+    $result = $conn->query("SHOW TABLES LIKE '$table'");
+    $table_info[$table] = $result->num_rows > 0 ? 'exists' : 'not exists';
+    
+    if ($result->num_rows > 0) {
+        // 显示表结构
+        $columns_result = $conn->query("DESCRIBE $table");
+        $columns = [];
+        while ($row = $columns_result->fetch_assoc()) {
+            $columns[] = $row;
+        }
+        $table_info[$table . '_columns'] = $columns;
+    }
+}
+
 echo json_encode([
     'success' => true,
-    'message' => 'Database connection successful'
+    'database' => $database,
+    'tables' => $table_info
 ]);
 
 $conn->close();

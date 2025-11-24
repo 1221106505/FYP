@@ -1,6 +1,14 @@
+// API endpoints
+const API_ENDPOINTS = {
+  checkLogin: 'check_login.php',
+  books: 'get_book.php'
+};
+
 // 检查登录状态并更新UI
 function checkLoginStatus() {
-  fetch('check_login.php')
+  fetch(API_ENDPOINTS.checkLogin, {
+    credentials: 'include'
+  })
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -20,7 +28,7 @@ function checkLoginStatus() {
     });
 }
 
-/// 更新管理员入口显示
+// 更新管理员入口显示
 function updateAdminEntry(userData) {
   const adminEntry = document.getElementById('adminEntry');
   
@@ -31,16 +39,6 @@ function updateAdminEntry(userData) {
   if (userData.logged_in && userData.role === 'admin') {
     adminEntry.classList.remove('hidden');
     console.log('Admin entry displayed');
-    
-    // 强制应用样式
-    adminEntry.style.background = 'white';
-    adminEntry.style.color = '#333';
-    adminEntry.style.padding = '30px';
-    adminEntry.style.margin = '40px auto';
-    adminEntry.style.maxWidth = '1000px';
-    adminEntry.style.borderRadius = '8px';
-    adminEntry.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-    adminEntry.style.border = '1px solid #e0e0e0';
   } else {
     adminEntry.classList.add('hidden');
   }
@@ -57,101 +55,79 @@ function trackAdminEntry() {
 }
 
 // 根据用户角色更新服务选项
-function updateServicesBasedOnRole(userData) {
-  const servicesContainer = document.getElementById('servicesContainer');
-  
-  if (!servicesContainer) return;
-  
-  console.log('Updating services for role:', userData.role); // 调试信息
-  
-  if (!userData.logged_in) {
-    // 未登录用户只能看到搜索和关于我们
-    servicesContainer.innerHTML = `
-      <div class="service-item">
-        <a href="Searching.html" class="service-link">
-          <div class="service-icon">🔍</div>
-          <h3>Search Books</h3>
-          <p>Find exactly what you're looking for with our powerful search tool.</p>
-        </a>
-      </div>
-      <div class="service-item">
-        <a href="About.html" class="service-link">
-          <div class="service-icon">ℹ️</div>
-          <h3>About Us</h3>
-          <p>Learn more about our mission and the team behind Virtual BookStore.</p>
-        </a>
-      </div>
-    `;
-  } else if (userData.role === 'admin') {
-    // 管理员看到的服务选项
-    servicesContainer.innerHTML = `
-      <div class="service-item">
-        <a href="admin_panel.html" class="service-link" onclick="trackLinkClick('admin_panel')">
-          <div class="service-icon">⚙️</div>
-          <h3>Admin Panel</h3>
-          <p>Access administrative functions and system management.</p>
-        </a>
-      </div>
-      <div class="service-item">
-        <a href="stock_management.html" class="service-link">
-          <div class="service-icon">📊</div>
-          <h3>Stock Management</h3>
-          <p>Manage book inventory and track stock levels.</p>
-        </a>
-      </div>
-      <div class="service-item">
-        <a href="AddBook.html" class="service-link">
-          <div class="service-icon">➕</div>
-          <h3>Add New Book</h3>
-          <p>Contribute to our collection by adding new books to the store.</p>
-        </a>
-      </div>
-      <div class="service-item">
-        <a href="Searching.html" class="service-link">
-          <div class="service-icon">🔍</div>
-          <h3>Search Books</h3>
-          <p>Find exactly what you're looking for with our powerful search tool.</p>
-        </a>
-      </div>
-    `;
-  } else {
-    // 顾客看到的服务选项
-    servicesContainer.innerHTML = `
-      <div class="service-item">
-        <a href="customer_view.html" class="service-link">
-          <div class="service-icon">🛒</div>
-          <h3>Browse Books</h3>
-          <p>Explore our extensive collection of books.</p>
-        </a>
-      </div>
-      <div class="service-item">
-        <a href="Searching.html" class="service-link">
-          <div class="service-icon">🔍</div>
-          <h3>Search Books</h3>
-          <p>Find exactly what you're looking for.</p>
-        </a>
-      </div>
-      <div class="service-item">
-        <a href="user_profile.html" class="service-link">
-          <div class="service-icon">👤</div>
-          <h3>My Profile</h3>
-          <p>Manage your account and preferences.</p>
-        </a>
-      </div>
-      <div class="service-item">
-        <a href="About.html" class="service-link">
-          <div class="service-icon">ℹ️</div>
-          <h3>About Us</h3>
-          <p>Learn more about our bookstore.</p>
-        </a>
-      </div>
-    `;
-  }
+// 根据登录状态更新服务显示
+function updateServicesForLoggedInUser(userData) {
+    const servicesContainer = document.getElementById('servicesContainer');
+    
+    if (userData.user_type === 'admin') {
+        servicesContainer.innerHTML = `
+            <div class="service-card" onclick="location.href='admin_panel.html'">
+                <div class="service-icon">⚙️</div>
+                <h3>Admin Panel</h3>
+                <p>Manage books, inventory, orders, and system settings with full administrative privileges</p>
+                <button class="service-btn">Access Admin Panel</button>
+            </div>
+            <div class="service-card" onclick="location.href='order_history.html'">
+                <div class="service-icon">📦</div>
+                <h3>Order History</h3>
+                <p>View your order history and track your purchases with detailed information</p>
+                <button class="service-btn">View Orders</button>
+            </div>
+            <div class="service-card" onclick="location.href='Searching.html'">
+                <div class="service-icon">🔍</div>
+                <h3>Search Books</h3>
+                <p>Explore our vast collection and find your next favorite book</p>
+                <button class="service-btn">Search Books</button>
+            </div>
+        `;
+    } else if (userData.logged_in) {
+        servicesContainer.innerHTML = `
+            <div class="service-card" onclick="location.href='order_history.html'">
+                <div class="service-icon">📦</div>
+                <h3>My Orders</h3>
+                <p>View your complete order history, track shipments, and manage your purchases</p>
+                <button class="service-btn">View Order History</button>
+            </div>
+            <div class="service-card" onclick="location.href='Searching.html'">
+                <div class="service-icon">🔍</div>
+                <h3>Search Books</h3>
+                <p>Discover new books from our extensive collection across all genres</p>
+                <button class="service-btn">Search Books</button>
+            </div>
+            <div class="service-card" onclick="location.href='user_profile.html'">
+                <div class="service-icon">👤</div>
+                <h3>My Profile</h3>
+                <p>Manage your account settings, personal information, and preferences</p>
+                <button class="service-btn">View Profile</button>
+            </div>
+        `;
+    } else {
+        servicesContainer.innerHTML = `
+            <div class="service-card" onclick="location.href='Searching.html'">
+                <div class="service-icon">🔍</div>
+                <h3>Search Books</h3>
+                <p>Browse our extensive collection and find your next favorite read</p>
+                <button class="service-btn">Search Books</button>
+            </div>
+            <div class="service-card" onclick="location.href='../Login/Login.html'">
+                <div class="service-icon">🔐</div>
+                <h3>Login</h3>
+                <p>Sign in to access personalized features, order history, and exclusive deals</p>
+                <button class="service-btn">Login Now</button>
+            </div>
+            <div class="service-card" onclick="location.href='user_profile.html'">
+                <div class="service-icon">👤</div>
+                <h3>My Account</h3>
+                <p>Create an account or manage your profile to enjoy personalized services</p>
+                <button class="service-btn">View Account</button>
+            </div>
+        `;
+    }
 }
-
 // 更新用户界面
 function updateUserInterface(userData) {
   const userInfo = document.getElementById('userInfo');
+  const welcomeMessage = document.getElementById('welcomeMessage');
   
   if (!userInfo) return;
 
@@ -171,35 +147,50 @@ function updateUserInterface(userData) {
       console.log('Admin user detected, setting profile link to:', profileLink); // 调试信息
     }
     
-    // 用户已登录，显示头像和用户名
+    // 用户已登录，显示用户欢迎信息
     userInfo.innerHTML = `
-      <a href="${profileLink}" id="userProfileLink" onclick="trackLinkClick('${profileLink}')">
-        <button class="user-button">
-          <div class="main-avatar">
-            ${userProfile.avatarType === 'image' && userProfile.avatarImage ? 
-              `<img src="${userProfile.avatarImage}" class="main-avatar-img" alt="Avatar">` : 
-              `<div class="main-avatar-emoji">${userProfile.avatarValue}</div>`
-            }
-          </div>
-          ${displayText}
-        </button>
-      </a>
+      <div class="user-welcome">
+        <span>Welcome, ${displayText}!</span>
+        <div class="user-actions">
+          <a href="${profileLink}">
+            <button class="profile-button">👤 Profile</button>
+          </a>
+          ${userData.role !== 'admin' ? `
+            <a href="order_history.html">
+              <button class="orders-button">📦 Orders</button>
+            </a>
+          ` : ''}
+          <a href="logout.php">
+            <button class="logout-button">🚪 Logout</button>
+          </a>
+        </div>
+      </div>
     `;
     
-    // 设置头像背景颜色（如果是emoji）
-    if (userProfile.avatarType === 'emoji') {
-      const avatarElement = userInfo.querySelector('.main-avatar');
-      const colors = ['#6a11cb', '#2575fc', '#28a745', '#dc3545', '#fd7e14', '#6f42c1'];
-      const color = colors[userProfile.avatarValue.charCodeAt(0) % colors.length];
-      avatarElement.style.background = `linear-gradient(135deg, ${color} 0%, ${color}99 100%)`;
+    // 显示欢迎消息
+    if (welcomeMessage) {
+      const roleText = userData.role === 'admin' ? ' (Administrator)' : '';
+      welcomeMessage.innerHTML = `
+        <h3>Welcome back, ${userData.username}${roleText}! 🎉</h3>
+        <p>Ready to continue your reading journey? ${userData.role === 'admin' ? 'Access the admin panel to manage the store.' : 'Check out your order history or explore new books!'}</p>
+      `;
+      welcomeMessage.classList.remove('hidden');
+      
+      setTimeout(() => {
+        welcomeMessage.classList.add('hidden');
+      }, 5000);
     }
   } else {
     // 用户未登录，显示登录按钮
     userInfo.innerHTML = `
       <a href="../Login/Login.html">
-        <button class="login-button">Login</button>
+        <button class="login-button">🔐 Login</button>
       </a>
     `;
+    
+    if (welcomeMessage) {
+      welcomeMessage.classList.add('hidden');
+    }
   }
 }
 
@@ -240,47 +231,11 @@ function fallbackToURLParams() {
   const role = urlParams.get('role') || 'customer';
   
   if (loginSuccess === '1' && username) {
-    const userInfo = document.getElementById('userInfo');
-    const adminEntry = document.getElementById('adminEntry');
-    
-    if (userInfo) {
-      const userProfile = getUserAvatarData(username);
-      
-      let profileLink = 'user_profile.html';
-      let displayText = decodeURIComponent(username);
-      
-      if (role === 'admin') {
-        profileLink = 'admin_panel.html';
-        displayText = decodeURIComponent(username) + ' (Admin)';
-        
-        // 显示管理员入口
-        if (adminEntry) {
-          adminEntry.classList.remove('hidden');
-        }
-      }
-      
-      userInfo.innerHTML = `
-        <a href="${profileLink}">
-          <button class="user-button">
-            <div class="main-avatar">
-              ${userProfile.avatarType === 'image' && userProfile.avatarImage ? 
-                `<img src="${userProfile.avatarImage}" class="main-avatar-img" alt="Avatar">` : 
-                `<div class="main-avatar-emoji">${userProfile.avatarValue}</div>`
-              }
-            </div>
-            ${displayText}
-          </button>
-        </a>
-      `;
-      
-      if (userProfile.avatarType === 'emoji') {
-        const avatarElement = userInfo.querySelector('.main-avatar');
-        const colors = ['#6a11cb', '#2575fc', '#28a745', '#dc3545', '#fd7e14', '#6f42c1'];
-        const color = colors[userProfile.avatarValue.charCodeAt(0) % colors.length];
-        avatarElement.style.background = `linear-gradient(135deg, ${color} 0%, ${color}99 100%)`;
-      }
-    }
-    
+    updateUserInterface({ 
+      logged_in: true, 
+      username: decodeURIComponent(username), 
+      role: role 
+    });
     updateServicesBasedOnRole({ logged_in: true, role: role });
   } else {
     updateServicesBasedOnRole({ logged_in: false });
@@ -298,7 +253,10 @@ function checkURLParams() {
     const welcomeMsg = document.getElementById('welcomeMessage');
     if (welcomeMsg) {
       const roleText = role === 'admin' ? ' (Administrator)' : '';
-      welcomeMsg.textContent = `Welcome back, ${decodeURIComponent(username)}${roleText}! Login successful.`;
+      welcomeMsg.innerHTML = `
+        <h3>Welcome back, ${decodeURIComponent(username)}${roleText}! 🎉</h3>
+        <p>Login successful! ${role === 'admin' ? 'Access the admin panel to manage the store.' : 'Start exploring our book collection!'}</p>
+      `;
       welcomeMsg.classList.remove('hidden');
       
       setTimeout(() => {
@@ -312,18 +270,67 @@ function checkURLParams() {
   }
 }
 
+// 加载畅销书籍
+function loadBestsellers() {
+  fetch(API_ENDPOINTS.books)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch books');
+      }
+      return response.json();
+    })
+    .then(data => {
+      const booksGrid = document.getElementById('booksGrid');
+      
+      if (data.success && data.books && data.books.length > 0) {
+        // 获取前4本畅销书（按销量排序）
+        const bestsellers = data.books
+          .sort((a, b) => (b.total_sales || 0) - (a.total_sales || 0))
+          .slice(0, 4);
+        
+        booksGrid.innerHTML = bestsellers.map(book => `
+          <div class="book-card" onclick="location.href='book_details.html?id=${book.id}'">
+            <div class="book-cover">${book.title.split(' ').map(word => word[0]).join('').toUpperCase().substring(0, 2)}</div>
+            <h4>${book.title}</h4>
+            <p class="book-author">${book.author}</p>
+            <div class="book-price">RM ${parseFloat(book.price).toFixed(2)}</div>
+          </div>
+        `).join('');
+      }
+    })
+    .catch(error => {
+      console.error('Error loading bestsellers:', error);
+      // 保持默认的畅销书显示
+    });
+}
+
 // 页面加载时执行
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('Main page loaded'); // 调试信息
+  console.log('Virtual BookStore Main Page Loaded');
   checkLoginStatus();
   checkURLParams();
+  loadBestsellers();
   
-  // 添加一些交互效果
+  // 添加交互效果
   addInteractivity();
+  
+  // 每5分钟刷新用户状态（可选）
+  setInterval(checkLoginStatus, 300000);
 });
 
 // 添加交互效果
 function addInteractivity() {
+  // 为所有卡片添加点击效果
+  const cards = document.querySelectorAll('.feature-card, .service-card, .book-card');
+  cards.forEach(card => {
+    card.addEventListener('click', function() {
+      this.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        this.style.transform = '';
+      }, 150);
+    });
+  });
+
   // 为服务卡片添加悬停效果
   const serviceItems = document.querySelectorAll('.service-item');
   serviceItems.forEach(item => {

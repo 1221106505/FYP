@@ -1,22 +1,21 @@
 <?php
+// check_login.php
 session_start();
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
 
-// 检查用户是否登录
-if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-    echo json_encode([
-        'logged_in' => true,
-        'username' => $_SESSION['username'] ?? '',
-        'role' => $_SESSION['user_type'] ?? 'customer'
-    ]);
-} else {
-    echo json_encode([
-        'logged_in' => false,
-        'username' => '',
-        'role' => ''
-    ]);
+$response = [
+    'logged_in' => false,
+    'username' => '',
+    'user_type' => '',
+    'user_id' => null
+];
+
+if (isset($_SESSION['user_id'])) {
+    $response['logged_in'] = true;
+    $response['username'] = $_SESSION['username'];
+    $response['user_type'] = $_SESSION['user_type'];
+    $response['user_id'] = $_SESSION['user_id'];
 }
+
+echo json_encode($response);
 ?>

@@ -11,6 +11,7 @@
             --success: #27ae60;
             --warning: #f39c12;
             --danger: #e74c3c;
+            --info: #17a2b8;
             --light: #ecf0f1;
             --dark: #2c3e50;
         }
@@ -236,6 +237,19 @@
         .btn-warning {
             background: var(--warning);
             color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
         }
 
         /* Tables */
@@ -538,6 +552,183 @@
             border-color: #ffeaa7;
         }
 
+        /* Order Status Styles */
+        .order-status, .payment-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-shipped {
+            background: #cce7ff;
+            color: #004085;
+        }
+
+        .status-delivered {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-refunded {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .status-unknown {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        /* Order Details Modal Styles */
+        .order-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .order-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .order-section.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .order-section h4 {
+            margin: 0 0 12px 0;
+            color: var(--primary);
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-row label {
+            font-weight: 600;
+            color: var(--primary);
+            min-width: 120px;
+        }
+
+        .address-box, .notes-box {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            margin-top: 8px;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .order-items-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .order-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            margin-bottom: 10px;
+        }
+
+        .order-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .item-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .item-details {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .item-details span {
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .current-status {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        /* Warning Modal Styles */
+        .warning-modal .modal-content {
+            max-width: 500px;
+            border-top: 6px solid var(--warning);
+        }
+
+        .warning-modal .modal-header {
+            background: var(--warning);
+        }
+
+        .warning-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .warning-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .admin-container {
@@ -581,6 +772,25 @@
             .search-box {
                 flex-direction: column;
             }
+            
+            .order-details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .item-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .warning-actions {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -596,6 +806,7 @@
                 <li><a href="#" class="nav-link active" data-section="dashboard"><i>📊</i> Dashboard</a></li>
                 <li><a href="#" class="nav-link" data-section="books"><i>📚</i> Book Management</a></li>
                 <li><a href="#" class="nav-link" data-section="inventory"><i>📦</i> Inventory</a></li>
+                <li><a href="#" class="nav-link" data-section="orders"><i>📦</i> Order Management</a></li>
                 <li><a href="#" class="nav-link" data-section="categories"><i>🏷️</i> Categories</a></li>
                 <li><a href="#" class="nav-link" data-section="analytics"><i>📈</i> Analytics</a></li>
                 <li><a href="#" class="nav-link" data-section="settings"><i>⚙️</i> Settings</a></li>
@@ -633,6 +844,10 @@
                         <div class="stat-number" id="outOfStock">0</div>
                         <div class="stat-label">Out of Stock</div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalOrders">0</div>
+                        <div class="stat-label">Total Orders</div>
+                    </div>
                 </div>
 
                 <div class="chart-container">
@@ -654,6 +869,9 @@
                     </button>
                     <button class="btn btn-warning" onclick="loadSectionData('inventory')">
                         <i>📦</i> View Inventory
+                    </button>
+                    <button class="btn btn-info" onclick="loadSectionData('orders')">
+                        <i>📦</i> View Orders
                     </button>
                     <button class="btn btn-primary" onclick="loadSectionData('categories')">
                         <i>🏷️</i> Manage Categories
@@ -753,6 +971,75 @@
                         </thead>
                         <tbody id="inventoryTable">
                             <tr><td colspan="7" class="loading">Loading inventory data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Order Management Section -->
+            <section id="orders" class="content-section">
+                <div class="section-header">
+                    <h2>📦 Order Management</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="orderStatusFilter" class="form-control" style="width: 200px;" onchange="filterOrders()">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="refreshOrders()">
+                            <i>🔄</i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                    <div class="stat-card" style="border-top-color: var(--warning);">
+                        <div class="stat-number" id="pendingOrders">0</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--accent);">
+                        <div class="stat-number" id="confirmedOrders">0</div>
+                        <div class="stat-label">Confirmed</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--info);">
+                        <div class="stat-number" id="shippedOrders">0</div>
+                        <div class="stat-label">Shipped</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--success);">
+                        <div class="stat-number" id="deliveredOrders">0</div>
+                        <div class="stat-label">Delivered</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--danger);">
+                        <div class="stat-number" id="totalOrdersCount">0</div>
+                        <div class="stat-label">Total Orders</div>
+                    </div>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" id="orderSearch" class="search-input" placeholder="🔍 Search orders by ID, customer name, or email..." onkeyup="searchOrders()">
+                    <input type="number" id="customerIdFilter" class="form-control" style="width: 150px;" placeholder="Customer ID" onchange="filterOrders()">
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Order Date</th>
+                                <th>Items</th>
+                                <th>Total Amount</th>
+                                <th>Status</th>
+                                <th>Payment</th>
+                                <th>Last Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTable">
+                            <tr><td colspan="9" class="loading">Loading orders data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -941,13 +1228,27 @@
             saveBook: 'add_new_book.php',
             deleteBook: 'delete_book.php',
             updateStock: 'update_book_stock.php',
-            searchBook: 'search_book.php'
+            searchBook: 'search_book.php',
+            orders: 'getorder.php',
+            orderDetail: 'get_single_order.php',
+            updateOrder: 'update_order.php'
         };
 
         // Current state
         let currentBooks = [];
         let currentCategories = [];
-        let currentInventoryFilter = 'all'; // Track current inventory filter
+        let currentOrders = [];
+        let currentInventoryFilter = 'all';
+        let warningShownThisSession = false;
+
+        // Order status mapping
+        const ORDER_STATUS_MAP = {
+            'pending': { text: '⏳ Pending', class: 'status-pending' },
+            'confirmed': { text: '✅ Confirmed', class: 'status-confirmed' },
+            'shipped': { text: '🚚 Shipped', class: 'status-shipped' },
+            'delivered': { text: '📦 Delivered', class: 'status-delivered' },
+            'cancelled': { text: '❌ Cancelled', class: 'status-cancelled' }
+        };
 
         // 实时时钟函数
         function updateClock() {
@@ -971,29 +1272,26 @@
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 
-                // Update active nav link
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
                 
-                // Show corresponding section
                 const sectionId = this.getAttribute('data-section');
                 document.querySelectorAll('.content-section').forEach(section => {
                     section.classList.remove('active');
                 });
                 document.getElementById(sectionId).classList.add('active');
                 
-                // Update page title
                 const sectionTitles = {
                     'dashboard': 'Dashboard',
                     'books': 'Book Management',
                     'inventory': 'Inventory Management',
+                    'orders': 'Order Management',
                     'categories': 'Category Management',
                     'analytics': 'Sales Analytics',
                     'settings': 'System Settings'
                 };
                 document.getElementById('sectionTitle').textContent = sectionTitles[sectionId];
                 
-                // Load section data
                 loadSectionData(sectionId);
             });
         });
@@ -1010,6 +1308,9 @@
                 case 'inventory':
                     loadInventoryData();
                     break;
+                case 'orders':
+                    loadOrdersData();
+                    break;
                 case 'categories':
                     loadCategoriesData();
                     break;
@@ -1025,19 +1326,20 @@
         // Load dashboard data
         async function loadDashboardData() {
             try {
-                const [booksResponse, categoriesResponse] = await Promise.all([
+                const [booksResponse, categoriesResponse, ordersResponse] = await Promise.all([
                     fetch(API_ENDPOINTS.books),
-                    fetch(API_ENDPOINTS.categories)
+                    fetch(API_ENDPOINTS.categories),
+                    fetch(API_ENDPOINTS.orders)
                 ]);
 
                 const booksData = await booksResponse.json();
                 const categoriesData = await categoriesResponse.json();
+                const ordersData = await ordersResponse.json();
 
                 if (booksData.success) {
                     const books = booksData.books || booksData.data || [];
                     document.getElementById('totalBooks').textContent = books.length;
                     
-                    // 修复：使用正确的库存范围 (Low Stock: 1-10, Out of Stock: 0)
                     const lowStockCount = books.filter(book => {
                         const stock = parseInt(book.stock_quantity);
                         return stock >= 1 && stock <= 10;
@@ -1051,13 +1353,17 @@
                     document.getElementById('lowStockCount').textContent = lowStockCount;
                     document.getElementById('outOfStock').textContent = outOfStockCount;
                     
-                    // 检查并显示库存警告
                     checkStockWarnings(lowStockCount, outOfStockCount);
                 }
 
                 if (categoriesData.success) {
                     const categories = categoriesData.categories || categoriesData.data || [];
                     document.getElementById('totalCategories').textContent = categories.length;
+                }
+
+                if (ordersData.success) {
+                    const orders = ordersData.orders || [];
+                    document.getElementById('totalOrders').textContent = orders.length;
                 }
 
             } catch (error) {
@@ -1070,71 +1376,322 @@
             const lowStockCard = document.getElementById('lowStockCard');
             const outOfStockCard = document.getElementById('outOfStockCard');
             
-            // 重置警告状态
             lowStockCard.classList.remove('warning');
             outOfStockCard.classList.remove('warning');
             
             let warningMessage = '';
+            let showWarning = false;
             
             if (outOfStockCount > 0) {
                 outOfStockCard.classList.add('warning');
                 warningMessage += `CRITICAL: You have ${outOfStockCount} item(s) out of stock!\n`;
+                showWarning = true;
             }
             
             if (lowStockCount > 0) {
                 lowStockCard.classList.add('warning');
                 warningMessage += `WARNING: You have ${lowStockCount} item(s) with low stock!\n`;
+                showWarning = true;
             }
             
-            // 如果有警告，显示警告横幅
-            if (warningMessage) {
-                showWarningBanner(warningMessage);
-                
-                // 如果是第一次加载或有严重问题，显示弹窗警告
-                if (outOfStockCount > 0) {
-                    setTimeout(() => {
-                        if (confirm('STOCK ALERT:\n\n' + warningMessage + '\nClick OK to view inventory details.')) {
-                            loadSectionData('inventory');
-                        }
-                    }, 1500);
-                }
-            } else {
-                // 移除警告横幅
-                removeWarningBanner();
+            if (showWarning && !warningShownThisSession) {
+                showWarningModal(warningMessage);
+                warningShownThisSession = true;
             }
         }
 
-        // 显示警告横幅
-        function showWarningBanner(message) {
-            // 移除现有的警告横幅
-            removeWarningBanner();
+        // 显示警告弹窗（只显示一次）
+        function showWarningModal(message) {
+            const modal = document.createElement('div');
+            modal.className = 'modal warning-modal';
+            modal.style.display = 'flex';
+            modal.id = 'warningModal';
             
-            // 创建新的警告横幅
-            const banner = document.createElement('div');
-            banner.id = 'stock-warning-banner';
-            
-            banner.innerHTML = `
-                ⚠️ STOCK ALERT: ${message.replace(/\n/g, ' ')}
-                <button onclick="removeWarningBanner()" style="
-                    margin-left: 20px;
-                    background: white;
-                    color: #ff6b6b;
-                    border: none;
-                    padding: 5px 10px;
-                    border-radius: 3px;
-                    cursor: pointer;
-                    font-weight: bold;
-                ">Dismiss</button>
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>⚠️ STOCK ALERT</h3>
+                        <button class="close" id="closeWarningModal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="warning-icon">⚠️</div>
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <h4 style="color: var(--warning); margin-bottom: 15px;">Inventory Issues Detected</h4>
+                            <p style="line-height: 1.6; white-space: pre-line;">${message}</p>
+                        </div>
+                        <div class="warning-actions">
+                            <button class="btn btn-warning" id="viewInventoryBtn">
+                                📦 View Inventory
+                            </button>
+                            <button class="btn btn-primary" id="understandWarningBtn">
+                                👍 I Understand
+                            </button>
+                        </div>
+                    </div>
+                </div>
             `;
             
-            document.body.prepend(banner);
+            document.body.appendChild(modal);
+            
+            // 添加事件监听器
+            const closeModal = () => {
+                modal.remove();
+            };
+            
+            document.getElementById('closeWarningModal').addEventListener('click', closeModal);
+            document.getElementById('understandWarningBtn').addEventListener('click', closeModal);
+            document.getElementById('viewInventoryBtn').addEventListener('click', () => {
+                closeModal();
+                loadSectionData('inventory');
+            });
+            
+            // 点击外部关闭
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
         }
 
-        // 移除警告横幅
-        function removeWarningBanner() {
-            const existingBanner = document.getElementById('stock-warning-banner');
-            if (existingBanner) {
-                existingBanner.remove();
+        // View order details - 弹窗显示订单详情
+        async function viewOrderDetails(orderId) {
+            try {
+                console.log('Loading order details for order ID:', orderId);
+                
+                const response = await fetch(`${API_ENDPOINTS.orderDetail}?order_id=${orderId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Order details response:', data);
+                
+                if (data.success) {
+                    const order = data.order;
+                    showOrderDetailsModal(order);
+                } else {
+                    alert('Error loading order details: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error loading order details:', error);
+                alert('Error loading order details: ' + error.message);
+            }
+        }
+
+        // 显示订单详情弹窗
+        function showOrderDetailsModal(order) {
+            console.log('Showing order details:', order);
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.id = 'orderDetailsModal';
+            
+            // 格式化订单项
+            const itemsHtml = order.items && order.items.length > 0 ? order.items.map(item => `
+                <div class="order-item">
+                    <div class="item-title">${item.title || 'Unknown Book'}</div>
+                    <div class="item-details">
+                        <span>Quantity: ${item.quantity || 0}</span>
+                        <span>Price: RM ${parseFloat(item.unit_price || 0).toFixed(2)}</span>
+                        <span>Subtotal: RM ${parseFloat(item.subtotal || 0).toFixed(2)}</span>
+                    </div>
+                </div>
+            `).join('') : '<div class="order-item">No items found in this order</div>';
+            
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 800px;">
+                    <div class="modal-header">
+                        <h3>📦 Order #${order.order_id} Details</h3>
+                        <button class="close" id="closeOrderModal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="order-details-grid">
+                            <div class="order-section">
+                                <h4>👤 Customer Information</h4>
+                                <div class="detail-row">
+                                    <label>Customer ID:</label>
+                                    <span>${order.customer_id || 'N/A'}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <label>Email:</label>
+                                    <span>${order.contact_email || 'N/A'}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <label>Phone:</label>
+                                    <span>${order.contact_phone || 'N/A'}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="order-section">
+                                <h4>📋 Order Information</h4>
+                                <div class="detail-row">
+                                    <label>Order Date:</label>
+                                    <span>${order.order_date ? new Date(order.order_date).toLocaleString() : 'N/A'}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <label>Status:</label>
+                                    <span class="order-status ${ORDER_STATUS_MAP[order.status]?.class || 'status-unknown'}">
+                                        ${ORDER_STATUS_MAP[order.status]?.text || order.status || 'Unknown'}
+                                    </span>
+                                </div>
+                                <div class="detail-row">
+                                    <label>Total Amount:</label>
+                                    <span style="font-weight: bold; color: var(--success);">RM ${parseFloat(order.total_amount || 0).toFixed(2)}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="order-section full-width">
+                                <h4>🏠 Shipping Address</h4>
+                                <div class="address-box">${order.shipping_address || 'No shipping address provided'}</div>
+                            </div>
+                            
+                            <div class="order-section full-width">
+                                <h4>🏢 Billing Address</h4>
+                                <div class="address-box">${order.billing_address || 'No billing address provided'}</div>
+                            </div>
+                            
+                            <div class="order-section full-width">
+                                <h4>📚 Order Items (${order.items ? order.items.length : 0} items)</h4>
+                                <div class="order-items-list">
+                                    ${itemsHtml}
+                                </div>
+                            </div>
+                            
+                            ${order.notes ? `
+                            <div class="order-section full-width">
+                                <h4>📝 Order Notes</h4>
+                                <div class="notes-box">${order.notes}</div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" id="updateStatusBtn">
+                            ✏️ Update Status
+                        </button>
+                        <button class="btn" id="closeOrderModalBtn">❌ Close</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // 添加事件监听器
+            const closeModal = () => {
+                modal.remove();
+            };
+            
+            document.getElementById('closeOrderModal').addEventListener('click', closeModal);
+            document.getElementById('closeOrderModalBtn').addEventListener('click', closeModal);
+            document.getElementById('updateStatusBtn').addEventListener('click', () => {
+                closeModal();
+                openUpdateStatusModal(order.order_id, order.status);
+            });
+            
+            // 点击外部关闭
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        // 打开更新状态弹窗
+        function openUpdateStatusModal(orderId, currentStatus) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.id = 'updateStatusModal';
+            
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h3>✏️ Update Order Status</h3>
+                        <button class="close" id="closeStatusModal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="newOrderStatus">Select New Status:</label>
+                            <select id="newOrderStatus" class="form-control">
+                                <option value="pending" ${currentStatus === 'pending' ? 'selected' : ''}>⏳ Pending</option>
+                                <option value="confirmed" ${currentStatus === 'confirmed' ? 'selected' : ''}>✅ Confirmed</option>
+                                <option value="shipped" ${currentStatus === 'shipped' ? 'selected' : ''}>🚚 Shipped</option>
+                                <option value="delivered" ${currentStatus === 'delivered' ? 'selected' : ''}>📦 Delivered</option>
+                                <option value="cancelled" ${currentStatus === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="current-status">
+                            Current Status: <span class="order-status ${ORDER_STATUS_MAP[currentStatus]?.class || 'status-unknown'}">
+                                ${ORDER_STATUS_MAP[currentStatus]?.text || currentStatus}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" id="cancelStatusUpdate">❌ Cancel</button>
+                        <button class="btn btn-primary" id="confirmStatusUpdate">💾 Update Status</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // 添加事件监听器
+            const closeModal = () => {
+                modal.remove();
+            };
+            
+            document.getElementById('closeStatusModal').addEventListener('click', closeModal);
+            document.getElementById('cancelStatusUpdate').addEventListener('click', closeModal);
+            document.getElementById('confirmStatusUpdate').addEventListener('click', () => {
+                updateOrderStatus(orderId);
+            });
+            
+            // 点击外部关闭
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        // 更新订单状态
+        async function updateOrderStatus(orderId) {
+            const newStatus = document.getElementById('newOrderStatus').value;
+            
+            if (!newStatus) {
+                alert('Please select a status');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to update order #${orderId} status to "${newStatus}"?`)) {
+                try {
+                    const response = await fetch(API_ENDPOINTS.updateOrder, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            order_id: orderId,
+                            status: newStatus
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // 关闭弹窗
+                        const modal = document.querySelector('#updateStatusModal');
+                        if (modal) modal.remove();
+                        
+                        alert('Order status updated successfully!');
+                        loadOrdersData();
+                    } else {
+                        alert('Error updating order status: ' + result.error);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error updating order status');
+                }
             }
         }
 
@@ -1283,7 +1840,7 @@
                     .then(result => {
                         if (result.success) {
                             loadSectionData('books');
-                            loadDashboardData(); // 刷新仪表板数据
+                            loadDashboardData();
                             alert('Book set as Out of Stock successfully!');
                         } else {
                             alert('Error updating stock: ' + result.error);
@@ -1351,7 +1908,6 @@
                 if (data.success) {
                     const books = data.books;
                     updateInventoryStats(books);
-                    // 根据当前筛选状态显示数据
                     applyInventoryFilter(books);
                 }
             } catch (error) {
@@ -1359,7 +1915,7 @@
             }
         }
 
-        // Update inventory statistics - 使用正确的库存范围
+        // Update inventory statistics
         function updateInventoryStats(books) {
             const inStockCount = books.filter(book => {
                 const stock = parseInt(book.stock_quantity);
@@ -1381,7 +1937,7 @@
             document.getElementById('inventoryOutOfStock').textContent = outOfStockCount;
         }
 
-        // 应用库存筛选 - 使用正确的库存范围
+        // 应用库存筛选
         function applyInventoryFilter(books) {
             let filteredBooks = [];
             
@@ -1407,7 +1963,7 @@
             displayInventory(filteredBooks);
         }
 
-        // Display inventory - 修复库存状态显示
+        // Display inventory
         function displayInventory(books) {
             const inventoryTable = document.getElementById('inventoryTable');
             
@@ -1417,7 +1973,6 @@
             }
 
             inventoryTable.innerHTML = books.map(book => {
-                // 确保正确处理库存状态
                 const stockStatusClass = getStockStatusClass(book.stock_quantity);
                 const stockStatusText = getStockStatusText(book.stock_quantity);
                 
@@ -1459,6 +2014,129 @@
         function loadOutOfStockItems() {
             currentInventoryFilter = 'out';
             loadInventoryData();
+        }
+
+        // Load orders data
+        async function loadOrdersData() {
+            try {
+                const response = await fetch(API_ENDPOINTS.orders);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentOrders = data.orders || [];
+                    updateOrderStats(currentOrders);
+                    displayOrders(currentOrders);
+                } else {
+                    document.getElementById('ordersTable').innerHTML = '<tr><td colspan="9" class="error">Error loading orders</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                document.getElementById('ordersTable').innerHTML = '<tr><td colspan="9" class="error">Error loading orders</td></tr>';
+            }
+        }
+
+        // Update order statistics
+        function updateOrderStats(orders) {
+            const pending = orders.filter(order => order.status === 'pending').length;
+            const confirmed = orders.filter(order => order.status === 'confirmed').length;
+            const shipped = orders.filter(order => order.status === 'shipped').length;
+            const delivered = orders.filter(order => order.status === 'delivered').length;
+            
+            document.getElementById('pendingOrders').textContent = pending;
+            document.getElementById('confirmedOrders').textContent = confirmed;
+            document.getElementById('shippedOrders').textContent = shipped;
+            document.getElementById('deliveredOrders').textContent = delivered;
+            document.getElementById('totalOrdersCount').textContent = orders.length;
+        }
+
+        // Display orders
+        function displayOrders(orders) {
+            const ordersTable = document.getElementById('ordersTable');
+            
+            if (orders.length === 0) {
+                ordersTable.innerHTML = '<tr><td colspan="9" class="loading">No orders found</td></tr>';
+                return;
+            }
+
+            ordersTable.innerHTML = orders.map(order => {
+                const statusInfo = ORDER_STATUS_MAP[order.status] || { text: order.status, class: 'status-unknown' };
+                
+                return `
+                <tr>
+                    <td><strong>#${order.order_id}</strong></td>
+                    <td>
+                        <div><strong>${order.customer_name || 'Customer ' + order.customer_id}</strong></div>
+                        <div style="font-size: 0.8em; color: #666;">${order.contact_email || 'No email'}</div>
+                    </td>
+                    <td>${new Date(order.order_date).toLocaleDateString()}</td>
+                    <td>
+                        <div>${order.item_count} items</div>
+                        <div style="font-size: 0.8em; color: #666;">${order.total_quantity} total</div>
+                    </td>
+                    <td><strong>RM ${parseFloat(order.total_amount).toFixed(2)}</strong></td>
+                    <td>
+                        <span class="order-status ${statusInfo.class}">
+                            ${statusInfo.text}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="payment-status status-unknown">
+                            N/A
+                        </span>
+                    </td>
+                    <td>${new Date(order.updated_at).toLocaleDateString()}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-primary" onclick="viewOrderDetails(${order.order_id})">
+                            👁️ View
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="openUpdateStatusModal(${order.order_id}, '${order.status}')">
+                            ✏️ Update
+                        </button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        // Filter orders
+        function filterOrders() {
+            const statusFilter = document.getElementById('orderStatusFilter').value;
+            const customerIdFilter = document.getElementById('customerIdFilter').value;
+            
+            let filteredOrders = currentOrders || [];
+            
+            if (statusFilter !== 'all') {
+                filteredOrders = filteredOrders.filter(order => order.status === statusFilter);
+            }
+            
+            if (customerIdFilter) {
+                filteredOrders = filteredOrders.filter(order => order.customer_id == customerIdFilter);
+            }
+            
+            displayOrders(filteredOrders);
+        }
+
+        // Search orders
+        function searchOrders() {
+            const searchTerm = document.getElementById('orderSearch').value.toLowerCase();
+            
+            if (searchTerm.length < 2) {
+                displayOrders(currentOrders);
+                return;
+            }
+            
+            const filteredOrders = (currentOrders || []).filter(order => 
+                order.order_id.toString().includes(searchTerm) ||
+                (order.customer_name && order.customer_name.toLowerCase().includes(searchTerm)) ||
+                (order.contact_email && order.contact_email.toLowerCase().includes(searchTerm))
+            );
+            
+            displayOrders(filteredOrders);
+        }
+
+        // Refresh orders
+        function refreshOrders() {
+            loadOrdersData();
         }
 
         // Load categories data
@@ -1602,7 +2280,7 @@
                 if (result.success) {
                     closeModal();
                     loadSectionData('books');
-                    loadDashboardData(); // 刷新仪表板数据
+                    loadDashboardData();
                     alert('Book saved successfully!');
                 } else {
                     alert('Error saving book: ' + result.error);
@@ -1632,7 +2310,7 @@
                 if (result.success) {
                     closeStockModal();
                     loadSectionData('inventory');
-                    loadDashboardData(); // 刷新仪表板数据
+                    loadDashboardData();
                     alert('Stock updated successfully!');
                 } else {
                     alert('Error updating stock: ' + result.error);
@@ -1657,7 +2335,7 @@
                     
                     if (result.success) {
                         loadSectionData('books');
-                        loadDashboardData(); // 刷新仪表板数据
+                        loadDashboardData();
                         alert('Book deleted successfully!');
                     } else {
                         alert('Error deleting book: ' + result.error);
