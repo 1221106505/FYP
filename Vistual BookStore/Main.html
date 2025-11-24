@@ -2,119 +2,178 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Virtual BookStore</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual BookStore - Your Reading Journey Starts Here</title>
   <link rel="stylesheet" href="Main.css">
 </head>
 <body>
-  <section class="mainbackground">
-    <h1>Welcome To Virtual BookStore!</h1>
-    <p>Your ultimate destination for discovering amazing books</p>
-    
-    <div class="user-info" id="userInfo">
-      <!-- 这里会被JavaScript动态更新 -->
-      <a href="../Login/Login.html">
-        <button class="login-button" id="loginButton">Login</button>
-      </a>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <h2>📚 Virtual BookStore</h2>
+      </div>
+      <div class="nav-user" id="userInfo">
+        <!-- 动态用户信息 -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- 英雄区域 -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">Discover Your Next Favorite Book</h1>
+        <p class="hero-subtitle">Explore thousands of books across all genres. From bestsellers to hidden gems, your reading adventure starts here.</p>
+        <div class="hero-buttons">
+          <button class="btn-primary" onclick="location.href='Searching.html'">Browse Collection</button>
+          <button class="btn-secondary" onclick="location.href='../Login/Login.html'">Join Our Community</button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="floating-books">
+          <div class="book-item book-1">📖</div>
+          <div class="book-item book-2">📚</div>
+          <div class="book-item book-3">✨</div>
+        </div>
+      </div>
     </div>
   </section>
 
+  <!-- 欢迎消息 -->
   <div id="welcomeMessage" class="welcome-message hidden"></div>
 
-  <section class="content">
-    <div class="content-header">
-      <h2>About Virtual BookStore</h2>
-    </div>
-    <div class="content-body">
-      <p>Welcome to your ultimate online book destination! At Virtual BookStore, we bring the world of literature to your fingertips.</p>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">📚</div>
-          <h3>Vast Collection</h3>
-          <p>Discover thousands of books across all genres from bestsellers to hidden gems.</p>
+  <!-- 快速操作区域 -->
+  <section class="quick-actions">
+    <div class="container">
+      <div class="actions-grid">
+        <div class="action-card" onclick="location.href='Searching.html'">
+          <div class="action-icon">🔍</div>
+          <h3>Search Books</h3>
+          <p>Find your next read with advanced search</p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">🚚</div>
-          <h3>Fast Delivery</h3>
-          <p>Get your books delivered quickly with our reliable shipping service.</p>
+        <div class="action-card" onclick="location.href='reading_lists.html'">
+          <div class="action-icon">📖</div>
+          <h3>Reading Lists</h3>
+          <p>Create and share book lists</p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">💰</div>
-          <h3>Best Prices</h3>
-          <p>Enjoy competitive prices and regular discounts on your favorite books.</p>
+        <div class="action-card" onclick="location.href='order_history.html'">
+          <div class="action-icon">📦</div>
+          <h3>My Orders</h3>
+          <p>Track and manage your orders</p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">⭐</div>
-          <h3>Customer Reviews</h3>
-          <p>Make informed choices with authentic reviews from our reading community.</p>
+        
+        <div class="action-card" onclick="location.href='user_profile.html'">
+          <div class="action-icon">👤</div>
+          <h3>My Profile</h3>
+          <p>Manage your account settings</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="services">
-    <h2>Our Services</h2>
-    <div class="services-container" id="servicesContainer">
-      <!-- 这里会被JavaScript根据用户角色动态更新 -->
-      <!-- 管理员会在这里看到 Admin Panel 选项 -->
-      <!-- 已登录顾客会在这里看到 Order History 选项 -->
-    </div>
-  </section>
-
-  <section class="bestsellers">
-    <h2>Current Bestsellers</h2>
-    <div class="books-grid" id="booksGrid">
-      <!-- 这里会被JavaScript从数据库动态加载 -->
-      <div class="book-card">
-        <div class="book-cover">AH</div>
-        <h4>Atomic Habits</h4>
-        <p class="book-author">James Clear</p>
-        <div class="book-price">$18.99</div>
+  <!-- 畅销书展示 -->
+  <section class="showcase-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Trending Now</h2>
+        <p>Discover what other readers are loving this week</p>
       </div>
-      <div class="book-card">
-        <div class="book-cover">D</div>
-        <h4>Dune</h4>
-        <p class="book-author">Frank Herbert</p>
-        <div class="book-price">$16.99</div>
+      
+      <div class="books-showcase" id="booksGrid">
+        <!-- 动态书籍内容 - 现在显示8本 -->
       </div>
-      <div class="book-card">
-        <div class="book-cover">H</div>
-        <h4>The Hobbit</h4>
-        <p class="book-author">J.R.R. Tolkien</p>
-        <div class="book-price">$14.99</div>
-      </div>
-      <div class="book-card">
-        <div class="book-cover">HP</div>
-        <h4>Harry Potter and the Philosopher's Stone</h4>
-        <p class="book-author">J.K. Rowling</p>
-        <div class="book-price">$12.99</div>
+      
+      <div class="showcase-actions">
+        <button class="btn-outline" onclick="location.href='Searching.html'">View All Books</button>
+        <button class="btn-primary" onclick="location.href='order_history.html'">View My Orders</button>
       </div>
     </div>
   </section>
 
+  <!-- 关于我们部分 -->
+  <section class="about-section">
+    <div class="container">
+      <div class="about-content">
+        <div class="about-text">
+          <h2>About Virtual BookStore</h2>
+          <p>Founded with a passion for literature and technology, Virtual BookStore brings the magic of reading to the digital age. We believe every book has a story to tell and every reader deserves to find their perfect match.</p>
+          <p>Our mission is to create a welcoming space where book lovers can discover, connect, and share their reading experiences. From classic literature to contemporary bestsellers, we curate collections that inspire and delight.</p>
+          <div class="about-features">
+            <div class="about-feature">
+              <span class="feature-icon">📚</span>
+              <span>Curated Collections</span>
+            </div>
+            <div class="about-feature">
+              <span class="feature-icon">🌟</span>
+              <span>Expert Recommendations</span>
+            </div>
+            <div class="about-feature">
+              <span class="feature-icon">💫</span>
+              <span>Community Driven</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-visual">
+          <div class="visual-element book-stack">
+            <div class="book book-1"></div>
+            <div class="book book-2"></div>
+            <div class="book book-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
   <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h4>Virtual BookStore</h4>
-        <p>Your online destination for all things books. Read, explore, and discover.</p>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <h3>📚 Virtual BookStore</h3>
+          <p>Your gateway to endless reading possibilities. Discover, read, and connect with stories that matter.</p>
+          <div class="social-links">
+            <a href="#" class="social-link">📘</a>
+            <a href="#" class="social-link">🐦</a>
+            <a href="#" class="social-link">📷</a>
+          </div>
+        </div>
+        
+        <div class="footer-links">
+          <div class="footer-column">
+            <h4>Explore</h4>
+            <ul>
+              <li><a href="Main.html">Home</a></li>
+              <li><a href="Searching.html">Browse Books</a></li>
+              <li><a href="About.html">About Us</a></li>
+              <li><a href="order_history.html">My Orders</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer-column">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="#">Help Center</a></li>
+              <li><a href="#">Contact Us</a></li>
+              <li><a href="#">Shipping Info</a></li>
+              <li><a href="#">Returns</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer-column">
+            <h4>Contact</h4>
+            <div class="contact-info">
+              <p>📧 hello@virtualbookstore.com</p>
+              <p>📞 1-800-READ-NOW</p>
+              <p>📍 123 Bookworm Lane</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="footer-section">
-        <h4>Quick Links</h4>
-        <ul>
-          <li><a href="Main.html">Home</a></li>
-          <li><a href="About.html">About</a></li>
-          <li><a href="Searching.html">Search Books</a></li>
-          <li><a href="user_profile.html">My Account</a></li>
-        </ul>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Virtual BookStore. All stories welcome. 📖</p>
       </div>
-      <div class="footer-section">
-        <h4>Contact Info</h4>
-        <p>📧 support@virtualbookstore.com</p>
-        <p>📞 1-800-BOOKS-NOW</p>
-        <p>📍 123 Book Street, Readerville</p>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2024 Virtual BookStore. All rights reserved.</p>
     </div>
   </footer>
 
