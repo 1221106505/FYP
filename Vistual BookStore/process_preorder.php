@@ -62,6 +62,7 @@ try {
     $stmt->close();
     
 } catch (Exception $e) {
+    error_log("Database error in process_preorder.php: " . $e->getMessage());
     echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
 }
 

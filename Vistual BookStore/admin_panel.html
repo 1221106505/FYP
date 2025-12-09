@@ -729,6 +729,42 @@
             margin-top: 20px;
         }
 
+        /* Pre-order specific styles */
+        .preorder-badge {
+            background: var(--warning);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .pagination-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            padding: 8px 16px;
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .admin-container {
@@ -745,6 +781,10 @@
             
             .stats-grid {
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .order-details-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -771,10 +811,6 @@
             
             .search-box {
                 flex-direction: column;
-            }
-            
-            .order-details-grid {
-                grid-template-columns: 1fr;
             }
             
             .detail-row {
@@ -807,6 +843,7 @@
                 <li><a href="#" class="nav-link" data-section="books"><i>📚</i> Book Management</a></li>
                 <li><a href="#" class="nav-link" data-section="inventory"><i>📦</i> Inventory</a></li>
                 <li><a href="#" class="nav-link" data-section="orders"><i>📦</i> Order Management</a></li>
+                <li><a href="#" class="nav-link" data-section="preorders"><i>📋</i> Pre-Order Management</a></li>
                 <li><a href="#" class="nav-link" data-section="categories"><i>🏷️</i> Categories</a></li>
                 <li><a href="#" class="nav-link" data-section="analytics"><i>📈</i> Analytics</a></li>
                 <li><a href="#" class="nav-link" data-section="settings"><i>⚙️</i> Settings</a></li>
@@ -848,6 +885,10 @@
                         <div class="stat-number" id="totalOrders">0</div>
                         <div class="stat-label">Total Orders</div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalPreOrders">0</div>
+                        <div class="stat-label">Active Pre-Orders</div>
+                    </div>
                 </div>
 
                 <div class="chart-container">
@@ -872,6 +913,9 @@
                     </button>
                     <button class="btn btn-info" onclick="loadSectionData('orders')">
                         <i>📦</i> View Orders
+                    </button>
+                    <button class="btn btn-info" onclick="loadSectionData('preorders')">
+                        <i>📋</i> Manage Pre-Orders
                     </button>
                     <button class="btn btn-primary" onclick="loadSectionData('categories')">
                         <i>🏷️</i> Manage Categories
@@ -1042,6 +1086,94 @@
                             <tr><td colspan="9" class="loading">Loading orders data...</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </section>
+            
+            <!-- Pre-Order Management Section (增强版) -->
+            <section id="preorders" class="content-section">
+                <div class="section-header">
+                    <h2>📋 Pre-Order Management</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="preorderStatusFilter" class="form-control" style="width: 200px;" onchange="filterPreOrders()">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="refreshPreOrders()">
+                            <i>🔄</i> Refresh
+                        </button>
+                        <button class="btn btn-success" onclick="exportPreOrders()">
+                            <i>📥</i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                    <div class="stat-card" style="border-top-color: var(--warning);">
+                        <div class="stat-number" id="pendingPreOrders">0</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--accent);">
+                        <div class="stat-number" id="confirmedPreOrders">0</div>
+                        <div class="stat-label">Confirmed</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--info);">
+                        <div class="stat-number" id="shippedPreOrders">0</div>
+                        <div class="stat-label">Shipped</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--success);">
+                        <div class="stat-number" id="deliveredPreOrders">0</div>
+                        <div class="stat-label">Delivered</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--danger);">
+                        <div class="stat-number" id="cancelledPreOrders">0</div>
+                        <div class="stat-label">Cancelled</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--primary);">
+                        <div class="stat-number" id="totalPreOrdersCount">0</div>
+                        <div class="stat-label">Total Pre-Orders</div>
+                    </div>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" id="preorderSearch" class="search-input" 
+                        placeholder="🔍 Search pre-orders by ID, customer name, book title, or email..." 
+                        onkeyup="searchPreOrders()">
+                    <input type="number" id="preorderCustomerFilter" class="form-control" 
+                        style="width: 150px;" placeholder="Customer ID" onchange="filterPreOrders()">
+                    <input type="number" id="preorderBookFilter" class="form-control" 
+                        style="width: 150px;" placeholder="Book ID" onchange="filterPreOrders()">
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Pre-Order ID</th>
+                                <th>Customer</th>
+                                <th>Book</th>
+                                <th>Qty</th>
+                                <th>Order Date</th>
+                                <th>Expected Date</th>
+                                <th>Total Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="preordersTable">
+                            <tr><td colspan="9" class="loading">Loading pre-orders data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 分页控制 -->
+                <div class="pagination">
+                    <button class="pagination-btn" onclick="changePreOrderPage(-1)" id="prevPageBtn" disabled>⬅️ Previous</button>
+                    <span class="pagination-info" id="preorderPageInfo">Page 1 of 1</span>
+                    <button class="pagination-btn" onclick="changePreOrderPage(1)" id="nextPageBtn" disabled>Next ➡️</button>
                 </div>
             </section>
 
@@ -1218,9 +1350,56 @@
         </div>
     </div>
 
+    <!-- Pre-Order Details Modal -->
+    <div class="modal" id="preorderDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="preorderModalTitle">Pre-Order Details</h3>
+                <button class="close" onclick="closePreOrderModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="preorderModalBody">
+                <!-- 动态加载内容 -->
+            </div>
+            <div class="modal-footer" id="preorderModalFooter">
+                <!-- 动态加载按钮 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Pre-Order Status Modal -->
+    <div class="modal" id="updatePreOrderStatusModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Update Pre-Order Status</h3>
+                <button class="close" onclick="closeUpdatePreOrderStatusModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newPreOrderStatus">Select New Status:</label>
+                    <select id="newPreOrderStatus" class="form-control">
+                        <option value="pending">⏳ Pending</option>
+                        <option value="confirmed">✅ Confirmed</option>
+                        <option value="shipped">🚚 Shipped</option>
+                        <option value="delivered">📦 Delivered</option>
+                        <option value="cancelled">❌ Cancelled</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="preOrderNotes">Notes (Optional):</label>
+                    <textarea id="preOrderNotes" class="form-control" rows="3" placeholder="Add any notes about this status change..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeUpdatePreOrderStatusModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmUpdatePreOrderStatus()">Update Status</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // API endpoints
         const API_ENDPOINTS = {
+            // 从admin_panel.html继承的API
             books: 'get_book.php',
             bookDetail: 'get_book_detail.php',
             categories: 'get_categories.php',
@@ -1231,7 +1410,12 @@
             searchBook: 'search_book.php',
             orders: 'getorder.php',
             orderDetail: 'get_single_order.php',
-            updateOrder: 'update_order.php'
+            updateOrder: 'update_order.php',
+            adminPreorders: 'admin_get_preorders.php',
+            adminPreorderDetail: 'admin_get_single_preorder.php',
+            adminUpdatePreOrder: 'admin_update_preorder.php',
+            adminCancelPreOrder: 'admin_cancel_preorder.php',
+            preorderStats: 'admin_get_preorder_stats.php'
         };
 
         // Current state
@@ -1240,6 +1424,13 @@
         let currentOrders = [];
         let currentInventoryFilter = 'all';
         let warningShownThisSession = false;
+        
+        // 预购订单状态
+        let currentPreOrders = [];
+        let currentPreOrdersFiltered = [];
+        let currentPreOrderPage = 1;
+        let selectedPreOrderId = 0;
+        const PREORDERS_PER_PAGE = 15;
 
         // Order status mapping
         const ORDER_STATUS_MAP = {
@@ -1286,6 +1477,7 @@
                     'books': 'Book Management',
                     'inventory': 'Inventory Management',
                     'orders': 'Order Management',
+                    'preorders': 'Pre-Order Management',
                     'categories': 'Category Management',
                     'analytics': 'Sales Analytics',
                     'settings': 'System Settings'
@@ -1311,6 +1503,9 @@
                 case 'orders':
                     loadOrdersData();
                     break;
+                case 'preorders':
+                    loadPreOrdersData();
+                    break;
                 case 'categories':
                     loadCategoriesData();
                     break;
@@ -1326,6 +1521,7 @@
         // Load dashboard data
         async function loadDashboardData() {
             try {
+                // 从admin_panel.html的dashboard逻辑
                 const [booksResponse, categoriesResponse, ordersResponse] = await Promise.all([
                     fetch(API_ENDPOINTS.books),
                     fetch(API_ENDPOINTS.categories),
@@ -1335,7 +1531,28 @@
                 const booksData = await booksResponse.json();
                 const categoriesData = await categoriesResponse.json();
                 const ordersData = await ordersResponse.json();
-
+                
+              
+                const preorderStatsResponse = await fetch(API_ENDPOINTS.preorderStats);
+                const preorderStatsData = await preorderStatsResponse.json();
+                
+                if (preorderStatsData.success) {
+                    const stats = preorderStatsData.stats || {};
+                    const activePreOrders = (stats.pending || 0) + (stats.confirmed || 0) + (stats.shipped || 0);
+                    document.getElementById('totalPreOrders').textContent = activePreOrders;
+                } else {
+                    // 回退到原始方法
+                    const preordersResponse = await fetch(API_ENDPOINTS.preorders);
+                    const preordersData = await preordersResponse.json();
+                    if (preordersData.success) {
+                        const preorders = preordersData.preorders || [];
+                        const activePreOrders = preorders.filter(order => 
+                            order.status === 'pending' || order.status === 'confirmed'
+                        ).length;
+                        document.getElementById('totalPreOrders').textContent = activePreOrders;
+                    }
+                }
+                
                 if (booksData.success) {
                     const books = booksData.books || booksData.data || [];
                     document.getElementById('totalBooks').textContent = books.length;
@@ -1453,7 +1670,517 @@
             });
         }
 
-        // View order details - 弹窗显示订单详情
+        // ============================================
+        // PRE-ORDER MANAGEMENT FUNCTIONS (增强版)
+        // ============================================
+
+        // 加载预购订单数据
+        async function loadPreOrdersData() {
+            try {
+                document.getElementById('preordersTable').innerHTML = 
+                    '<tr><td colspan="9" class="loading">Loading pre-orders data...</td></tr>';
+                
+                // 尝试使用增强API，如果失败则使用原始API
+                let response;
+                try {
+                    response = await fetch(API_ENDPOINTS.adminPreorders);
+                } catch (e) {
+                    console.log('Using fallback preorders API');
+                    response = await fetch(API_ENDPOINTS.preorders);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentPreOrders = data.preorders || [];
+                    currentPreOrdersFiltered = [...currentPreOrders];
+                    currentPreOrderPage = 1;
+                    
+                    updatePreOrderStats(data);
+                    displayPreOrders();
+                    updatePreOrderPagination();
+                } else {
+                    document.getElementById('preordersTable').innerHTML = 
+                        '<tr><td colspan="9" class="error">Error loading pre-orders: ' + (data.error || 'Unknown error') + '</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading pre-orders:', error);
+                document.getElementById('preordersTable').innerHTML = 
+                    '<tr><td colspan="9" class="error">Error loading pre-orders</td></tr>';
+            }
+        }
+
+        // 更新预购订单统计
+        function updatePreOrderStats(data) {
+            const stats = {
+                pending: 0,
+                confirmed: 0,
+                shipped: 0,
+                delivered: 0,
+                cancelled: 0,
+                total: 0,
+                totalAmount: 0
+            };
+            
+            currentPreOrders.forEach(order => {
+                const status = order.status;
+                if (stats[status] !== undefined) {
+                    stats[status]++;
+                }
+                stats.total++;
+                stats.totalAmount += parseFloat(order.total_amount || 0);
+            });
+            
+            document.getElementById('pendingPreOrders').textContent = stats.pending;
+            document.getElementById('confirmedPreOrders').textContent = stats.confirmed;
+            document.getElementById('shippedPreOrders').textContent = stats.shipped;
+            document.getElementById('deliveredPreOrders').textContent = stats.delivered;
+            document.getElementById('cancelledPreOrders').textContent = stats.cancelled;
+            document.getElementById('totalPreOrdersCount').textContent = stats.total;
+        }
+
+        // 显示预购订单（带分页）
+        function displayPreOrders() {
+            const preordersTable = document.getElementById('preordersTable');
+            
+            if (!currentPreOrdersFiltered || currentPreOrdersFiltered.length === 0) {
+                preordersTable.innerHTML = '<tr><td colspan="9" class="loading">No pre-orders found</td></tr>';
+                return;
+            }
+
+            // 分页
+            const startIndex = (currentPreOrderPage - 1) * PREORDERS_PER_PAGE;
+            const endIndex = startIndex + PREORDERS_PER_PAGE;
+            const pagePreorders = currentPreOrdersFiltered.slice(startIndex, endIndex);
+
+            preordersTable.innerHTML = pagePreorders.map(preorder => {
+                const statusInfo = ORDER_STATUS_MAP[preorder.status] || { 
+                    text: preorder.status.charAt(0).toUpperCase() + preorder.status.slice(1), 
+                    class: 'status-unknown' 
+                };
+                
+                // 格式化日期
+                const orderDate = formatDate(preorder.order_date);
+                const expectedDate = formatDate(preorder.expected_delivery_date);
+                
+                return `
+                <tr>
+                    <td><strong>#${preorder.pre_order_id}</strong></td>
+                    <td>
+                        <div><strong>${preorder.customer_name || 'Customer #' + preorder.customer_id}</strong></div>
+                        <div style="font-size: 0.8em; color: #666;">${preorder.customer_email || preorder.contact_email || 'No email'}</div>
+                    </td>
+                    <td>
+                        <div><strong>${preorder.book_title || 'Book #' + preorder.book_id}</strong></div>
+                        <div style="font-size: 0.8em; color: #666;">by ${preorder.book_author || preorder.author || 'Unknown Author'}</div>
+                    </td>
+                    <td>${preorder.quantity}</td>
+                    <td>${orderDate}</td>
+                    <td>${expectedDate}</td>
+                    <td><strong>RM ${parseFloat(preorder.total_amount || 0).toFixed(2)}</strong></td>
+                    <td>
+                        <span class="order-status ${statusInfo.class}">
+                            ${statusInfo.text}
+                        </span>
+                    </td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-primary" onclick="viewPreOrderDetails(${preorder.pre_order_id})">
+                            👁️ View
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="openUpdatePreOrderStatusModal(${preorder.pre_order_id})">
+                            ✏️ Update
+                        </button>
+                        ${preorder.status !== 'cancelled' && preorder.status !== 'delivered' ? `
+                        <button class="btn btn-sm btn-danger" onclick="cancelPreOrder(${preorder.pre_order_id})">
+                            ❌ Cancel
+                        </button>
+                        ` : ''}
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        // 更新分页控制
+        function updatePreOrderPagination() {
+            const totalPages = Math.ceil(currentPreOrdersFiltered.length / PREORDERS_PER_PAGE);
+            document.getElementById('preorderPageInfo').textContent = 
+                `Page ${currentPreOrderPage} of ${totalPages}`;
+            
+            document.getElementById('prevPageBtn').disabled = currentPreOrderPage <= 1;
+            document.getElementById('nextPageBtn').disabled = currentPreOrderPage >= totalPages;
+        }
+
+        // 翻页
+        function changePreOrderPage(direction) {
+            const totalPages = Math.ceil(currentPreOrdersFiltered.length / PREORDERS_PER_PAGE);
+            const newPage = currentPreOrderPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPreOrderPage = newPage;
+                displayPreOrders();
+                updatePreOrderPagination();
+            }
+        }
+
+        // 筛选预购订单
+        function filterPreOrders() {
+            const statusFilter = document.getElementById('preorderStatusFilter').value;
+            const customerId = document.getElementById('preorderCustomerFilter').value;
+            const bookId = document.getElementById('preorderBookFilter').value;
+            
+            currentPreOrdersFiltered = currentPreOrders.filter(preorder => {
+                // 状态筛选
+                if (statusFilter !== 'all' && preorder.status !== statusFilter) {
+                    return false;
+                }
+                
+                // 客户ID筛选
+                if (customerId && preorder.customer_id != customerId) {
+                    return false;
+                }
+                
+                // 书籍ID筛选
+                if (bookId && preorder.book_id != bookId) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            currentPreOrderPage = 1;
+            displayPreOrders();
+            updatePreOrderPagination();
+        }
+
+        // 搜索预购订单
+        function searchPreOrders() {
+            const searchTerm = document.getElementById('preorderSearch').value.toLowerCase();
+            
+            if (!searchTerm) {
+                currentPreOrdersFiltered = [...currentPreOrders];
+            } else {
+                currentPreOrdersFiltered = currentPreOrders.filter(preorder => 
+                    preorder.pre_order_id.toString().includes(searchTerm) ||
+                    (preorder.customer_name && preorder.customer_name.toLowerCase().includes(searchTerm)) ||
+                    (preorder.customer_email && preorder.customer_email.toLowerCase().includes(searchTerm)) ||
+                    (preorder.contact_email && preorder.contact_email.toLowerCase().includes(searchTerm)) ||
+                    (preorder.book_title && preorder.book_title.toLowerCase().includes(searchTerm)) ||
+                    (preorder.book_author && preorder.book_author.toLowerCase().includes(searchTerm)) ||
+                    (preorder.author && preorder.author.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            currentPreOrderPage = 1;
+            displayPreOrders();
+            updatePreOrderPagination();
+        }
+
+        // 查看预购订单详情
+        async function viewPreOrderDetails(preOrderId) {
+            try {
+                // 尝试使用增强API
+                let response;
+                try {
+                    response = await fetch(`${API_ENDPOINTS.adminPreorderDetail}?pre_order_id=${preOrderId}`);
+                } catch (e) {
+                    response = await fetch(`${API_ENDPOINTS.preorderDetail}?pre_order_id=${preOrderId}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showPreOrderDetails(data.preorder || data.data);
+                } else {
+                    alert('Error loading pre-order details: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error loading pre-order details:', error);
+                alert('Error loading pre-order details');
+            }
+        }
+
+        // 显示预购订单详情弹窗
+        function showPreOrderDetails(preorder) {
+            const modal = document.getElementById('preorderDetailsModal');
+            const modalTitle = document.getElementById('preorderModalTitle');
+            const modalBody = document.getElementById('preorderModalBody');
+            const modalFooter = document.getElementById('preorderModalFooter');
+            
+            modalTitle.textContent = `Pre-Order #${preorder.pre_order_id} Details`;
+            
+            // 格式化日期
+            const orderDate = formatDate(preorder.order_date, true);
+            const expectedDate = formatDate(preorder.expected_delivery_date);
+            const updatedDate = formatDate(preorder.updated_at, true);
+            
+            modalBody.innerHTML = `
+                <div class="order-details-grid">
+                    <!-- Customer Information -->
+                    <div class="order-section">
+                        <h4>👤 Customer Information</h4>
+                        <div class="detail-row">
+                            <label>Customer ID:</label>
+                            <span>${preorder.customer_id || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Name:</label>
+                            <span>${preorder.customer_name || preorder.contact_name || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Email:</label>
+                            <span>${preorder.customer_email || preorder.contact_email || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Phone:</label>
+                            <span>${preorder.customer_phone || preorder.contact_phone || 'N/A'}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Book Information -->
+                    <div class="order-section">
+                        <h4>📚 Book Information</h4>
+                        <div class="detail-row">
+                            <label>Book ID:</label>
+                            <span>${preorder.book_id || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Title:</label>
+                            <span><strong>${preorder.book_title || preorder.title || 'N/A'}</strong></span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Author:</label>
+                            <span>${preorder.book_author || preorder.author || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Price:</label>
+                            <span>RM ${parseFloat(preorder.book_price || preorder.unit_price || 0).toFixed(2)}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Information -->
+                    <div class="order-section">
+                        <h4>📋 Order Information</h4>
+                        <div class="detail-row">
+                            <label>Order Date:</label>
+                            <span>${orderDate}</span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Quantity:</label>
+                            <span>${preorder.quantity}</span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Total Amount:</label>
+                            <span style="font-weight: bold; color: var(--success);">
+                                RM ${parseFloat(preorder.total_amount || 0).toFixed(2)}
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Status:</label>
+                            <span class="order-status ${ORDER_STATUS_MAP[preorder.status]?.class || 'status-unknown'}">
+                                ${ORDER_STATUS_MAP[preorder.status]?.text || preorder.status}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Delivery Information -->
+                    <div class="order-section">
+                        <h4>🚚 Delivery Information</h4>
+                        <div class="detail-row">
+                            <label>Expected Delivery:</label>
+                            <span>${expectedDate}</span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Last Updated:</label>
+                            <span>${updatedDate}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Address Information -->
+                    ${preorder.shipping_address ? `
+                    <div class="order-section full-width">
+                        <h4>🏠 Shipping Address</h4>
+                        <div class="address-box">${preorder.shipping_address}</div>
+                    </div>
+                    ` : ''}
+                    
+                    ${preorder.billing_address ? `
+                    <div class="order-section full-width">
+                        <h4>🏢 Billing Address</h4>
+                        <div class="address-box">${preorder.billing_address}</div>
+                    </div>
+                    ` : ''}
+                    
+                    ${preorder.notes ? `
+                    <div class="order-section full-width">
+                        <h4>📝 Notes</h4>
+                        <div class="notes-box">${preorder.notes}</div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            modalFooter.innerHTML = `
+                <button class="btn btn-warning" onclick="openUpdatePreOrderStatusModal(${preorder.pre_order_id})">
+                    ✏️ Update Status
+                </button>
+                <button class="btn btn-danger" onclick="cancelPreOrder(${preorder.pre_order_id})">
+                    ❌ Cancel Pre-Order
+                </button>
+                <button class="btn" onclick="closePreOrderModal()">
+                    Close
+                </button>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+
+        // 打开更新状态弹窗
+        function openUpdatePreOrderStatusModal(preOrderId) {
+            selectedPreOrderId = preOrderId;
+            document.getElementById('updatePreOrderStatusModal').style.display = 'flex';
+        }
+
+        // 关闭更新状态弹窗
+        function closeUpdatePreOrderStatusModal() {
+            document.getElementById('updatePreOrderStatusModal').style.display = 'none';
+            selectedPreOrderId = 0;
+        }
+
+        // 确认更新预购订单状态
+        async function confirmUpdatePreOrderStatus() {
+            const newStatus = document.getElementById('newPreOrderStatus').value;
+            const notes = document.getElementById('preOrderNotes').value;
+            
+            if (!newStatus) {
+                alert('Please select a status');
+                return;
+            }
+            
+            try {
+                // 尝试使用增强API
+                let response;
+                try {
+                    response = await fetch(API_ENDPOINTS.adminUpdatePreOrder, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            pre_order_id: selectedPreOrderId,
+                            status: newStatus,
+                            notes: notes
+                        })
+                    });
+                } catch (e) {
+                    response = await fetch(API_ENDPOINTS.updatePreOrder, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            pre_order_id: selectedPreOrderId,
+                            status: newStatus
+                        })
+                    });
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Pre-order status updated successfully!');
+                    closeUpdatePreOrderStatusModal();
+                    closePreOrderModal();
+                    loadPreOrdersData();
+                } else {
+                    alert('Error updating pre-order status: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error updating pre-order status:', error);
+                alert('Error updating pre-order status');
+            }
+        }
+
+        // 取消预购订单
+        async function cancelPreOrder(preOrderId) {
+            if (!confirm('Are you sure you want to cancel this pre-order?')) {
+                return;
+            }
+            
+            const reason = prompt('Please enter a reason for cancellation:', 'Cancelled by admin');
+            
+            try {
+                // 尝试使用增强API
+                let response;
+                try {
+                    response = await fetch(API_ENDPOINTS.adminCancelPreOrder, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            pre_order_id: preOrderId,
+                            reason: reason || 'No reason provided'
+                        })
+                    });
+                } catch (e) {
+                    response = await fetch(API_ENDPOINTS.cancelPreOrder, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            pre_order_id: preOrderId
+                        })
+                    });
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Pre-order cancelled successfully!');
+                    closePreOrderModal();
+                    loadPreOrdersData();
+                } else {
+                    alert('Error cancelling pre-order: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error cancelling pre-order:', error);
+                alert('Error cancelling pre-order');
+            }
+        }
+
+        // 关闭预购订单弹窗
+        function closePreOrderModal() {
+            document.getElementById('preorderDetailsModal').style.display = 'none';
+        }
+
+        // 刷新预购订单
+        function refreshPreOrders() {
+            loadPreOrdersData();
+        }
+
+        // 导出预购订单
+        function exportPreOrders() {
+            const dataStr = JSON.stringify(currentPreOrdersFiltered, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `pre-orders-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        // 格式化日期辅助函数
+        function formatDate(dateString, includeTime = false) {
+            if (!dateString) return 'N/A';
+            
+            const date = new Date(dateString);
+            if (includeTime) {
+                return date.toLocaleString();
+            }
+            return date.toLocaleDateString();
+        }
+
+        // ============================================
+        // 从admin_panel.html继承的其他函数
+        // ============================================
+
+        // 查看订单详情 - 弹窗显示订单详情
         async function viewOrderDetails(orderId) {
             try {
                 console.log('Loading order details for order ID:', orderId);
@@ -2378,9 +3105,13 @@
         window.onclick = function(event) {
             const modal = document.getElementById('bookModal');
             const stockModal = document.getElementById('stockModal');
+            const preorderDetailsModal = document.getElementById('preorderDetailsModal');
+            const updatePreOrderStatusModal = document.getElementById('updatePreOrderStatusModal');
             
             if (event.target === modal) closeModal();
             if (event.target === stockModal) closeStockModal();
+            if (event.target === preorderDetailsModal) closePreOrderModal();
+            if (event.target === updatePreOrderStatusModal) closeUpdatePreOrderStatusModal();
         }
     </script>
 </body>

@@ -735,6 +735,9 @@
                     <a href="cart.html" class="nav-link active">
                         <i class="fas fa-shopping-cart"></i> Cart (<span id="cart-count">0</span>)
                     </a>
+                    <a href="preorders.html" class="nav-link">
+                        <i class="fas fa-clock"></i> Pre-orders
+                    </a>
                     <a href="user_profile.html" class="nav-link">
                         <i class="fas fa-user"></i> Profile
                     </a>
@@ -1402,34 +1405,123 @@
         }
     }
 
-    // Process pre-order
-    async function processPreorder(cartId) {
-        try {
-            const response = await fetch(PROCESS_PREORDER_API, {
+    // 修复 processPreorder 函数
+async function processPreorder(cartId) {
+    try {
+        const response = await fetch('process_preorder.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                cart_id: cartId
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Pre-order processed successfully', 'success');
+            await loadPreorders();
+            await loadCartCount();
+        } else {
+            showToast(data.error || 'Failed to process pre-order', 'error');
+        }
+    } catch (error) {
+        console.error('Error processing pre-order:', error);
+        showToast('Error processing pre-order. Please try again.', 'error');
+    }
+}
+
+// 修复 moveToCart 函数
+async function moveToCart(cartId) {
+    try {
+        const response = await fetch('convert_to_preorder.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                cart_id: cartId,
+                action: 'cancel'
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Moved to regular cart', 'success');
+            await loadPreorders();
+            await loadCartCount();
+        } else {
+            showToast(data.error || 'Failed to move to cart', 'error');
+        }
+    } catch (error) {
+        console.error('Error moving to cart:', error);
+        showToast('Error moving to cart. Please try again.', 'error');
+    }
+}
+
+// 修复 executePendingAction 函数中的取消操作
+async function executePendingAction() {
+    if (!pendingAction || !pendingData) return;
+    
+    const { id, type } = pendingData;
+    
+    try {
+        if (pendingAction === 'cancel') {
+            let endpoint, body;
+            
+            if (type === 'cart') {
+                endpoint = 'cancel_preorder.php';
+                body = { cart_id: id, reason: 'Cancelled by user' };
+            } else {
+                // 对于独立预购订单的取消
+                endpoint = 'cancel_preorder_item.php';
+                body = { pre_order_id: id, reason: 'Cancelled by user' };
+            }
+            
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify({
-                    cart_id: cartId
-                })
+                body: JSON.stringify(body)
             });
 
             const data = await response.json();
             
             if (data.success) {
-                showToast('Pre-order processed successfully', 'success');
-                await loadCart();
+                showToast('Pre-order cancelled successfully', 'success');
+                await loadPreorders();
+                await loadCartCount();
             } else {
-                showToast(data.error || 'Failed to process pre-order', 'error');
+                showToast(data.error || 'Failed to cancel pre-order', 'error');
             }
-        } catch (error) {
-            console.error('Error processing pre-order:', error);
-            showToast('Error processing pre-order. Please try again.', 'error');
+            
+        } else if (pendingAction === 'confirm') {
+            // 跳转到结账页面
+            showToast('Redirecting to checkout...', 'success');
+            setTimeout(() => {
+                window.location.href = `checkout.html?preorder=${id}`;
+            }, 1000);
+            return;
+            
+        } else if (pendingAction === 'pickup') {
+            showToast('Please contact our store at 03-1234 5678 to arrange pickup.', 'success');
         }
+    } catch (error) {
+        console.error('Error executing action:', error);
+        showToast('Error performing action. Please try again.', 'error');
+    } finally {
+        closeModal();
+        pendingAction = null;
+        pendingData = null;
     }
-
+}
     // Checkout function
     function checkout() {
         if (selectedItems.size === 0) {

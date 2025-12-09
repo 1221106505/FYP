@@ -1,4 +1,5 @@
 <?php
+// /cart/convert_to_preorder.php
 session_start();
 require_once '../include/database.php';
 
@@ -23,7 +24,7 @@ if ($cart_id <= 0) {
 try {
     // 检查购物车项目是否属于当前用户
     $stmt = $conn->prepare("
-        SELECT c.*, b.title, b.price, b.stock_quantity 
+        SELECT c.*, b.title, b.price, b.stock_quantity, b.pre_order_available
         FROM cart c
         JOIN books b ON c.book_id = b.book_id
         WHERE c.cart_id = ? AND c.customer_id = ?
@@ -41,7 +42,7 @@ try {
     
     if ($action === 'cancel') {
         // 取消预购 - 恢复为普通购物车项目
-        $stmt = $conn->prepare("UPDATE cart SET is_pre_order = 0, pre_order_status = 'pending' WHERE cart_id = ?");
+        $stmt = $conn->prepare("UPDATE cart SET is_pre_order = 0, pre_order_status = 'cancelled' WHERE cart_id = ?");
         $stmt->bind_param("i", $cart_id);
         
         if ($stmt->execute()) {
@@ -51,20 +52,29 @@ try {
         }
     } else {
         // 转换为预购
+        // 检查是否允许预购
+        if ($cart_item['pre_order_available'] != 1) {
+            echo json_encode(['success' => false, 'error' => 'Pre-order not available for this book']);
+            exit();
+        }
+        
         // 检查库存是否不足
         if ($cart_item['stock_quantity'] <= 0) {
             // 更新购物车项目为预购
-            $stmt = $conn->prepare("UPDATE cart SET is_pre_order = 1, pre_order_status = 'pending', expected_date = DATE_ADD(CURDATE(), INTERVAL 30 DAY) WHERE cart_id = ?");
-            $stmt->bind_param("i", $cart_id);
+            $expected_date = date('Y-m-d', strtotime('+30 days'));
+            $stmt = $conn->prepare("UPDATE cart SET is_pre_order = 1, pre_order_status = 'pending', expected_date = ? WHERE cart_id = ?");
+            $stmt->bind_param("si", $expected_date, $cart_id);
             
             if ($stmt->execute()) {
                 // 创建预购记录到 pre_orders 表
                 $stmt2 = $conn->prepare("
                     INSERT INTO pre_orders (customer_id, book_id, quantity, total_amount, expected_delivery_date) 
-                    VALUES (?, ?, ?, ?, DATE_ADD(CURDATE(), INTERVAL 30 DAY))
+                    VALUES (?, ?, ?, ?, ?)
                 ");
-                $price = $cart_item['quantity'] * $cart_item['price'];
-                $stmt2->bind_param("iiid", $user_id, $cart_item['book_id'], $cart_item['quantity'], $price);
+                $price = $cart_item['price'];
+                $total_amount = $cart_item['quantity'] * $price;
+                $expected_delivery = date('Y-m-d', strtotime('+30 days'));
+                $stmt2->bind_param("iiids", $user_id, $cart_item['book_id'], $cart_item['quantity'], $total_amount, $expected_delivery);
                 $stmt2->execute();
                 $stmt2->close();
                 
@@ -73,13 +83,14 @@ try {
                 echo json_encode(['success' => false, 'error' => 'Failed to convert to pre-order']);
             }
         } else {
-            echo json_encode(['success' => false, 'error' => 'Item is still in stock']);
+            echo json_encode(['success' => false, 'error' => 'Item is still in stock. Cannot convert to pre-order.']);
         }
     }
     
     $stmt->close();
     
 } catch (Exception $e) {
+    error_log("Database error in convert_to_preorder.php: " . $e->getMessage());
     echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
 }
 
