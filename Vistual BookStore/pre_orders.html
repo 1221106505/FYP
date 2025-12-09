@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Pre-Orders</title>
+    <style>
+        /* 样式可以参考 customer_view.html */
+        .pre-order-item {
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        .expected-date {
+            color: #3b82f6;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Pre-Orders</h1>
+        <div id="preOrdersContainer">
+            Loading pre-orders...
+        </div>
+    </div>
+    
+    <script>
+        // 获取预购列表的API
+        async function loadPreOrders() {
+            try {
+                const response = await fetch('get_pre_orders.php', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayPreOrders(data.pre_orders);
+                }
+            } catch (error) {
+                console.error('Error loading pre-orders:', error);
+            }
+        }
+        
+        function displayPreOrders(preOrders) {
+            const container = document.getElementById('preOrdersContainer');
+            
+            if (preOrders.length === 0) {
+                container.innerHTML = '<p>You have no pre-orders.</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            preOrders.forEach(order => {
+                const item = document.createElement('div');
+                item.className = 'pre-order-item';
+                item.innerHTML = `
+                    <h3>${order.title}</h3>
+                    <p>Quantity: ${order.quantity}</p>
+                    <p>Total: RM ${order.total_amount}</p>
+                    <p class="expected-date">Expected: ${order.expected_delivery_date}</p>
+                    <p>Status: ${order.pre_order_status}</p>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        // 页面加载时获取预购列表
+        document.addEventListener('DOMContentLoaded', loadPreOrders);
+    </script>
+</body>
+</html>

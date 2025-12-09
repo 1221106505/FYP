@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookStore - Browse Books</title>
-    <link rel="stylesheet" href="Main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Customer specific styles */
         :root {
             --primary: #6d28d9;
             --primary-dark: #5b21b6;
@@ -18,6 +18,21 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #e74c3c;
+            --pre-order: #3b82f6;
+            --pre-order-dark: #1d4ed8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: var(--text);
+            line-height: 1.6;
         }
 
         .customer-container {
@@ -64,10 +79,22 @@
             color: var(--text-light);
             font-weight: 500;
             transition: color 0.3s;
+            padding: 8px 0;
+            position: relative;
         }
 
         .customer-nav a:hover, .customer-nav a.active {
             color: var(--primary);
+        }
+
+        .customer-nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
         }
 
         .user-actions {
@@ -76,26 +103,59 @@
             align-items: center;
         }
 
+        .user-welcome {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .username {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
         .cart-icon {
             position: relative;
             font-size: 1.2rem;
             color: var(--text-light);
             cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .cart-icon:hover {
+            background-color: var(--secondary);
+            color: var(--primary);
         }
 
         .cart-count {
             position: absolute;
-            top: -8px;
-            right: -8px;
+            top: -5px;
+            right: -5px;
             background: var(--primary);
             color: white;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.7rem;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background-color: var(--secondary);
+            color: var(--text);
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #e2e8f0;
         }
 
         .search-section {
@@ -136,12 +196,13 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
         .search-box input:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
         }
 
         .search-icon {
@@ -158,13 +219,45 @@
             border-radius: 8px;
             background-color: white;
             min-width: 180px;
+            font-size: 1rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .books-section {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .books-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .books-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .sort-options {
+            display: flex;
+            gap: 10px;
         }
 
         .books-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 25px;
-            margin-bottom: 40px;
         }
 
         .book-card {
@@ -174,16 +267,31 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
+            border: 1px solid var(--border);
+            position: relative;
         }
 
         .book-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .pre-order-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: var(--pre-order);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 2;
         }
 
         .book-image {
             height: 200px;
-            background-color: var(--secondary);
+            background: linear-gradient(135deg, var(--secondary), #e2e8f0);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -211,6 +319,7 @@
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
+            z-index: 2;
         }
 
         .stock-badge.in-stock {
@@ -228,6 +337,11 @@
             color: var(--danger);
         }
 
+        .stock-badge.pre-order {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: var(--pre-order);
+        }
+
         .book-info {
             padding: 20px;
         }
@@ -240,6 +354,7 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            color: var(--text);
         }
 
         .book-author {
@@ -248,23 +363,47 @@
             font-size: 0.9rem;
         }
 
+        .book-description {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
         .book-meta {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 15px;
             font-size: 0.9rem;
         }
 
         .book-category {
             background-color: var(--secondary);
-            padding: 3px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
             color: var(--text-light);
+            font-size: 0.85rem;
         }
 
         .book-price {
             font-weight: 700;
             color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .pre-order-price {
+            color: var(--pre-order);
+        }
+
+        .expected-date {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-style: italic;
         }
 
         .book-actions {
@@ -274,12 +413,17 @@
 
         .book-actions button {
             flex: 1;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 10px;
+            border-radius: 8px;
             border: none;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
 
         .add-to-cart-btn {
@@ -300,30 +444,265 @@
             background-color: var(--primary-dark);
         }
 
+        .pre-order-btn {
+            background-color: var(--pre-order);
+            color: white;
+        }
+
+        .pre-order-btn:hover {
+            background-color: var(--pre-order-dark);
+        }
+
+        .out-of-stock-btn {
+            background-color: var(--danger);
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .out-of-stock-btn:hover {
+            background-color: var(--danger);
+            opacity: 0.9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-books {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .no-books i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            color: var(--text);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .book-detail {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .book-detail-image {
+            flex: 0 0 200px;
+            height: 280px;
+            background: linear-gradient(135deg, var(--secondary), #e2e8f0);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .book-detail-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .book-detail-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .book-detail-author {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .book-detail-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .pre-order-detail {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--pre-order);
+        }
+
+        .book-detail-description {
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .book-detail-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .detail-meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-meta-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .detail-meta-value {
+            font-weight: 600;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            font-size: 1rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background-color: var(--success);
+        }
+
+        .toast.error {
+            background-color: var(--danger);
+        }
+
         @media (max-width: 768px) {
             .customer-header {
                 flex-direction: column;
                 gap: 20px;
             }
 
-            .customer-nav {
-                order: 3;
-                width: 100%;
-                justify-content: center;
+            .search-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
             }
 
             .search-controls {
                 flex-direction: column;
+                width: 100%;
             }
 
             .search-box {
                 min-width: 100%;
+            }
+
+            .books-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .book-detail {
+                flex-direction: column;
             }
         }
 
         @media (max-width: 480px) {
             .books-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .book-actions {
+                flex-direction: column;
             }
         }
     </style>
@@ -337,16 +716,19 @@
                 <h1>BookStore</h1>
             </div>
             <div class="customer-nav">
-                <a href="Main.html" class="active">Home</a>
-                <a href="About.html">About</a>
+                <a href="#" class="active">Home</a>
+                <a href="cart.html">Cart</a>
                 <a href="user_profile.html">Profile</a>
             </div>
             <div class="user-actions">
+                <div class="user-welcome">
+                    Welcome, <span class="username" id="username">Guest</span>
+                </div>
                 <div class="cart-icon" onclick="viewCart()">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count">0</span>
                 </div>
-                <a href="logout.php" class="logout-btn">Logout</a>
+                <a href="../Login/Login.html" class="logout-btn">Logout</a>
             </div>
         </header>
 
@@ -362,6 +744,11 @@
                     <select class="filter-select" id="categoryFilter">
                         <option value="all">All Categories</option>
                     </select>
+                    <select class="filter-select" id="availabilityFilter">
+                        <option value="all">All Availability</option>
+                        <option value="in_stock">In Stock</option>
+                        <option value="out_of_stock">Out of Stock</option>
+                    </select>
                     <select class="filter-select" id="priceFilter">
                         <option value="all">All Prices</option>
                         <option value="0-20">Under RM 20</option>
@@ -373,7 +760,7 @@
             </div>
         </section>
 
-        <!-- Books Grid -->
+        <!-- Books Section -->
         <section class="books-section">
             <div class="books-header">
                 <h2>Featured Books</h2>
@@ -387,43 +774,642 @@
                 </div>
             </div>
             <div class="books-grid" id="booksContainer">
-                <!-- Books will be dynamically loaded from database -->
-                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-light);">
-                    <i class="fas fa-book" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
-                    <h3>Welcome to BookStore!</h3>
-                    <p>Browse our collection of amazing books</p>
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading books...</p>
                 </div>
             </div>
         </section>
     </div>
 
+    <!-- Book Detail Modal -->
+    <div class="modal" id="bookDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Book Details</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle" id="toast-icon"></i>
+        <span id="toast-message">Book added to cart!</span>
+    </div>
+
     <script>
-        // 这里可以添加从数据库加载书籍的JavaScript代码
-        // 类似于之前提供的customer_view.html中的JavaScript功能
-        
-        // 简单的购物车功能
-        let cart = [];
-        
-        function viewCart() {
-            alert('Cart functionality coming soon! Items in cart: ' + cart.length);
-        }
-        
-        function addToCart(bookId) {
-            cart.push(bookId);
-            document.querySelector('.cart-count').textContent = cart.length;
-            alert('Book added to cart!');
-        }
-        
-        function buyNow(bookId) {
-            addToCart(bookId);
-            alert('Proceeding to checkout...');
-        }
-        
-        // 页面加载时检查用户登录状态
+        // API endpoints
+        const CHECK_LOGIN_API = 'check_login.php';
+        const BOOKS_API = 'get_book.php';
+        const CATEGORIES_API = 'get_categories.php';
+        const BOOK_DETAIL_API = 'get_book_detail.php';
+        const ADD_TO_CART_API = 'add_to_cart.php';
+        const ADD_PRE_ORDER_API = 'add_pre_order.php';
+        const GET_CART_API = 'get_cart.php';
+
+        // Global variables
+        let allBooks = [];
+        let filteredBooks = [];
+        let categories = [];
+        let currentUser = null;
+
+        // DOM Elements
+        const booksContainer = document.getElementById('booksContainer');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const availabilityFilter = document.getElementById('availabilityFilter');
+        const priceFilter = document.getElementById('priceFilter');
+        const sortBy = document.getElementById('sortBy');
+        const cartCount = document.querySelector('.cart-count');
+        const usernameElement = document.getElementById('username');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        const toastIcon = document.getElementById('toast-icon');
+
+        // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
-            // 这里可以添加从数据库加载书籍的逻辑
-            console.log('Customer view loaded');
+            checkLoginStatus();
+            loadCategories();
+            loadBooks();
+            setupEventListeners();
         });
+
+        // Check login status
+        async function checkLoginStatus() {
+            try {
+                const response = await fetch(CHECK_LOGIN_API, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.logged_in) {
+                    currentUser = data;
+                    usernameElement.textContent = data.username;
+                } else {
+                    usernameElement.textContent = 'Guest';
+                }
+                
+                updateCartCount();
+            } catch (error) {
+                console.error('Error checking login status:', error);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            searchInput.addEventListener('input', filterBooks);
+            categoryFilter.addEventListener('change', filterBooks);
+            availabilityFilter.addEventListener('change', filterBooks);
+            priceFilter.addEventListener('change', filterBooks);
+            sortBy.addEventListener('change', sortBooks);
+        }
+
+        // Load categories
+        async function loadCategories() {
+            try {
+                const response = await fetch(CATEGORIES_API);
+                const data = await response.json();
+                
+                if (data.success) {
+                    categories = data.categories;
+                    populateCategoryFilter();
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Populate category filter
+        function populateCategoryFilter() {
+            categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.category_id;
+                option.textContent = category.category_name;
+                categoryFilter.appendChild(option);
+            });
+        }
+
+        // Load books
+        async function loadBooks() {
+            try {
+                const response = await fetch(BOOKS_API);
+                const data = await response.json();
+                
+                if (data.success) {
+                    allBooks = data.books;
+                    filteredBooks = [...allBooks];
+                    displayBooks(filteredBooks);
+                }
+            } catch (error) {
+                console.error('Error loading books:', error);
+            }
+        }
+
+        // Display books
+        function displayBooks(books) {
+            if (books.length === 0) {
+                booksContainer.innerHTML = `
+                    <div class="no-books">
+                        <i class="fas fa-book-open"></i>
+                        <h3>No Books Found</h3>
+                        <p>Try adjusting your search or filter criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            booksContainer.innerHTML = '';
+            
+            books.forEach(book => {
+                const bookCard = createBookCard(book);
+                booksContainer.appendChild(bookCard);
+            });
+        }
+
+        // Create book card
+        function createBookCard(book) {
+            const card = document.createElement('div');
+            card.className = 'book-card';
+            card.dataset.id = book.book_id;
+            
+            // Determine availability
+            const isPreOrder = book.pre_order_available == 1;
+            const isOutOfStock = book.stock_quantity <= 0;
+            
+            // 只有预购书籍显示标签
+            if (isPreOrder) {
+                card.innerHTML += '<div class="pre-order-tag">PRE-ORDER</div>';
+            }
+            
+            // Stock badge
+            let stockStatus = 'in-stock';
+            let stockText = 'In Stock';
+            
+            if (isPreOrder) {
+                stockStatus = 'pre-order';
+                stockText = 'Pre-Order';
+            } else if (isOutOfStock) {
+                stockStatus = 'out-of-stock';
+                stockText = 'Out of Stock';
+            } else if (book.stock_quantity < 10) {
+                stockStatus = 'low-stock';
+                stockText = 'Low Stock';
+            }
+            
+            // Price
+            const price = parseFloat(book.price).toFixed(2);
+            
+            // ================================================
+            // 修改这里：缺货书籍显示 Out of Stock + Pre-Order 按钮
+            // ================================================
+            let button1Html = '';
+            let button2Html = '';
+            
+            if (isOutOfStock) {
+                // 缺货书籍：显示一个灰色的Out of Stock按钮和一个蓝色的Pre-Order按钮
+                button1Html = `
+                    <button class="out-of-stock-btn" disabled>
+                        <i class="fas fa-times-circle"></i> Out of Stock
+                    </button>
+                `;
+                button2Html = `
+                    <button class="pre-order-btn" onclick="addPreOrder(${book.book_id}, '${escapeHtml(book.title)}')">
+                        <i class="fas fa-clock"></i> Pre-Order
+                    </button>
+                `;
+            } else {
+                // 有库存书籍：显示普通购买按钮
+                button1Html = `
+                    <button class="add-to-cart-btn" onclick="addToCart(${book.book_id}, '${escapeHtml(book.title)}')">
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
+                `;
+                button2Html = `
+                    <button class="buy-now-btn" onclick="buyNow(${book.book_id}, '${escapeHtml(book.title)}')">
+                        <i class="fas fa-bolt"></i> Buy Now
+                    </button>
+                `;
+            }
+            
+            // Expected date for pre-order
+            let expectedDateHtml = '';
+            if (isPreOrder && book.expected_date) {
+                const expectedDate = new Date(book.expected_date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                expectedDateHtml = `<div class="expected-date">Expected: ${expectedDate}</div>`;
+            }
+            
+            card.innerHTML += `
+                <div class="book-image" onclick="viewBookDetail(${book.book_id})">
+                    <i class="fas fa-book-open book-placeholder"></i>
+                    <div class="stock-badge ${stockStatus}">${stockText}</div>
+                </div>
+                <div class="book-info">
+                    <h3 class="book-title" onclick="viewBookDetail(${book.book_id})">${escapeHtml(book.title)}</h3>
+                    <p class="book-author">by ${escapeHtml(book.author || 'Unknown Author')}</p>
+                    <p class="book-description">${escapeHtml(book.description || 'No description available.')}</p>
+                    ${expectedDateHtml}
+                    <div class="book-meta">
+                        <span class="book-category">${escapeHtml(book.category_name || 'Uncategorized')}</span>
+                        <span class="book-price ${isPreOrder ? 'pre-order-price' : ''}">RM ${price}</span>
+                    </div>
+                    <div class="book-actions">
+                        ${button1Html}
+                        ${button2Html}
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Filter books
+        function filterBooks() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedCategory = categoryFilter.value;
+            const selectedAvailability = availabilityFilter.value;
+            const selectedPrice = priceFilter.value;
+            
+            filteredBooks = allBooks.filter(book => {
+                // Search filter
+                const matchesSearch = 
+                    book.title.toLowerCase().includes(searchTerm) ||
+                    (book.author && book.author.toLowerCase().includes(searchTerm)) ||
+                    (book.category_name && book.category_name.toLowerCase().includes(searchTerm)) ||
+                    (book.description && book.description.toLowerCase().includes(searchTerm));
+                
+                if (!matchesSearch) return false;
+                
+                // Category filter
+                if (selectedCategory !== 'all' && book.category_id != selectedCategory) {
+                    return false;
+                }
+                
+                // Availability filter
+                if (selectedAvailability !== 'all') {
+                    const isOutOfStock = book.stock_quantity <= 0;
+                    
+                    if (selectedAvailability === 'in_stock' && isOutOfStock) {
+                        return false;
+                    }
+                    if (selectedAvailability === 'out_of_stock' && !isOutOfStock) {
+                        return false;
+                    }
+                }
+                
+                // Price filter
+                if (selectedPrice !== 'all') {
+                    const price = parseFloat(book.price);
+                    if (selectedPrice === '0-20' && price > 20) return false;
+                    if (selectedPrice === '20-50' && (price < 20 || price > 50)) return false;
+                    if (selectedPrice === '50-100' && (price < 50 || price > 100)) return false;
+                    if (selectedPrice === '100+' && price < 100) return false;
+                }
+                
+                return true;
+            });
+            
+            sortBooks();
+        }
+
+        // Sort books
+        function sortBooks() {
+            const sortValue = sortBy.value;
+            
+            filteredBooks.sort((a, b) => {
+                switch (sortValue) {
+                    case 'title':
+                        return a.title.localeCompare(b.title);
+                    case 'price_low':
+                        return parseFloat(a.price) - parseFloat(b.price);
+                    case 'price_high':
+                        return parseFloat(b.price) - parseFloat(a.price);
+                    case 'newest':
+                        return new Date(b.publish_date || 0) - new Date(a.publish_date || 0);
+                    default:
+                        return 0;
+                }
+            });
+            
+            displayBooks(filteredBooks);
+        }
+
+        // View book details
+        async function viewBookDetail(bookId) {
+            try {
+                const response = await fetch(`${BOOK_DETAIL_API}?book_id=${bookId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showBookDetailModal(data.book);
+                }
+            } catch (error) {
+                console.error('Error loading book details:', error);
+            }
+        }
+
+        // Show book detail modal
+        function showBookDetailModal(book) {
+            const modal = document.getElementById('bookDetailModal');
+            const modalBody = document.getElementById('modalBody');
+            
+            const isPreOrder = book.pre_order_available == 1;
+            const isOutOfStock = book.stock_quantity <= 0;
+            
+            // Stock status
+            let stockStatus = 'in-stock';
+            let stockText = 'In Stock';
+            let stockClass = 'success';
+            
+            if (isPreOrder) {
+                stockStatus = 'pre-order';
+                stockText = 'Pre-Order Available';
+                stockClass = 'pre-order';
+            } else if (isOutOfStock) {
+                stockStatus = 'out-of-stock';
+                stockText = 'Out of Stock';
+                stockClass = 'error';
+            } else if (book.stock_quantity < 10) {
+                stockStatus = 'low-stock';
+                stockText = 'Low Stock';
+                stockClass = 'warning';
+            }
+            
+            // Price
+            const price = parseFloat(book.price).toFixed(2);
+            
+            // ================================================
+            // 修改这里：详情弹窗也显示相同的按钮
+            // ================================================
+            let actionButtonsHtml = '';
+            if (isOutOfStock) {
+                // 缺货书籍：显示 Out of Stock + Pre-Order 按钮
+                actionButtonsHtml = `
+                    <button class="out-of-stock-btn" disabled>
+                        <i class="fas fa-times-circle"></i> Out of Stock
+                    </button>
+                    <button class="pre-order-btn" onclick="addPreOrder(${book.book_id}, '${escapeHtml(book.title)}'); closeModal();">
+                        <i class="fas fa-clock"></i> Pre-Order
+                    </button>
+                `;
+            } else {
+                // 有库存书籍：显示普通购买按钮
+                actionButtonsHtml = `
+                    <button class="add-to-cart-btn" onclick="addToCart(${book.book_id}, '${escapeHtml(book.title)}'); closeModal();">
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
+                    <button class="buy-now-btn" onclick="buyNow(${book.book_id}, '${escapeHtml(book.title)}'); closeModal();">
+                        <i class="fas fa-bolt"></i> Buy Now
+                    </button>
+                `;
+            }
+            
+            modalBody.innerHTML = `
+                <div class="book-detail">
+                    <div class="book-detail-image">
+                        <i class="fas fa-book-open" style="font-size: 4rem; color: var(--text-light);"></i>
+                    </div>
+                    <div class="book-detail-info">
+                        <h2 class="book-detail-title">${escapeHtml(book.title)}</h2>
+                        <p class="book-detail-author">by ${escapeHtml(book.author || 'Unknown Author')}</p>
+                        ${isPreOrder ? `
+                        <div class="pre-order-detail">
+                            <h4><i class="fas fa-clock"></i> Pre-Order Available</h4>
+                            <div class="book-detail-price" style="color: var(--pre-order);">RM ${price}</div>
+                            ${book.expected_date ? `
+                                <p>Expected: ${new Date(book.expected_date).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}</p>
+                            ` : ''}
+                        </div>
+                        ` : `
+                        <div class="book-detail-price">RM ${price}</div>
+                        `}
+                        <div class="book-detail-description">
+                            ${escapeHtml(book.description || 'No description available.')}
+                        </div>
+                        <div class="book-detail-meta">
+                            <div class="detail-meta-item">
+                                <span class="detail-meta-label">Category</span>
+                                <span class="detail-meta-value">${escapeHtml(book.category_name || 'Uncategorized')}</span>
+                            </div>
+                            <div class="detail-meta-item">
+                                <span class="detail-meta-label">Availability</span>
+                                <span class="detail-meta-value ${stockClass}">${stockText}</span>
+                            </div>
+                            ${!isOutOfStock ? `
+                            <div class="detail-meta-item">
+                                <span class="detail-meta-label">Stock Quantity</span>
+                                <span class="detail-meta-value">${book.stock_quantity} available</span>
+                            </div>` : ''}
+                            ${book.publish_date ? `
+                            <div class="detail-meta-item">
+                                <span class="detail-meta-label">Published</span>
+                                <span class="detail-meta-value">${new Date(book.publish_date).toLocaleDateString()}</span>
+                            </div>` : ''}
+                            ${book.isbn ? `
+                            <div class="detail-meta-item">
+                                <span class="detail-meta-label">ISBN</span>
+                                <span class="detail-meta-value">${book.isbn}</span>
+                            </div>` : ''}
+                        </div>
+                        <div class="modal-actions">
+                            ${actionButtonsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('bookDetailModal').style.display = 'none';
+        }
+
+        // Add to cart for regular items
+        async function addToCart(bookId, bookTitle) {
+            if (!currentUser || !currentUser.logged_in) {
+                showToast('Please login to add items to cart', 'error');
+                setTimeout(() => {
+                    window.location.href = '../Login/Login.html?redirect=customer_view';
+                }, 2000);
+                return;
+            }
+            
+            try {
+                const response = await fetch(ADD_TO_CART_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        book_id: bookId,
+                        quantity: 1
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(`"${bookTitle}" added to cart!`, 'success');
+                    updateCartCount();
+                } else {
+                    showToast(data.error || 'Failed to add to cart', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showToast('Error adding to cart. Please try again.', 'error');
+            }
+        }
+
+        // Add pre-order (只允许缺货书籍)
+        async function addPreOrder(bookId, bookTitle) {
+            if (!currentUser || !currentUser.logged_in) {
+                showToast('Please login to pre-order items', 'error');
+                setTimeout(() => {
+                    window.location.href = '../Login/Login.html?redirect=customer_view';
+                }, 2000);
+                return;
+            }
+            
+            try {
+                // 检查书籍是否缺货
+                const book = allBooks.find(b => b.book_id === bookId);
+                if (book && book.stock_quantity > 0) {
+                    showToast('This book is in stock. Please use "Add to Cart" instead.', 'error');
+                    return;
+                }
+                
+                const response = await fetch(ADD_PRE_ORDER_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        book_id: bookId,
+                        quantity: 1
+                    })
+                });
+
+                const rawText = await response.text();
+                console.log('Pre-order response:', rawText);
+                
+                try {
+                    const data = JSON.parse(rawText);
+                    
+                    if (data.success) {
+                        let message = `"${bookTitle}" pre-ordered successfully!`;
+                        if (data.expected_date) {
+                            const expectedDate = new Date(data.expected_date);
+                            const formattedDate = expectedDate.toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+                            message += ` Expected: ${formattedDate}`;
+                        }
+                        showToast(message, 'success');
+                    } else {
+                        showToast(data.error || 'Failed to add pre-order', 'error');
+                    }
+                } catch (jsonError) {
+                    console.error('Invalid JSON response:', rawText.substring(0, 200));
+                    showToast('Server error - invalid response', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding pre-order:', error);
+                showToast('Error adding pre-order. Please try again.', 'error');
+            }
+        }
+
+        // Buy now - only for in-stock items
+        async function buyNow(bookId, bookTitle) {
+            // Check if book is in stock
+            const book = allBooks.find(b => b.book_id === bookId);
+            if (book && book.stock_quantity <= 0) {
+                showToast('This book is out of stock. Please use Pre-Order instead.', 'error');
+                return;
+            }
+            
+            await addToCart(bookId, bookTitle);
+            setTimeout(() => {
+                window.location.href = 'cart.html';
+            }, 1500);
+        }
+
+        // Update cart count
+        async function updateCartCount() {
+            if (!currentUser || !currentUser.logged_in) {
+                cartCount.textContent = '0';
+                return;
+            }
+            
+            try {
+                const response = await fetch(GET_CART_API, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        cartCount.textContent = data.total_items;
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating cart count:', error);
+            }
+        }
+
+        // View cart
+        function viewCart() {
+            if (!currentUser || !currentUser.logged_in) {
+                showToast('Please login to view cart', 'error');
+                setTimeout(() => {
+                    window.location.href = '../Login/Login.html?redirect=cart';
+                }, 2000);
+                return;
+            }
+            
+            window.location.href = 'cart.html';
+        }
+
+        // Show toast
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('bookDetailModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
     </script>
 </body>
 </html>
