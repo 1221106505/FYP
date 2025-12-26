@@ -1,0 +1,215 @@
+/* --- Payment History Container --- */
+.history-container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Slightly stronger shadow than container */
+}
+
+.history-container h2 {
+    margin-bottom: 25px;
+    color: #2d3436;
+    border-bottom: 2px solid #f1f1f1;
+    padding-bottom: 10px;
+    text-align: left; /* Consistent with professional dashboards */
+}
+
+/* --- Individual Order Cards --- */
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 15px;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    transition: transform 0.2s;
+}
+
+.history-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* --- Details Styling --- */
+.history-details p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #636e72;
+}
+
+.history-details b {
+    color: #0984e3; /* Primary theme color */
+    font-weight: 600;
+}
+
+.order-total {
+    font-size: 18px;
+    color: #ee4d2d; /* Shopee Orange for emphasis */
+    font-weight: bold;
+}
+
+/* --- Status Badges --- */
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-completed {
+    background-color: #e3fcef;
+    color: #00b894; /* Green for success */
+}
+
+.status-pending {
+    background-color: #fff4e6;
+    color: #d35400; /* Orange for pending */
+}
+
+/* --- Buttons --- */
+.back-btn {
+    background-color: #d63031; /* Original red theme */
+    color: white;
+    width: auto;
+    padding: 12px 30px;
+    margin-top: 20px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.back-btn:hover {
+    background-color: #ff7675; /* Hover state */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .history-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .status-badge {
+        margin-top: 10px;
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order History - Virtual Bookstore</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .history-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .history-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-details b { color: #0984e3; }
+        .status-badge {
+            background: #e1f5fe;
+            color: #01579b;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="history-container">
+        <h2>📜 Your Purchase History</h2>
+        <div id="historyList">
+            </div>
+        <button class="back-btn" onclick="window.location.href='Store.html'">Back to Shop</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+// ✅ 1. Process Payment & Save to History
+function confirmPayment() {
+    const name = document.getElementById("cardName").value;
+    const card = document.getElementById("cardNumber").value;
+    const total = document.getElementById("paymentTotal").innerText; // Get total from UI
+
+    if (name && card) {
+        // Create an order object
+        const newOrder = {
+            name: name,
+            total: total,
+            date: new Date().toLocaleString(),
+            status: "Success"
+        };
+
+        // Get existing history or start a new list [cite: 7, 11]
+        const history = JSON.parse(localStorage.getItem("history")) || [];
+        
+        // Add new order to the top of the list [cite: 8]
+        history.unshift(newOrder); 
+        
+        // Save back to LocalStorage [cite: 9]
+        localStorage.setItem("history", JSON.stringify(history));
+
+        alert("Payment Successful! Order recorded.");
+        window.location.href = "PaymentHistory.html"; // Redirect to history [cite: 9]
+    } else {
+        alert("Please fill in your payment details."); [cite: 10]
+    }
+}
+
+// ✅ 2. Load History for the History Page
+function loadHistory() {
+    const list = document.getElementById("historyList");
+    if (!list) return;
+
+    const history = JSON.parse(localStorage.getItem("history")) || []; [cite: 11]
+
+    if (history.length === 0) {
+        list.innerHTML = "<p style='text-align:center; padding:20px;'>No orders found yet.</p>"; [cite: 12]
+    } else {
+        list.innerHTML = ""; // Clear list
+        history.forEach(item => {
+            const div = document.createElement("div");
+            div.classList.add("history-item"); [cite: 13]
+            div.innerHTML = `
+                <div class="history-details">
+                    <p><b>Order Date:</b> ${item.date}</p>
+                    <p><b>Customer:</b> ${item.name}</p>
+                    <p><b>Total Amount:</b> RM ${item.total}</p>
+                </div>
+                <span class="status-badge">Completed</span>
+            `; [cite: 13]
+            list.appendChild(div); [cite: 13]
+        });
+    }
+}
+
+// Run the loader if we are on the history page
+document.addEventListener("DOMContentLoaded", loadHistory)
+
+// Example of how to structure the HTML in script.js
+div.innerHTML = `
+    <div class="history-details">
+        <p><b>Order Date:</b> ${item.date}</p>
+        <p><b>Customer:</b> ${item.name}</p>
+        <p class="order-total">RM ${item.total}</p>
+    </div>
+    <span class="status-badge status-completed">Completed</span>
+`;
