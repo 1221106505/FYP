@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout - Virtual Bookstore</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Shopee-style Split Layout */
+    .checkout-wrapper {
+      display: flex;
+      max-width: 1000px;
+      margin: 40px auto;
+      gap: 30px;
+      padding: 0 20px;
+    }
+    .payment-form-container {
+      flex: 2;
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .order-summary-container {
+      flex: 1;
+      background: #fffefb; /* Light cream background */
+      padding: 25px;
+      border: 1px solid #f1d8b5;
+      border-radius: 8px;
+      height: fit-content;
+    }
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    .final-total {
+      font-size: 20px;
+      color: #ee4d2d; /* Shopee Orange */
+      font-weight: bold;
+    }
+    .pay-now-btn {
+      background-color: #ee4d2d;
+      color: white;
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="checkout-wrapper">
+  <div class="payment-form-container">
+    <h2>💳 Payment Method</h2>
+    <form id="checkoutForm" action="process_payment.php" method="POST">
+      <label>Full Name</label>
+      <input type="text" name="customer_name" id="cardName" placeholder="Enter your name" required>
+      
+      <label>Card Number</label>
+      <input type="text" name="card_no" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="16" required>
+      
+      <div style="display:flex; gap:10px;">
+        <div style="flex:1;">
+          <label>Expiry</label>
+          <input type="text" placeholder="MM/YY" maxlength="5">
+        </div>
+        <div style="flex:1;">
+          <label>CVV</label>
+          <input type="password" name="cvv" id="cvv" placeholder="123" maxlength="3" required>
+        </div>
+      </div>
+      <button type="submit" class="pay-now-btn">Place Order</button>
+    </form>
+  </div>
+
+  <div class="order-summary-container">
+    <h3>Order Summary</h3>
+    <div id="checkoutSummary">
+        </div>
+    <hr style="border: 0.5px solid #eee; margin: 20px 0;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span>Total Payment:</span>
+      <span class="final-total">RM <span id="paymentTotal">0.00</span></span>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
