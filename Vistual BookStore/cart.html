@@ -100,6 +100,9 @@
             padding: 8px 0;
             position: relative;
             transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .nav-link:hover {
@@ -192,6 +195,9 @@
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .action-btn:hover {
@@ -297,6 +303,7 @@
             justify-content: center;
             color: var(--text-light);
             overflow: hidden;
+            cursor: pointer;
         }
 
         .item-image i {
@@ -345,6 +352,17 @@
         .pre-order-badge {
             display: inline-block;
             background-color: var(--pre-order);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .available-badge {
+            display: inline-block;
+            background-color: var(--success);
             color: white;
             padding: 3px 8px;
             border-radius: 4px;
@@ -404,6 +422,11 @@
             background-color: var(--secondary);
         }
 
+        .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .quantity-input {
             width: 50px;
             text-align: center;
@@ -416,6 +439,11 @@
         .quantity-input:focus {
             outline: none;
             border-color: var(--primary);
+        }
+
+        .quantity-input:disabled {
+            background-color: var(--secondary);
+            cursor: not-allowed;
         }
 
         .remove-btn {
@@ -597,6 +625,21 @@
             cursor: not-allowed;
         }
 
+        .checkout-preorder-btn {
+            padding: 8px 16px;
+            background-color: var(--success);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .checkout-preorder-btn:hover {
+            background-color: #0d9c6c;
+        }
+
         .cancel-preorder-btn {
             padding: 8px 16px;
             background-color: var(--danger);
@@ -666,6 +709,116 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Checkout Modal */
+        .checkout-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 500px;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .payment-option {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary);
+        }
+
+        .payment-option.selected {
+            border-color: var(--primary);
+            background: rgba(109, 40, 217, 0.05);
+        }
+
+        .payment-option i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
         /* Responsive Design */
         @media (max-width: 992px) {
             .cart-content {
@@ -707,10 +860,15 @@
             
             .item-actions {
                 justify-content: center;
+                flex-wrap: wrap;
             }
             
             .item-checkbox {
                 justify-content: center;
+            }
+            
+            .payment-options {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -737,6 +895,9 @@
                     </a>
                     <a href="preorders.html" class="nav-link">
                         <i class="fas fa-clock"></i> Pre-orders
+                    </a>
+                    <a href="order_history.html" class="nav-link">
+                        <i class="fas fa-history"></i> Order History
                     </a>
                     <a href="user_profile.html" class="nav-link">
                         <i class="fas fa-user"></i> Profile
@@ -810,12 +971,96 @@
                         <span class="summary-value" id="total">RM 0.00</span>
                     </div>
                 </div>
-                <button class="checkout-btn" id="checkoutBtn" onclick="checkout()" disabled>
+                <button class="checkout-btn" id="checkoutBtn" onclick="processCheckout()" disabled>
                     <i class="fas fa-credit-card"></i> Proceed to Checkout
                 </button>
                 <button class="clear-cart-btn" onclick="clearCart()">
                     <i class="fas fa-trash"></i> Clear Cart
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Complete Your Order</h2>
+                <button class="close-btn" onclick="closeCheckoutModal()">&times;</button>
+            </div>
+            
+            <div id="modalContent">
+                <div class="loading" id="modalLoading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Processing...</p>
+                </div>
+                
+                <!-- Payment Selection -->
+                <div id="paymentSelection" style="display: none;">
+                    <h3>Select Payment Method</h3>
+                    <div class="payment-options">
+                        <div class="payment-option" onclick="selectPaymentMethod('credit_card')">
+                            <i class="fas fa-credit-card"></i>
+                            <div>Credit Card</div>
+                        </div>
+                        <div class="payment-option" onclick="selectPaymentMethod('paypal')">
+                            <i class="fab fa-paypal"></i>
+                            <div>PayPal</div>
+                        </div>
+                        <div class="payment-option" onclick="selectPaymentMethod('bank_transfer')">
+                            <i class="fas fa-university"></i>
+                            <div>Bank Transfer</div>
+                        </div>
+                        <div class="payment-option" onclick="selectPaymentMethod('debit_card')">
+                            <i class="fas fa-credit-card"></i>
+                            <div>Debit Card</div>
+                        </div>
+                        <div class="payment-option" onclick="selectPaymentMethod('cash_on_delivery')">
+                            <i class="fas fa-truck"></i>
+                            <div>Cash on Delivery</div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeCheckoutModal()">Cancel</button>
+                        <button class="btn btn-primary" onclick="confirmPayment()" id="confirmPaymentBtn" disabled>
+                            Confirm Payment
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Order Confirmation -->
+                <div id="orderConfirmation" style="display: none;">
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 20px;"></i>
+                        <h3>Order Confirmed!</h3>
+                        <p id="confirmationMessage"></p>
+                        <div style="margin-top: 20px;">
+                            <div><strong>Order ID:</strong> <span id="confirmedOrderId"></span></div>
+                            <div><strong>Payment ID:</strong> <span id="confirmedPaymentId"></span></div>
+                            <div><strong>Total Amount:</strong> <span id="confirmedAmount"></span></div>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="viewOrderHistory()">
+                            View Order History
+                        </button>
+                        <button class="btn btn-secondary" onclick="continueShopping()">
+                            Continue Shopping
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Error Display -->
+                <div id="paymentError" style="display: none; text-align: center; padding: 20px; color: var(--danger);">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                    <h3>Payment Failed</h3>
+                    <p id="errorMessage"></p>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="retryPayment()">Retry</button>
+                        <button class="btn btn-primary" onclick="closeCheckoutModal()">Close</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -827,11 +1072,15 @@
     </div>
 
     <script>
-    // API endpoints
+    // API endpoints - 相对路径
+    const API_BASE = ''; // 空字符串表示当前目录
     const CHECK_LOGIN_API = 'check_login.php';
     const GET_CART_API = 'get_cart.php';
     const UPDATE_CART_API = 'update_cart.php';
     const CLEAR_CART_API = 'clear_cart.php';
+    const CREATE_ORDER_API = 'create_order.php';
+    const GET_PAYMENT_API = 'get_payment.php';
+    const PROCESS_PAYMENT_API = 'process_payment.php';
     const CONVERT_TO_PREORDER_API = 'convert_to_preorder.php';
     const PROCESS_PREORDER_API = 'process_preorder.php';
 
@@ -847,6 +1096,12 @@
     const taxElement = document.getElementById('tax');
     const totalElement = document.getElementById('total');
     const checkoutBtn = document.getElementById('checkoutBtn');
+    const checkoutModal = document.getElementById('checkoutModal');
+    const modalLoading = document.getElementById('modalLoading');
+    const paymentSelection = document.getElementById('paymentSelection');
+    const orderConfirmation = document.getElementById('orderConfirmation');
+    const paymentError = document.getElementById('paymentError');
+    const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toast-message');
     const toastIcon = document.getElementById('toast-icon');
@@ -856,10 +1111,19 @@
     let currentUser = null;
     let selectedItems = new Set();
     let selectedItemsData = new Map();
+    let selectedPaymentMethod = null;
+    let currentOrderData = null;
 
     // Initialize cart
     document.addEventListener('DOMContentLoaded', function() {
         checkLoginStatus();
+        
+        // 监听复选框点击事件
+        document.addEventListener('click', function(e) {
+            if (e.target.type === 'checkbox' && e.target.classList.contains('item-checkbox')) {
+                updateSelectedItems(e.target);
+            }
+        });
     });
 
     // Check login status
@@ -872,7 +1136,7 @@
             
             if (data.logged_in) {
                 currentUser = data;
-                usernameElement.textContent = data.username;
+                usernameElement.textContent = data.username || data.first_name || 'User';
                 loadCart();
             } else {
                 usernameElement.textContent = 'Guest';
@@ -952,7 +1216,7 @@
                         <h3 class="item-title" onclick="viewBookDetail(${item.book_id})">
                             ${escapeHtml(item.title)}
                             ${isPreOrder ? '<span class="pre-order-badge">PRE-ORDER</span>' : ''}
-                            ${isPreOrderAvailable ? '<span class="pre-order-badge" style="background-color: var(--success);">AVAILABLE</span>' : ''}
+                            ${isPreOrderAvailable ? '<span class="available-badge">AVAILABLE</span>' : ''}
                         </h3>
                         <p class="item-author">by ${escapeHtml(item.author || 'Unknown Author')}</p>
                         <span class="item-category">${escapeHtml(item.category_name || 'Uncategorized')}</span>
@@ -965,8 +1229,8 @@
                     <div class="item-actions">
                         ${isPreOrder ? 
                             isPreOrderAvailable ? 
-                                `<button class="pre-order-btn" style="background-color: var(--success);" onclick="processPreorder(${item.cart_id})">
-                                    <i class="fas fa-check"></i> Available - Checkout Now
+                                `<button class="checkout-preorder-btn" onclick="processAvailablePreorder(${item.cart_id})">
+                                    <i class="fas fa-check"></i> Checkout Now
                                 </button>
                                 <button class="cancel-preorder-btn" onclick="cancelPreorder(${item.cart_id})">
                                     <i class="fas fa-times"></i> Cancel
@@ -1058,6 +1322,7 @@
         
         selectedSummary.style.display = 'none';
         checkoutBtn.disabled = true;
+        cartCountElement.textContent = '0';
     }
 
     // Toggle select all
@@ -1180,7 +1445,8 @@
 
     // Update quantity
     async function updateQuantity(cartId, newQuantity) {
-        if (newQuantity < 1) {
+        newQuantity = parseInt(newQuantity);
+        if (isNaN(newQuantity) || newQuantity < 1) {
             newQuantity = 1;
         }
 
@@ -1372,6 +1638,41 @@
         }
     }
 
+    // Process available pre-order
+    async function processAvailablePreorder(cartId) {
+        if (!confirm('This pre-order is now available. Would you like to process it now?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(PROCESS_PREORDER_API, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    cart_id: cartId,
+                    action: 'process'
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast('Pre-order processed successfully. Redirecting to checkout...', 'success');
+                setTimeout(() => {
+                    window.location.href = `checkout.php?preorder=${cartId}`;
+                }, 1500);
+            } else {
+                showToast(data.error || 'Failed to process pre-order', 'error');
+            }
+        } catch (error) {
+            console.error('Error processing pre-order:', error);
+            showToast('Error processing pre-order. Please try again.', 'error');
+        }
+    }
+
     // Cancel pre-order
     async function cancelPreorder(cartId) {
         if (!confirm('Are you sure you want to cancel this pre-order?')) {
@@ -1405,125 +1706,8 @@
         }
     }
 
-    // 修复 processPreorder 函数
-async function processPreorder(cartId) {
-    try {
-        const response = await fetch('process_preorder.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                cart_id: cartId
-            })
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-            showToast('Pre-order processed successfully', 'success');
-            await loadPreorders();
-            await loadCartCount();
-        } else {
-            showToast(data.error || 'Failed to process pre-order', 'error');
-        }
-    } catch (error) {
-        console.error('Error processing pre-order:', error);
-        showToast('Error processing pre-order. Please try again.', 'error');
-    }
-}
-
-// 修复 moveToCart 函数
-async function moveToCart(cartId) {
-    try {
-        const response = await fetch('convert_to_preorder.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                cart_id: cartId,
-                action: 'cancel'
-            })
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-            showToast('Moved to regular cart', 'success');
-            await loadPreorders();
-            await loadCartCount();
-        } else {
-            showToast(data.error || 'Failed to move to cart', 'error');
-        }
-    } catch (error) {
-        console.error('Error moving to cart:', error);
-        showToast('Error moving to cart. Please try again.', 'error');
-    }
-}
-
-// 修复 executePendingAction 函数中的取消操作
-async function executePendingAction() {
-    if (!pendingAction || !pendingData) return;
-    
-    const { id, type } = pendingData;
-    
-    try {
-        if (pendingAction === 'cancel') {
-            let endpoint, body;
-            
-            if (type === 'cart') {
-                endpoint = 'cancel_preorder.php';
-                body = { cart_id: id, reason: 'Cancelled by user' };
-            } else {
-                // 对于独立预购订单的取消
-                endpoint = 'cancel_preorder_item.php';
-                body = { pre_order_id: id, reason: 'Cancelled by user' };
-            }
-            
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify(body)
-            });
-
-            const data = await response.json();
-            
-            if (data.success) {
-                showToast('Pre-order cancelled successfully', 'success');
-                await loadPreorders();
-                await loadCartCount();
-            } else {
-                showToast(data.error || 'Failed to cancel pre-order', 'error');
-            }
-            
-        } else if (pendingAction === 'confirm') {
-            // 跳转到结账页面
-            showToast('Redirecting to checkout...', 'success');
-            setTimeout(() => {
-                window.location.href = `checkout.html?preorder=${id}`;
-            }, 1000);
-            return;
-            
-        } else if (pendingAction === 'pickup') {
-            showToast('Please contact our store at 03-1234 5678 to arrange pickup.', 'success');
-        }
-    } catch (error) {
-        console.error('Error executing action:', error);
-        showToast('Error performing action. Please try again.', 'error');
-    } finally {
-        closeModal();
-        pendingAction = null;
-        pendingData = null;
-    }
-}
-    // Checkout function
-    function checkout() {
+    // Process checkout
+    async function processCheckout() {
         if (selectedItems.size === 0) {
             showToast('Please select items to checkout', 'warning');
             return;
@@ -1536,22 +1720,191 @@ async function executePendingAction() {
         });
 
         if (hasPreOrderItems) {
-            showToast('Pre-order items cannot be checked out. Please remove them or process them separately.', 'error');
+            showToast('Pre-order items cannot be checked out with regular items. Please remove them or process them separately.', 'error');
             return;
         }
 
-        const selectedTitles = Array.from(selectedItemsData.values()).map(item => item.title);
-        const message = `Proceeding to checkout with ${selectedItems.size} item(s):\n\n` +
-                       selectedTitles.join('\n') +
-                       `\n\nTotal: ${totalElement.textContent}`;
+        // 检查库存是否足够
+        let insufficientStock = false;
+        for (const [cartId, item] of selectedItemsData) {
+            const cartItem = document.querySelector(`[data-cart-id="${cartId}"]`);
+            if (cartItem) {
+                const quantityInput = cartItem.querySelector('.quantity-input');
+                const maxQuantity = parseInt(quantityInput.max);
+                if (item.quantity > maxQuantity && maxQuantity > 0) {
+                    insufficientStock = true;
+                    showToast(`Insufficient stock for "${item.title}". Only ${maxQuantity} available.`, 'error');
+                    break;
+                }
+            }
+        }
+
+        if (insufficientStock) {
+            return;
+        }
+
+        // 显示结算模态框
+        showCheckoutModal();
+    }
+
+    // Show checkout modal
+    function showCheckoutModal() {
+        checkoutModal.style.display = 'flex';
+        modalLoading.style.display = 'block';
+        paymentSelection.style.display = 'none';
+        orderConfirmation.style.display = 'none';
+        paymentError.style.display = 'none';
         
-        showToast('Proceeding to checkout...', 'success');
+        // 重置支付方法选择
+        selectedPaymentMethod = null;
+        const paymentOptions = document.querySelectorAll('.payment-option');
+        paymentOptions.forEach(option => option.classList.remove('selected'));
+        confirmPaymentBtn.disabled = true;
         
+        // 模拟加载过程
         setTimeout(() => {
-            alert(message);
-            // 这里可以跳转到结算页面
-            // window.location.href = 'checkout.html';
-        }, 1000);
+            modalLoading.style.display = 'none';
+            paymentSelection.style.display = 'block';
+        }, 500);
+    }
+
+    // Close checkout modal
+    function closeCheckoutModal() {
+        checkoutModal.style.display = 'none';
+    }
+
+    // Select payment method
+    function selectPaymentMethod(method) {
+        selectedPaymentMethod = method;
+        const paymentOptions = document.querySelectorAll('.payment-option');
+        paymentOptions.forEach(option => option.classList.remove('selected'));
+        
+        // 高亮选中的支付方式
+        paymentOptions.forEach(option => {
+            if (option.onclick && option.onclick.toString().includes(method)) {
+                option.classList.add('selected');
+            }
+        });
+        
+        confirmPaymentBtn.disabled = false;
+    }
+
+    // 在 cart.html 中找到 confirmPayment 函数，修改第1887行附近的代码：
+
+async function confirmPayment() {
+    if (!selectedPaymentMethod) {
+        showToast('Please select a payment method', 'error');
+        return;
+    }
+
+    try {
+        modalLoading.style.display = 'block';
+        paymentSelection.style.display = 'none';
+        
+        // 1. 创建订单（支付会自动完成）
+        const orderResponse = await fetch(CREATE_ORDER_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                cart_ids: Array.from(selectedItems),
+                customer_id: currentUser.user_id || currentUser.auto_id || 1,
+                payment_method: selectedPaymentMethod,
+                total_amount: parseFloat(totalElement.textContent.replace('RM ', '')),
+                shipping_address: getUserAddress(),
+                contact_phone: getUserPhone(),
+                contact_email: getUserEmail()
+            })
+        });
+
+        const orderText = await orderResponse.text();
+        console.log('Order Response:', orderText);
+        
+        let orderData;
+        try {
+            orderData = JSON.parse(orderText);
+        } catch (parseError) {
+            console.error('JSON Parse Error:', parseError);
+            console.error('Response Text:', orderText);
+            throw new Error(`Invalid JSON response from server`);
+        }
+        
+        if (!orderData.success) {
+            throw new Error(orderData.error || 'Failed to create order');
+        }
+
+        // 成功处理
+        currentOrderData = {
+            order_id: orderData.order_id,
+            payment_id: orderData.payment_id,
+            total_amount: orderData.total_amount,
+            transaction_id: orderData.transaction_id
+        };
+
+        modalLoading.style.display = 'none';
+        orderConfirmation.style.display = 'block';
+        
+        document.getElementById('confirmedOrderId').textContent = orderData.order_id;
+        document.getElementById('confirmedPaymentId').textContent = orderData.payment_id;
+        document.getElementById('confirmedAmount').textContent = 'RM ' + parseFloat(orderData.total_amount).toFixed(2);
+        document.getElementById('confirmationMessage').textContent = 
+            `Thank you for your order! Your payment has been processed successfully.` +
+            `\nTransaction ID: ${orderData.transaction_id}` +
+            `\nPayment Method: ${selectedPaymentMethod}`;
+
+        // 清空购物车
+        selectedItems.clear();
+        selectedItemsData.clear();
+        await loadCart();
+        
+    } catch (error) {
+        console.error('Payment Error:', error);
+        modalLoading.style.display = 'none';
+        paymentSelection.style.display = 'none';
+        paymentError.style.display = 'block';
+        document.getElementById('errorMessage').textContent = error.message;
+    }
+}
+
+    // Retry payment
+    function retryPayment() {
+        paymentError.style.display = 'none';
+        paymentSelection.style.display = 'block';
+    }
+
+    // View order history
+    function viewOrderHistory() {
+        closeCheckoutModal();
+        window.location.href = 'order_history.html';
+    }
+
+    // Continue shopping
+    function continueShopping() {
+        closeCheckoutModal();
+        window.location.href = 'customer_view.html';
+    }
+
+    // Get user address (简化版本，实际应用中应该从用户资料获取)
+    function getUserAddress() {
+        if (currentUser && currentUser.address) {
+            return currentUser.address;
+        }
+        return '123 Main Street, Kuala Lumpur, Malaysia';
+    }
+
+    // Get user phone
+    function getUserPhone() {
+        if (currentUser && currentUser.phone) {
+            return currentUser.phone;
+        }
+        return '012-3456789';
+    }
+
+    // Get user email
+    function getUserEmail() {
+        if (currentUser && currentUser.email) {
+            return currentUser.email;
+        }
+        return (currentUser.username || 'user') + '@example.com';
     }
 
     // View book details
@@ -1585,6 +1938,57 @@ async function executePendingAction() {
             toast.classList.remove('show');
         }, 3000);
     }
-</script>
+
+    // 测试API是否存在的函数
+    async function testAPI(endpoint) {
+        try {
+            // 使用GET方法而不是HEAD，因为有些服务器不支持HEAD
+            const response = await fetch(endpoint, { 
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            return response.ok || response.status === 405; // 405也表示API存在
+        } catch (error) {
+            console.log(`API ${endpoint} 检查失败:`, error.message);
+            return false;
+        }
+    }
+
+    // 初始化时检查关键API
+    async function checkRequiredAPIs() {
+        const requiredAPIs = [
+            CREATE_ORDER_API,
+            GET_PAYMENT_API,
+            PROCESS_PAYMENT_API,
+            GET_CART_API,
+            UPDATE_CART_API
+        ];
+        
+        console.log('🔍 检查API可用性...');
+        
+        for (const api of requiredAPIs) {
+            try {
+                const exists = await testAPI(api);
+                if (exists) {
+                    console.log(`✅ ${api} 可用`);
+                } else {
+                    console.warn(`⚠️  ${api} 可能不可用`);
+                }
+            } catch (error) {
+                console.error(`❌ 检查 ${api} 时出错:`, error);
+            }
+        }
+    }
+
+    // 页面加载完成后检查API
+    document.addEventListener('DOMContentLoaded', function() {
+        // 延迟检查，避免影响主要功能
+        setTimeout(() => {
+            checkRequiredAPIs();
+        }, 1000);
+    });
+    </script>
 </body>
 </html>

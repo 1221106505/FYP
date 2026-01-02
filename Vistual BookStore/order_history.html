@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>My Order History - Virtual BookStore</title>
     <style>
-        /* 保持原有的CSS样式不变 */
         :root {
             --primary: #2c3e50;
             --secondary: #34495e;
@@ -14,6 +13,7 @@
             --danger: #e74c3c;
             --light: #ecf0f1;
             --dark: #2c3e50;
+            --info: #17a2b8;
         }
 
         * {
@@ -127,6 +127,35 @@
             color: #721c24;
         }
 
+        /* Payment Status Styles */
+        .payment-status {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .payment-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .payment-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .payment-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .payment-refunded {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
         /* Orders List */
         .orders-container {
             background: white;
@@ -218,10 +247,132 @@
             padding-top: 10px;
         }
 
+        /* Payment History Section */
+        .payment-history {
+            margin-top: 20px;
+            border-top: 1px solid #e9ecef;
+            padding-top: 15px;
+        }
+
+        .payment-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--info);
+        }
+
+        .payment-item.completed {
+            border-left-color: var(--success);
+        }
+
+        .payment-item.failed {
+            border-left-color: var(--danger);
+        }
+
+        .payment-item.refunded {
+            border-left-color: #6c757d;
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .payment-method {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .payment-date {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .payment-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .payment-amount {
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .transaction-id {
+            font-size: 0.8rem;
+            color: #666;
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 8px 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            background: white;
+            color: #495057;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            border-radius: 6px;
+            background: #f8f9fa;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
         .no-orders {
             text-align: center;
-            padding: 40px;
+            padding: 60px 40px;
             color: #6c757d;
+            background: white;
+            border-radius: 12px;
         }
 
         .no-orders h3 {
@@ -235,10 +386,28 @@
             color: #6c757d;
         }
 
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .error {
             color: var(--danger);
             text-align: center;
             padding: 40px;
+            background: white;
+            border-radius: 12px;
         }
 
         /* Login Prompt */
@@ -262,7 +431,7 @@
 
         /* Hidden class */
         .hidden {
-            display: none;
+            display: none !important;
         }
 
         /* Responsive */
@@ -283,19 +452,85 @@
                 gap: 15px;
                 text-align: center;
             }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .stats-card {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .order-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .item-quantity, .item-price {
+                margin: 0;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
             <h1>📦 My Order History</h1>
             <div class="user-info">
-                <a href="user_profile.html" class="btn btn-back">👤 Back to Profile</a>
-                <a href="Main.html" class="btn btn-secondary">🏠 Back to Main</a>
+                <span id="welcomeUser">Welcome, Guest</span>
+                <a href="user_profile.html" class="btn btn-back">👤 Profile</a>
+                <a href="Main.html" class="btn btn-secondary">🏠 Main</a>
             </div>
         </div>
 
+        <!-- Statistics Cards -->
+        <div id="orderStats" class="stats-card hidden">
+            <div class="stat-item">
+                <div class="stat-value" id="totalOrders">0</div>
+                <div class="stat-label">Total Orders</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalSpent">RM 0.00</div>
+                <div class="stat-label">Total Spent</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="pendingOrders">0</div>
+                <div class="stat-label">Pending Orders</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="avgOrder">RM 0.00</div>
+                <div class="stat-label">Average Order</div>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div id="filterControls" class="filter-controls hidden">
+            <div style="font-weight: 600; color: var(--primary);">Filter Orders:</div>
+            <select id="statusFilter" class="filter-select" onchange="filterOrders()">
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+            <select id="dateFilter" class="filter-select" onchange="filterOrders()">
+                <option value="all">All Time</option>
+                <option value="30">Last 30 Days</option>
+                <option value="90">Last 90 Days</option>
+                <option value="365">Last Year</option>
+            </select>
+            <button class="btn btn-primary" onclick="refreshOrders()">
+                🔄 Refresh
+            </button>
+        </div>
+
+        <!-- Main Content -->
         <div id="orderContent">
             <div class="login-prompt" id="loginPrompt">
                 <h2>Please Login</h2>
@@ -306,7 +541,10 @@
             <div id="ordersList" class="hidden">
                 <div class="orders-container">
                     <div id="ordersContainer">
-                        <div class="loading">Loading your orders...</div>
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>Loading your orders...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -317,8 +555,14 @@
         // API endpoints
         const API_ENDPOINTS = {
             orders: 'get_customer_orders.php',
+            payments: 'get_payment.php',
             checkLogin: 'check_login.php'
         };
+
+        // Global variables
+        let allOrders = [];
+        let currentCustomerId = null;
+        let filteredOrders = [];
 
         // 检查登录状态并加载订单
         async function loadOrderHistory() {
@@ -327,9 +571,7 @@
             try {
                 const response = await fetch(API_ENDPOINTS.checkLogin, {
                     credentials: 'include',
-                    headers: {
-                        'Cache-Control': 'no-cache'
-                    }
+                    headers: { 'Cache-Control': 'no-cache' }
                 });
                 
                 console.log('Login check response status:', response.status);
@@ -343,44 +585,53 @@
                 
                 const loginPrompt = document.getElementById('loginPrompt');
                 const ordersList = document.getElementById('ordersList');
+                const filterControls = document.getElementById('filterControls');
+                const orderStats = document.getElementById('orderStats');
                 
-                if (data.logged_in && data.user_id) {
-                    console.log('User is logged in with ID:', data.user_id);
+                if (data.logged_in && (data.user_id || data.auto_id)) {
+                    console.log('User is logged in');
                     
-                    // 用户已登录，加载订单
+                    // 显示用户欢迎信息
+                    const username = data.username || data.first_name || 'User';
+                    document.getElementById('welcomeUser').textContent = `Welcome, ${username}`;
+                    
+                    currentCustomerId = data.user_id || data.auto_id;
+                    
+                    // 显示订单内容
                     loginPrompt.classList.add('hidden');
                     ordersList.classList.remove('hidden');
+                    filterControls.classList.remove('hidden');
+                    orderStats.classList.remove('hidden');
                     
                     // 加载用户订单
-                    await loadCustomerOrders(data.user_id);
+                    await loadCustomerOrders();
                 } else {
-                    console.log('User is not logged in or missing user ID');
+                    console.log('User is not logged in');
                     // 用户未登录，显示登录提示
                     loginPrompt.classList.remove('hidden');
                     ordersList.classList.add('hidden');
+                    filterControls.classList.add('hidden');
+                    orderStats.classList.add('hidden');
                 }
             } catch (error) {
                 console.error('Error loading order history:', error);
-                // 显示错误信息
-                document.getElementById('ordersContainer').innerHTML = 
-                    '<div class="error">Error loading orders. Please try again later.</div>';
-                
-                // 显示登录提示
-                document.getElementById('loginPrompt').classList.remove('hidden');
-                document.getElementById('ordersList').classList.add('hidden');
+                showError('Error loading orders. Please try again later.');
             }
         }
 
         // 加载顾客订单
-        async function loadCustomerOrders(customerId) {
-            console.log('Loading orders for customer:', customerId);
+        async function loadCustomerOrders() {
+            if (!currentCustomerId) {
+                showError('Customer ID not found');
+                return;
+            }
+            
+            console.log('Loading orders for customer:', currentCustomerId);
             
             try {
-                const response = await fetch(`${API_ENDPOINTS.orders}?customer_id=${customerId}`, {
+                const response = await fetch(`${API_ENDPOINTS.orders}?customer_id=${currentCustomerId}`, {
                     credentials: 'include',
-                    headers: {
-                        'Cache-Control': 'no-cache'
-                    }
+                    headers: { 'Cache-Control': 'no-cache' }
                 });
                 
                 console.log('Orders response status:', response.status);
@@ -390,46 +641,111 @@
                 }
                 
                 const data = await response.json();
-                console.log('Orders data:', data);
-                
-                const ordersContainer = document.getElementById('ordersContainer');
+                console.log('Orders data received:', data);
                 
                 if (data.success && data.orders && data.orders.length > 0) {
                     console.log(`Found ${data.orders.length} orders`);
-                    displayOrders(data.orders);
+                    allOrders = data.orders;
+                    
+                    // 为每个订单加载支付历史
+                    await loadPaymentsForOrders();
+                    
+                    // 显示订单
+                    filterOrders();
+                    updateStats();
                 } else {
                     console.log('No orders found or API returned error');
-                    ordersContainer.innerHTML = `
-                        <div class="no-orders">
-                            <h3>No Orders Found</h3>
-                            <p>You haven't placed any orders yet.</p>
-                            <a href="Searching.html" class="btn btn-primary" style="margin-top: 15px;">
-                                🛍️ Start Shopping
-                            </a>
-                        </div>
-                    `;
+                    showNoOrders();
                 }
             } catch (error) {
                 console.error('Error loading customer orders:', error);
-                document.getElementById('ordersContainer').innerHTML = 
-                    '<div class="error">Error loading orders. Please try again later.</div>';
+                showError('Error loading orders. Please try again later.');
             }
+        }
+
+        // 为所有订单加载支付历史
+        async function loadPaymentsForOrders() {
+            for (let i = 0; i < allOrders.length; i++) {
+                try {
+                    const order = allOrders[i];
+                    const paymentResponse = await fetch(`${API_ENDPOINTS.payments}?order_id=${order.order_id}`, {
+                        credentials: 'include'
+                    });
+                    
+                    if (paymentResponse.ok) {
+                        const paymentData = await paymentResponse.json();
+                        if (paymentData.success) {
+                            allOrders[i].payments = paymentData.payments || [];
+                        } else {
+                            allOrders[i].payments = [];
+                        }
+                    } else {
+                        allOrders[i].payments = [];
+                    }
+                } catch (error) {
+                    console.error(`Error loading payments for order ${order.order_id}:`, error);
+                    allOrders[i].payments = [];
+                }
+            }
+        }
+
+        // 过滤订单
+        function filterOrders() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            filteredOrders = allOrders.filter(order => {
+                // 状态过滤
+                if (statusFilter !== 'all' && order.status !== statusFilter) {
+                    return false;
+                }
+                
+                // 日期过滤
+                if (dateFilter !== 'all') {
+                    const days = parseInt(dateFilter);
+                    const orderDate = new Date(order.order_date);
+                    const cutoffDate = new Date();
+                    cutoffDate.setDate(cutoffDate.getDate() - days);
+                    
+                    if (orderDate < cutoffDate) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            displayOrders(filteredOrders);
         }
 
         // 显示订单
         function displayOrders(orders) {
             const ordersContainer = document.getElementById('ordersContainer');
             
+            if (orders.length === 0) {
+                ordersContainer.innerHTML = `
+                    <div class="no-orders">
+                        <h3>No Orders Found</h3>
+                        <p>No orders match your current filters.</p>
+                        <button class="btn btn-primary" onclick="resetFilters()" style="margin-top: 15px;">
+                            Reset Filters
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
             ordersContainer.innerHTML = orders.map(order => {
-                // 确保订单项数据存在且格式正确
+                const orderDate = new Date(order.order_date);
                 const orderItems = order.items || [];
+                const payments = order.payments || [];
                 
                 return `
                 <div class="order-card">
                     <div class="order-header">
                         <div>
                             <div class="order-id">Order #${order.order_id}</div>
-                            <div class="order-date">Placed on ${new Date(order.order_date).toLocaleDateString()}</div>
+                            <div class="order-date">${orderDate.toLocaleDateString()} at ${orderDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
                         </div>
                         <div class="order-status ${getStatusClass(order.status)}">
                             ${getStatusText(order.status)}
@@ -439,19 +755,19 @@
                     <div class="order-details">
                         <div>
                             <strong>Shipping Address:</strong><br>
-                            ${order.shipping_address || 'No address provided'}
-                        </div>
-                        <div>
-                            <strong>Items:</strong><br>
-                            ${order.item_count || orderItems.length || 0} items
-                        </div>
-                        <div>
-                            <strong>Total Quantity:</strong><br>
-                            ${order.total_quantity || orderItems.reduce((sum, item) => sum + (parseInt(item.quantity) || 0), 0)}
+                            <small>${order.shipping_address || 'No address provided'}</small>
                         </div>
                         <div>
                             <strong>Contact:</strong><br>
-                            ${order.contact_phone || 'N/A'}
+                            <small>${order.contact_phone || 'N/A'}</small>
+                        </div>
+                        <div>
+                            <strong>Items:</strong><br>
+                            <small>${order.item_count || orderItems.length || 0} items</small>
+                        </div>
+                        <div>
+                            <strong>Total:</strong><br>
+                            <strong>RM ${parseFloat(order.total_amount || 0).toFixed(2)}</strong>
                         </div>
                     </div>
                     
@@ -459,7 +775,6 @@
                         <div class="order-items">
                             <strong>Order Items:</strong>
                             ${orderItems.map(item => {
-                                // 确保书本名称正确显示
                                 const bookTitle = item.book_title || item.title || 'Unknown Book';
                                 const author = item.author || 'Unknown Author';
                                 const quantity = item.quantity || 0;
@@ -469,8 +784,8 @@
                                 return `
                                 <div class="order-item">
                                     <div class="item-info">
-                                        <div class="item-title">${bookTitle}</div>
-                                        <div class="item-author">by ${author}</div>
+                                        <div class="item-title">${escapeHtml(bookTitle)}</div>
+                                        <div class="item-author">by ${escapeHtml(author)}</div>
                                     </div>
                                     <div class="item-quantity">Qty: ${quantity}</div>
                                     <div class="item-price">RM ${unitPrice}</div>
@@ -481,24 +796,121 @@
                         </div>
                     ` : '<div class="order-items"><em>No items found for this order</em></div>'}
                     
-                    <div class="order-total">
-                        Total Amount: RM ${parseFloat(order.total_amount || 0).toFixed(2)}
+                    <!-- Payment History Section -->
+                    <div class="payment-history">
+                        <strong>Payment History:</strong>
+                        ${payments.length > 0 ? 
+                            payments.map(payment => {
+                                const paymentDate = payment.created_at ? new Date(payment.created_at) : new Date();
+                                const statusClass = getPaymentStatusClass(payment.payment_status);
+                                
+                                return `
+                                <div class="payment-item ${payment.payment_status}">
+                                    <div class="payment-header">
+                                        <div class="payment-method">
+                                            ${getPaymentMethodText(payment.payment_method)}
+                                        </div>
+                                        <div class="payment-status ${statusClass}">
+                                            ${payment.payment_status.toUpperCase()}
+                                        </div>
+                                    </div>
+                                    <div class="payment-details">
+                                        <div class="payment-amount">
+                                            RM ${parseFloat(payment.amount || 0).toFixed(2)}
+                                        </div>
+                                        <div class="payment-date">
+                                            ${paymentDate.toLocaleDateString()}
+                                        </div>
+                                    </div>
+                                    ${payment.transaction_id ? `
+                                    <div style="margin-top: 8px; font-size: 0.8rem;">
+                                        <strong>Transaction ID:</strong>
+                                        <div class="transaction-id">${payment.transaction_id}</div>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                                `;
+                            }).join('') 
+                            : 
+                            '<div style="color: #666; font-style: italic; padding: 10px; background: #f8f9fa; border-radius: 6px;">No payment records found for this order</div>'
+                        }
                     </div>
-                    
-                    ${order.payment ? `
-                        <div style="margin-top: 10px; font-size: 0.9rem; color: #666;">
-                            Payment: ${order.payment.payment_method || 'Unknown'} - 
-                            <span class="${getPaymentStatusClass(order.payment.payment_status)}">
-                                ${order.payment.payment_status || 'Unknown'}
-                            </span>
-                        </div>
-                    ` : '<div style="margin-top: 10px; font-size: 0.9rem; color: #666;">Payment: No payment information</div>'}
                 </div>
                 `;
             }).join('');
         }
 
-        // 获取状态类名
+        // 更新统计信息
+        function updateStats() {
+            if (allOrders.length === 0) return;
+            
+            // 总订单数
+            document.getElementById('totalOrders').textContent = allOrders.length;
+            
+            // 总消费额
+            const totalSpent = allOrders.reduce((sum, order) => sum + parseFloat(order.total_amount || 0), 0);
+            document.getElementById('totalSpent').textContent = `RM ${totalSpent.toFixed(2)}`;
+            
+            // 待处理订单
+            const pendingOrders = allOrders.filter(order => order.status === 'pending').length;
+            document.getElementById('pendingOrders').textContent = pendingOrders;
+            
+            // 平均订单金额
+            const avgOrder = totalSpent / allOrders.length;
+            document.getElementById('avgOrder').textContent = `RM ${avgOrder.toFixed(2)}`;
+        }
+
+        // 显示无订单
+        function showNoOrders() {
+            const ordersContainer = document.getElementById('ordersContainer');
+            ordersContainer.innerHTML = `
+                <div class="no-orders">
+                    <h3>No Orders Found</h3>
+                    <p>You haven't placed any orders yet.</p>
+                    <a href="Searching.html" class="btn btn-primary" style="margin-top: 15px;">
+                        🛍️ Start Shopping
+                    </a>
+                </div>
+            `;
+        }
+
+        // 显示错误
+        function showError(message) {
+            const ordersContainer = document.getElementById('ordersContainer');
+            ordersContainer.innerHTML = `
+                <div class="error">
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                    <button class="btn btn-primary" onclick="loadOrderHistory()" style="margin-top: 15px;">
+                        Retry
+                    </button>
+                </div>
+            `;
+        }
+
+        // 重置过滤器
+        function resetFilters() {
+            document.getElementById('statusFilter').value = 'all';
+            document.getElementById('dateFilter').value = 'all';
+            filterOrders();
+        }
+
+        // 刷新订单
+        function refreshOrders() {
+            const ordersContainer = document.getElementById('ordersContainer');
+            ordersContainer.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Refreshing orders...</p>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                loadCustomerOrders();
+            }, 500);
+        }
+
+        // 辅助函数
         function getStatusClass(status) {
             const statusMap = {
                 'pending': 'status-pending',
@@ -510,7 +922,6 @@
             return statusMap[status] || 'status-pending';
         }
 
-        // 获取状态文本
         function getStatusText(status) {
             const statusMap = {
                 'pending': 'Pending',
@@ -522,15 +933,31 @@
             return statusMap[status] || status;
         }
 
-        // 获取支付状态类名
         function getPaymentStatusClass(status) {
             const statusMap = {
-                'pending': 'status-pending',
-                'completed': 'status-delivered',
-                'failed': 'status-cancelled',
-                'refunded': 'status-cancelled'
+                'pending': 'payment-pending',
+                'completed': 'payment-completed',
+                'failed': 'payment-failed',
+                'refunded': 'payment-refunded'
             };
-            return statusMap[status] || 'status-pending';
+            return statusMap[status] || 'payment-pending';
+        }
+
+        function getPaymentMethodText(method) {
+            const methodMap = {
+                'credit_card': 'Credit Card',
+                'debit_card': 'Debit Card',
+                'paypal': 'PayPal',
+                'bank_transfer': 'Bank Transfer',
+                'cash_on_delivery': 'Cash on Delivery'
+            };
+            return methodMap[method] || method.replace('_', ' ').toUpperCase();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // 页面加载时执行

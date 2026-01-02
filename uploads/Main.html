@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual BookStore - Your Reading Journey Starts Here</title>
+  <link rel="stylesheet" href="Main.css">
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <h2>📚 Virtual BookStore</h2>
+      </div>
+      <div class="nav-user" id="userInfo">
+        <!-- 动态用户信息 -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- 英雄区域 -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">Discover Your Next Favorite Book</h1>
+        <p class="hero-subtitle">Explore thousands of books across all genres. From bestsellers to hidden gems, your reading adventure starts here.</p>
+        <div class="hero-buttons">
+          <button class="btn-primary" onclick="location.href='Searching.html'">Browse Collection</button>
+          <button class="btn-secondary" onclick="location.href='../Login/Login.html'">Join Our Community</button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="floating-books">
+          <div class="book-item book-1">📖</div>
+          <div class="book-item book-2">📚</div>
+          <div class="book-item book-3">✨</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 欢迎消息 -->
+  <div id="welcomeMessage" class="welcome-message hidden"></div>
+
+  <!-- 快速操作区域 -->
+  <section class="quick-actions">
+    <div class="container">
+      <div class="actions-grid">
+        <div class="action-card" onclick="location.href='customer_view.html'">
+          <div class="action-icon">🔍</div>
+          <h3> Books</h3>
+          <p>Find your next read with advanced search</p>
+        </div>
+        <div class="action-card" onclick="location.href='cart.html'">
+          <div class="action-icon">📖</div>
+          <h3>Cart</h3>
+          <p>Create and share book lists</p>
+        </div>
+        <div class="action-card" onclick="location.href='order_history.html'">
+          <div class="action-icon">📦</div>
+          <h3>My Orders</h3>
+          <p>Track and manage your orders</p>
+        </div>
+        
+        <div class="action-card" onclick="location.href='user_profile.html'">
+          <div class="action-icon">👤</div>
+          <h3>My Profile</h3>
+          <p>Manage your account settings</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 畅销书展示 -->
+  <section class="showcase-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Trending Now</h2>
+        <p>Discover what other readers are loving this week</p>
+      </div>
+      
+      <div class="books-showcase" id="booksGrid">
+        <!-- 动态书籍内容 - 现在显示8本 -->
+      </div>
+      
+      <div class="showcase-actions">
+        <button class="btn-outline" onclick="location.href='customer_view.html'">View All Books</button>
+        <button class="btn-primary" onclick="location.href='order_history.html'">View My Orders</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 关于我们部分 -->
+  <section class="about-section">
+    <div class="container">
+      <div class="about-content">
+        <div class="about-text">
+          <h2>About Virtual BookStore</h2>
+          <p>Founded with a passion for literature and technology, Virtual BookStore brings the magic of reading to the digital age. We believe every book has a story to tell and every reader deserves to find their perfect match.</p>
+          <p>Our mission is to create a welcoming space where book lovers can discover, connect, and share their reading experiences. From classic literature to contemporary bestsellers, we curate collections that inspire and delight.</p>
+          <div class="about-features">
+            <div class="about-feature">
+              <span class="feature-icon">📚</span>
+              <span>Curated Collections</span>
+            </div>
+            <div class="about-feature">
+              <span class="feature-icon">🌟</span>
+              <span>Expert Recommendations</span>
+            </div>
+            <div class="about-feature">
+              <span class="feature-icon">💫</span>
+              <span>Community Driven</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-visual">
+          <div class="visual-element book-stack">
+            <div class="book book-1"></div>
+            <div class="book book-2"></div>
+            <div class="book book-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <h3>📚 Virtual BookStore</h3>
+          <p>Your gateway to endless reading possibilities. Discover, read, and connect with stories that matter.</p>
+          <div class="social-links">
+            <a href="#" class="social-link">📘</a>
+            <a href="#" class="social-link">🐦</a>
+            <a href="#" class="social-link">📷</a>
+          </div>
+        </div>
+        
+        <div class="footer-links">
+          <div class="footer-column">
+            <h4>Explore</h4>
+            <ul>
+              <li><a href="Main.html">Home</a></li>
+              <li><a href="Searching.html">Browse Books</a></li>
+              <li><a href="About.html">About Us</a></li>
+              <li><a href="order_history.html">My Orders</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer-column">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="#">Help Center</a></li>
+              <li><a href="#">Contact Us</a></li>
+              <li><a href="#">Shipping Info</a></li>
+              <li><a href="#">Returns</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer-column">
+            <h4>Contact</h4>
+            <div class="contact-info">
+              <p>📧 hello@virtualbookstore.com</p>
+              <p>📞 1-800-READ-NOW</p>
+              <p>📍 123 Bookworm Lane</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Virtual BookStore. All stories welcome. 📖</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="Main.js"></script>
+</body>
+</html>

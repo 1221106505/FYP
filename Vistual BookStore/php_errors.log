@@ -1,0 +1,357 @@
+[02-Jan-2026 09:56:35 Europe/Berlin] Received order data: {"cart_ids":[14],"customer_id":4,"payment_method":"cash_on_delivery","total_amount":53.75,"shipping_address":"123 Main Street, Kuala Lumpur, Malaysia","contact_phone":"012-3456789","contact_email":"teio@example.com"}
+[02-Jan-2026 09:56:35 Europe/Berlin] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (14) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 09:56:35 Europe/Berlin] Order SQL: INSERT INTO orders (
+                    customer_id, 
+                    total_amount, 
+                    status, 
+                    shipping_address, 
+                    billing_address, 
+                    contact_phone, 
+                    contact_email, 
+                    notes
+                  ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
+[02-Jan-2026 09:56:35 Europe/Berlin] Order created with ID: 28
+[02-Jan-2026 09:56:35 Europe/Berlin] Item SQL for book 1: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 09:56:35 Europe/Berlin] Update stock SQL for book 1: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 09:56:35 Europe/Berlin] Stock updated for book 1
+[02-Jan-2026 09:56:35 Europe/Berlin] Delete cart SQL: DELETE FROM cart WHERE cart_id IN (14) AND customer_id = ?
+[02-Jan-2026 09:56:35 Europe/Berlin] Cart items deleted
+[02-Jan-2026 09:56:35 Europe/Berlin] Payment SQL: INSERT INTO payments (
+                        order_id, 
+                        customer_id, 
+                        payment_method, 
+                        payment_status, 
+                        amount
+                    ) VALUES (?, ?, ?, 'pending', ?)
+[02-Jan-2026 09:56:35 Europe/Berlin] Payment record created with ID: 32
+[02-Jan-2026 09:56:35 Europe/Berlin] Transaction committed successfully
+[02-Jan-2026 17:06:09 Asia/Kuala_Lumpur] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (15) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 17:06:09 Asia/Kuala_Lumpur] Order SQL: INSERT INTO orders (
+                    customer_id, 
+                    total_amount, 
+                    status, 
+                    shipping_address, 
+                    billing_address, 
+                    contact_phone, 
+                    contact_email, 
+                    notes
+                  ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
+[02-Jan-2026 17:06:09 Asia/Kuala_Lumpur] Order created with ID: 29
+[02-Jan-2026 17:06:09 Asia/Kuala_Lumpur] Item SQL for book 1: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:06:09 Asia/Kuala_Lumpur] Update stock SQL for book 1: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:06:09 Asia/Kuala_Lumpur] Stock updated for book 1
+[02-Jan-2026 17:06:09 Asia/Kuala_Lumpur] Delete cart SQL: DELETE FROM cart WHERE cart_id IN (15) AND customer_id = ?
+[02-Jan-2026 17:06:09 Asia/Kuala_Lumpur] Cart items deleted
+[02-Jan-2026 17:06:09 Asia/Kuala_Lumpur] Payment SQL: INSERT INTO payments (
+                        order_id, 
+                        customer_id, 
+                        payment_method, 
+                        payment_status, 
+                        amount
+                    ) VALUES (?, ?, ?, 'pending', ?)
+[02-Jan-2026 17:06:09 Asia/Kuala_Lumpur] Payment record created with ID: 33
+[02-Jan-2026 17:06:09 Asia/Kuala_Lumpur] Transaction committed successfully
+[02-Jan-2026 17:07:46 Asia/Kuala_Lumpur] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (16) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 17:07:46 Asia/Kuala_Lumpur] Order SQL: INSERT INTO orders (
+                    customer_id, 
+                    total_amount, 
+                    status, 
+                    shipping_address, 
+                    billing_address, 
+                    contact_phone, 
+                    contact_email, 
+                    notes
+                  ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
+[02-Jan-2026 17:07:46 Asia/Kuala_Lumpur] Order created with ID: 30
+[02-Jan-2026 17:07:46 Asia/Kuala_Lumpur] Item SQL for book 1: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:07:46 Asia/Kuala_Lumpur] Update stock SQL for book 1: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:07:46 Asia/Kuala_Lumpur] Stock updated for book 1
+[02-Jan-2026 17:07:46 Asia/Kuala_Lumpur] Delete cart SQL: DELETE FROM cart WHERE cart_id IN (16) AND customer_id = ?
+[02-Jan-2026 17:07:46 Asia/Kuala_Lumpur] Cart items deleted
+[02-Jan-2026 17:07:46 Asia/Kuala_Lumpur] Payment SQL: INSERT INTO payments (
+                        order_id, 
+                        customer_id, 
+                        payment_method, 
+                        payment_status, 
+                        amount
+                    ) VALUES (?, ?, ?, 'pending', ?)
+[02-Jan-2026 17:07:46 Asia/Kuala_Lumpur] Payment record created with ID: 34
+[02-Jan-2026 17:07:46 Asia/Kuala_Lumpur] Transaction committed successfully
+[02-Jan-2026 17:09:44 Asia/Kuala_Lumpur] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (17) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 17:09:44 Asia/Kuala_Lumpur] Order SQL: INSERT INTO orders (
+                    customer_id, 
+                    total_amount, 
+                    status, 
+                    shipping_address, 
+                    billing_address, 
+                    contact_phone, 
+                    contact_email, 
+                    notes
+                  ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
+[02-Jan-2026 17:09:44 Asia/Kuala_Lumpur] Order created with ID: 31
+[02-Jan-2026 17:09:44 Asia/Kuala_Lumpur] Item SQL for book 1: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:09:44 Asia/Kuala_Lumpur] Update stock SQL for book 1: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:09:44 Asia/Kuala_Lumpur] Stock updated for book 1
+[02-Jan-2026 17:09:44 Asia/Kuala_Lumpur] Delete cart SQL: DELETE FROM cart WHERE cart_id IN (17) AND customer_id = ?
+[02-Jan-2026 17:09:44 Asia/Kuala_Lumpur] Cart items deleted
+[02-Jan-2026 17:09:44 Asia/Kuala_Lumpur] Payment SQL: INSERT INTO payments (
+                        order_id, 
+                        customer_id, 
+                        payment_method, 
+                        payment_status, 
+                        amount
+                    ) VALUES (?, ?, ?, 'pending', ?)
+[02-Jan-2026 17:09:44 Asia/Kuala_Lumpur] Payment record created with ID: 35
+[02-Jan-2026 17:09:44 Asia/Kuala_Lumpur] Transaction committed successfully
+[02-Jan-2026 17:13:11 Asia/Kuala_Lumpur] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (18) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 17:13:11 Asia/Kuala_Lumpur] Order SQL: INSERT INTO orders (
+                    customer_id, 
+                    total_amount, 
+                    status, 
+                    shipping_address, 
+                    billing_address, 
+                    contact_phone, 
+                    contact_email, 
+                    notes
+                  ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
+[02-Jan-2026 17:13:11 Asia/Kuala_Lumpur] Order created with ID: 32
+[02-Jan-2026 17:13:11 Asia/Kuala_Lumpur] Item SQL for book 1: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:13:11 Asia/Kuala_Lumpur] Update stock SQL for book 1: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:13:11 Asia/Kuala_Lumpur] Stock updated for book 1
+[02-Jan-2026 17:13:11 Asia/Kuala_Lumpur] Delete cart SQL: DELETE FROM cart WHERE cart_id IN (18) AND customer_id = ?
+[02-Jan-2026 17:13:11 Asia/Kuala_Lumpur] Cart items deleted
+[02-Jan-2026 17:13:11 Asia/Kuala_Lumpur] Payment SQL: INSERT INTO payments (
+                        order_id, 
+                        customer_id, 
+                        payment_method, 
+                        payment_status, 
+                        amount
+                    ) VALUES (?, ?, ?, 'pending', ?)
+[02-Jan-2026 17:13:11 Asia/Kuala_Lumpur] Payment record created with ID: 36
+[02-Jan-2026 17:13:11 Asia/Kuala_Lumpur] Transaction committed successfully
+[02-Jan-2026 17:15:17 Asia/Kuala_Lumpur] Missing fields: total_amount
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (24,23,22) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Order SQL: INSERT INTO orders (
+                    customer_id, 
+                    total_amount, 
+                    status, 
+                    shipping_address, 
+                    billing_address, 
+                    contact_phone, 
+                    contact_email, 
+                    notes
+                  ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Order created with ID: 33
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Item SQL for book 1: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Update stock SQL for book 1: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Stock updated for book 1
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Item SQL for book 3: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Update stock SQL for book 3: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Stock updated for book 3
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Item SQL for book 5: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Update stock SQL for book 5: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Stock updated for book 5
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Delete cart SQL: DELETE FROM cart WHERE cart_id IN (24,23,22) AND customer_id = ?
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Cart items deleted
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Payment SQL: INSERT INTO payments (
+                        order_id, 
+                        customer_id, 
+                        payment_method, 
+                        payment_status, 
+                        amount
+                    ) VALUES (?, ?, ?, 'pending', ?)
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Payment record created with ID: 37
+[02-Jan-2026 17:15:53 Asia/Kuala_Lumpur] Transaction committed successfully
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (26,25) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Order SQL: INSERT INTO orders (
+                    customer_id, 
+                    total_amount, 
+                    status, 
+                    shipping_address, 
+                    billing_address, 
+                    contact_phone, 
+                    contact_email, 
+                    notes
+                  ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Order created with ID: 34
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Item SQL for book 1: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Update stock SQL for book 1: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Stock updated for book 1
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Item SQL for book 3: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Update stock SQL for book 3: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Stock updated for book 3
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Delete cart SQL: DELETE FROM cart WHERE cart_id IN (26,25) AND customer_id = ?
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Cart items deleted
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Payment record created with ID: 38, transaction_id: TXN_34_1767345613_1cc9a6
+[02-Jan-2026 17:20:13 Asia/Kuala_Lumpur] Transaction committed successfully
+[02-Jan-2026 17:20:22 Asia/Kuala_Lumpur] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (26,25) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 17:20:22 Asia/Kuala_Lumpur] Transaction failed: No valid cart items found for this customer
+[02-Jan-2026 17:20:24 Asia/Kuala_Lumpur] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (26,25) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 17:20:24 Asia/Kuala_Lumpur] Transaction failed: No valid cart items found for this customer
+[02-Jan-2026 17:20:30 Asia/Kuala_Lumpur] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (26,25) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 17:20:30 Asia/Kuala_Lumpur] Transaction failed: No valid cart items found for this customer
+[02-Jan-2026 17:20:32 Asia/Kuala_Lumpur] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (26,25) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 17:20:32 Asia/Kuala_Lumpur] Transaction failed: No valid cart items found for this customer
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (28,27) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Order SQL: INSERT INTO orders (
+                    customer_id, 
+                    total_amount, 
+                    status, 
+                    shipping_address, 
+                    billing_address, 
+                    contact_phone, 
+                    contact_email, 
+                    notes
+                  ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Order created with ID: 35
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Item SQL for book 1: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Update stock SQL for book 1: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Stock updated for book 1
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Item SQL for book 3: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Update stock SQL for book 3: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Stock updated for book 3
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Delete cart SQL: DELETE FROM cart WHERE cart_id IN (28,27) AND customer_id = ?
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Cart items deleted
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Payment SQL: INSERT INTO payments (
+                        order_id, 
+                        customer_id, 
+                        payment_method, 
+                        payment_status, 
+                        amount,
+                        transaction_id,
+                        payment_date,
+                        created_at,
+                        updated_at
+                    ) VALUES (?, ?, ?, 'completed', ?, ?, NOW(), NOW(), NOW())
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Payment record created with ID: 39, transaction_id: TXN_35_1767345790_c5e757
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Order status updated to confirmed
+[02-Jan-2026 17:23:10 Asia/Kuala_Lumpur] Transaction committed successfully
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Cart SQL: SELECT c.cart_id, c.book_id, c.quantity, b.price, b.title, b.stock_quantity, b.pre_order_available
+                 FROM cart c 
+                 JOIN books b ON c.book_id = b.book_id 
+                 WHERE c.cart_id IN (29,30) AND c.customer_id = ? with customer_id: 4
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Order SQL: INSERT INTO orders (
+                    customer_id, 
+                    total_amount, 
+                    status, 
+                    shipping_address, 
+                    billing_address, 
+                    contact_phone, 
+                    contact_email, 
+                    notes
+                  ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Order created with ID: 36
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Item SQL for book 1: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Update stock SQL for book 1: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Stock updated for book 1
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Item SQL for book 3: INSERT INTO order_items (order_id, book_id, quantity, unit_price, subtotal) 
+                     VALUES (?, ?, ?, ?, ?)
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Update stock SQL for book 3: UPDATE books 
+                       SET stock_quantity = stock_quantity - ?, 
+                           updated_at = NOW()
+                       WHERE book_id = ?
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Stock updated for book 3
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Delete cart SQL: DELETE FROM cart WHERE cart_id IN (29,30) AND customer_id = ?
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Cart items deleted
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Payment SQL: INSERT INTO payments (
+                        order_id, 
+                        customer_id, 
+                        payment_method, 
+                        payment_status, 
+                        amount,
+                        transaction_id,
+                        payment_date,
+                        created_at,
+                        updated_at
+                    ) VALUES (?, ?, ?, 'completed', ?, ?, NOW(), NOW(), NOW())
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Payment record created with ID: 40, transaction_id: TXN_36_1767346008_5a658e
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Order status updated to confirmed
+[02-Jan-2026 17:26:48 Asia/Kuala_Lumpur] Transaction committed successfully

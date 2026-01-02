@@ -1,0 +1,135 @@
+========================================
+文件结构分析报告
+========================================
+
+📋 基本信息
+----------------------------------------
+filename: About.css
+real_path: C:\xampp\htdocs\FYP\uploads\About.css
+directory: C:\xampp\htdocs\FYP\uploads
+extension: css
+file_size:
+  bytes: 461
+  human: 461 B
+permissions:
+  octal: 0666
+  symbolic: rw-rw-rw-
+timestamps:
+  created: 2026-01-02 06:44:41
+  modified: 2026-01-02 06:44:41
+  accessed: 2026-01-02 06:44:41
+ownership:
+  owner_id: 0
+  group_id: 0
+is_readable: 1
+is_writable: 1
+is_executable: 
+
+🔍 文件类型信息
+----------------------------------------
+detected_type: css
+mime_type: text/plain
+extension: css
+is_text_file: 1
+encoding: UTF-8
+has_bom: 
+
+🏗️ 内部结构
+----------------------------------------
+{
+    "selectors": [
+        ".mainbackground"
+    ],
+    "properties": [
+        {
+            "property": "background-image",
+            "count": 1
+        },
+        {
+            "property": "background-attachment",
+            "count": 1
+        },
+        {
+            "property": "background-size",
+            "count": 1
+        },
+        {
+            "property": "background-position",
+            "count": 1
+        },
+        {
+            "property": "background-repeat",
+            "count": 1
+        },
+        {
+            "property": "height",
+            "count": 1
+        },
+        {
+            "property": "display",
+            "count": 1
+        },
+        {
+            "property": "flex-direction",
+            "count": 1
+        },
+        {
+            "property": "justify-content",
+            "count": 1
+        },
+        {
+            "property": "align-items",
+            "count": 1
+        },
+        {
+            "property": "color",
+            "count": 1
+        },
+        {
+            "property": "text-shadow",
+            "count": 1
+        }
+    ],
+    "media_queries": [],
+    "imports": [],
+    "variables": []
+}
+
+📦 依赖关系
+----------------------------------------
+{
+    "included_files": [],
+    "required_files": [],
+    "imported_files": [],
+    "external_resources": []
+}
+
+📊 统计信息
+----------------------------------------
+lines:
+  total: 14
+  non_empty: 14
+  max_length: 64
+  average_length: 31.071428571428573
+characters:
+  total: 461
+  without_spaces: 385
+  letters: 284
+  digits: 11
+  spaces: 102
+  special: 64
+words:
+  total: 38
+  unique: 33
+  average_length: 12.131578947368421
+comments:
+  lines: 0
+  percentage: 0
+
+🛡️ 安全检查
+----------------------------------------
+✓ 未发现明显安全问题
+
+========================================
+报告生成时间: 2026-01-02 06:44:41
+========================================
