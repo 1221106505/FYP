@@ -375,14 +375,51 @@
 
         .chart-placeholder {
             height: 320px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border: 2px dashed #dee2e6;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: #6c757d;
-            font-size: 1.1em;
+            overflow: hidden;
+        }
+
+        /* Analytics Styles */
+        .analytics-controls {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .analytics-select {
+            padding: 8px 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            background: white;
+            color: #495057;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .analytics-metric {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
         }
 
         /* Modal */
@@ -522,36 +559,6 @@
             font-size: 14px;
         }
 
-        /* 警告横幅样式 */
-        #stock-warning-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 16px;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.8; }
-            100% { opacity: 1; }
-        }
-
-        /* 库存警告卡片样式 */
-        .stat-card.warning {
-            animation: pulse 2s infinite;
-            background: #fff3cd;
-            border-color: #ffeaa7;
-        }
-
         /* Order Status Styles */
         .order-status, .payment-status {
             padding: 4px 8px;
@@ -586,185 +593,6 @@
             color: #721c24;
         }
 
-        .status-completed {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-failed {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status-refunded {
-            background: #e2e3e5;
-            color: #383d41;
-        }
-
-        .status-unknown {
-            background: #f8f9fa;
-            color: #6c757d;
-        }
-
-        /* Order Details Modal Styles */
-        .order-details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .order-section {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid var(--accent);
-        }
-
-        .order-section.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .order-section h4 {
-            margin: 0 0 12px 0;
-            color: var(--primary);
-            font-size: 1.1em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-
-        .detail-row label {
-            font-weight: 600;
-            color: var(--primary);
-            min-width: 120px;
-        }
-
-        .address-box, .notes-box {
-            background: white;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #e9ecef;
-            margin-top: 8px;
-            white-space: pre-wrap;
-            line-height: 1.5;
-        }
-
-        .order-items-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .order-item {
-            background: white;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #e9ecef;
-            margin-bottom: 10px;
-        }
-
-        .order-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .item-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--primary);
-        }
-
-        .item-details {
-            display: flex;
-            gap: 20px;
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        .item-details span {
-            background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        .current-status {
-            text-align: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            margin-top: 15px;
-            font-weight: 600;
-        }
-
-        /* Warning Modal Styles */
-        .warning-modal .modal-content {
-            max-width: 500px;
-            border-top: 6px solid var(--warning);
-        }
-
-        .warning-modal .modal-header {
-            background: var(--warning);
-        }
-
-        .warning-icon {
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .warning-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        /* Pre-order specific styles */
-        .preorder-badge {
-            background: var(--warning);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-            gap: 10px;
-        }
-
-        .pagination-btn {
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .pagination-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .pagination-info {
-            padding: 8px 16px;
-        }
-
         /* Responsive */
         @media (max-width: 1024px) {
             .admin-container {
@@ -781,10 +609,6 @@
             
             .stats-grid {
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-            
-            .order-details-grid {
-                grid-template-columns: 1fr;
             }
         }
 
@@ -812,21 +636,6 @@
             .search-box {
                 flex-direction: column;
             }
-            
-            .detail-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            
-            .item-details {
-                flex-direction: column;
-                gap: 5px;
-            }
-            
-            .warning-actions {
-                flex-direction: column;
-            }
         }
     </style>
 </head>
@@ -843,7 +652,6 @@
                 <li><a href="#" class="nav-link" data-section="books"><i>📚</i> Book Management</a></li>
                 <li><a href="#" class="nav-link" data-section="inventory"><i>📦</i> Inventory</a></li>
                 <li><a href="#" class="nav-link" data-section="orders"><i>📦</i> Order Management</a></li>
-                <li><a href="#" class="nav-link" data-section="preorders"><i>📋</i> Pre-Order Management</a></li>
                 <li><a href="#" class="nav-link" data-section="categories"><i>🏷️</i> Categories</a></li>
                 <li><a href="#" class="nav-link" data-section="analytics"><i>📈</i> Analytics</a></li>
                 <li><a href="#" class="nav-link" data-section="settings"><i>⚙️</i> Settings</a></li>
@@ -864,7 +672,7 @@
 
             <!-- Dashboard Section -->
             <section id="dashboard" class="content-section active">
-                <div class="stats-grid">
+                <div class="stats-grid" id="dashboardStats">
                     <div class="stat-card">
                         <div class="stat-number" id="totalBooks">0</div>
                         <div class="stat-label">Total Books</div>
@@ -873,11 +681,11 @@
                         <div class="stat-number" id="totalCategories">0</div>
                         <div class="stat-label">Categories</div>
                     </div>
-                    <div class="stat-card" id="lowStockCard">
+                    <div class="stat-card">
                         <div class="stat-number" id="lowStockCount">0</div>
                         <div class="stat-label">Low Stock Items</div>
                     </div>
-                    <div class="stat-card" id="outOfStockCard">
+                    <div class="stat-card">
                         <div class="stat-number" id="outOfStock">0</div>
                         <div class="stat-label">Out of Stock</div>
                     </div>
@@ -886,15 +694,15 @@
                         <div class="stat-label">Total Orders</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="totalPreOrders">0</div>
-                        <div class="stat-label">Active Pre-Orders</div>
+                        <div class="stat-number" id="todayRevenue">RM 0</div>
+                        <div class="stat-label">Today's Revenue</div>
                     </div>
                 </div>
 
                 <div class="chart-container">
                     <h3>📈 Sales Overview</h3>
-                    <div class="chart-placeholder">
-                        📊 Sales analytics dashboard will be implemented here
+                    <div class="chart-placeholder" id="salesOverviewChart">
+                        Loading sales overview...
                     </div>
                 </div>
 
@@ -914,11 +722,8 @@
                     <button class="btn btn-info" onclick="loadSectionData('orders')">
                         <i>📦</i> View Orders
                     </button>
-                    <button class="btn btn-info" onclick="loadSectionData('preorders')">
-                        <i>📋</i> Manage Pre-Orders
-                    </button>
-                    <button class="btn btn-primary" onclick="loadSectionData('categories')">
-                        <i>🏷️</i> Manage Categories
+                    <button class="btn btn-primary" onclick="loadSectionData('analytics')">
+                        <i>📈</i> View Analytics
                     </button>
                 </div>
             </section>
@@ -937,12 +742,6 @@
                     <select id="categoryFilter" class="form-control" style="width: 200px;" onchange="filterBooks()">
                         <option value="all">All Categories</option>
                     </select>
-                    <!-- 添加库存状态筛选按钮 -->
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-warning" onclick="filterByStock('low')">⚠️ Low Stock</button>
-                        <button class="btn btn-danger" onclick="filterByStock('out')">❌ Out of Stock</button>
-                        <button class="btn btn-success" onclick="filterByStock('all')">📦 All Stock</button>
-                    </div>
                 </div>
 
                 <div class="table-container">
@@ -956,13 +755,11 @@
                                 <th>Price</th>
                                 <th>Stock</th>
                                 <th>Status</th>
-                                <th>Rating</th>
-                                <th>Total Sales</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="booksTable">
-                            <tr><td colspan="10" class="loading">Loading books data...</td></tr>
+                            <tr><td colspan="8" class="loading">Loading books data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1056,15 +853,10 @@
                         <div class="stat-number" id="deliveredOrders">0</div>
                         <div class="stat-label">Delivered</div>
                     </div>
-                    <div class="stat-card" style="border-top-color: var(--danger);">
-                        <div class="stat-number" id="totalOrdersCount">0</div>
-                        <div class="stat-label">Total Orders</div>
-                    </div>
                 </div>
 
                 <div class="search-box">
                     <input type="text" id="orderSearch" class="search-input" placeholder="🔍 Search orders by ID, customer name, or email..." onkeyup="searchOrders()">
-                    <input type="number" id="customerIdFilter" class="form-control" style="width: 150px;" placeholder="Customer ID" onchange="filterOrders()">
                 </div>
 
                 <div class="table-container">
@@ -1077,103 +869,13 @@
                                 <th>Items</th>
                                 <th>Total Amount</th>
                                 <th>Status</th>
-                                <th>Payment</th>
-                                <th>Last Updated</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="ordersTable">
-                            <tr><td colspan="9" class="loading">Loading orders data...</td></tr>
+                            <tr><td colspan="7" class="loading">Loading orders data...</td></tr>
                         </tbody>
                     </table>
-                </div>
-            </section>
-            
-            <!-- Pre-Order Management Section (增强版) -->
-            <section id="preorders" class="content-section">
-                <div class="section-header">
-                    <h2>📋 Pre-Order Management</h2>
-                    <div style="display: flex; gap: 10px;">
-                        <select id="preorderStatusFilter" class="form-control" style="width: 200px;" onchange="filterPreOrders()">
-                            <option value="all">All Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                        <button class="btn btn-primary" onclick="refreshPreOrders()">
-                            <i>🔄</i> Refresh
-                        </button>
-                        <button class="btn btn-success" onclick="exportPreOrders()">
-                            <i>📥</i> Export
-                        </button>
-                    </div>
-                </div>
-
-                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-                    <div class="stat-card" style="border-top-color: var(--warning);">
-                        <div class="stat-number" id="pendingPreOrders">0</div>
-                        <div class="stat-label">Pending</div>
-                    </div>
-                    <div class="stat-card" style="border-top-color: var(--accent);">
-                        <div class="stat-number" id="confirmedPreOrders">0</div>
-                        <div class="stat-label">Confirmed</div>
-                    </div>
-                    <div class="stat-card" style="border-top-color: var(--info);">
-                        <div class="stat-number" id="shippedPreOrders">0</div>
-                        <div class="stat-label">Shipped</div>
-                    </div>
-                    <div class="stat-card" style="border-top-color: var(--success);">
-                        <div class="stat-number" id="deliveredPreOrders">0</div>
-                        <div class="stat-label">Delivered</div>
-                    </div>
-                    <div class="stat-card" style="border-top-color: var(--danger);">
-                        <div class="stat-number" id="cancelledPreOrders">0</div>
-                        <div class="stat-label">Cancelled</div>
-                    </div>
-                    <div class="stat-card" style="border-top-color: var(--primary);">
-                        <div class="stat-number" id="totalPreOrdersCount">0</div>
-                        <div class="stat-label">Total Pre-Orders</div>
-                    </div>
-                </div>
-
-                <div class="search-box">
-                    <input type="text" id="preorderSearch" class="search-input" 
-                        placeholder="🔍 Search pre-orders by ID, customer name, book title, or email..." 
-                        onkeyup="searchPreOrders()">
-                    <input type="number" id="preorderCustomerFilter" class="form-control" 
-                        style="width: 150px;" placeholder="Customer ID" onchange="filterPreOrders()">
-                    <input type="number" id="preorderBookFilter" class="form-control" 
-                        style="width: 150px;" placeholder="Book ID" onchange="filterPreOrders()">
-                </div>
-
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Pre-Order ID</th>
-                                <th>Customer</th>
-                                <th>Book</th>
-                                <th>Qty</th>
-                                <th>Order Date</th>
-                                <th>Expected Date</th>
-                                <th>Total Amount</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="preordersTable">
-                            <tr><td colspan="9" class="loading">Loading pre-orders data...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- 分页控制 -->
-                <div class="pagination">
-                    <button class="pagination-btn" onclick="changePreOrderPage(-1)" id="prevPageBtn" disabled>⬅️ Previous</button>
-                    <span class="pagination-info" id="preorderPageInfo">Page 1 of 1</span>
-                    <button class="pagination-btn" onclick="changePreOrderPage(1)" id="nextPageBtn" disabled>Next ➡️</button>
                 </div>
             </section>
 
@@ -1207,26 +909,42 @@
             <section id="analytics" class="content-section">
                 <div class="section-header">
                     <h2>📈 Sales Analytics</h2>
+                    <div class="analytics-controls">
+                        <select id="analyticsPeriod" class="analytics-select" onchange="loadSalesAnalytics(this.value)">
+                            <option value="7days">Last 7 Days</option>
+                            <option value="30days" selected>Last 30 Days</option>
+                            <option value="90days">Last 90 Days</option>
+                            <option value="year">Last Year</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="loadSalesAnalytics()">
+                            <i>🔄</i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Summary Stats -->
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 25px;" id="analyticsSummary">
+                    <!-- Will be populated by JavaScript -->
                 </div>
                 
                 <div class="chart-container">
-                    <h3>📊 Sales Trend (Last 30 Days)</h3>
-                    <div class="chart-placeholder">
-                        Sales trend chart will be displayed here
+                    <h3>📊 Sales Trend</h3>
+                    <div class="chart-placeholder" id="salesTrendChart">
+                        Loading sales trend...
                     </div>
                 </div>
 
                 <div class="chart-container">
                     <h3>🔥 Top Selling Books</h3>
-                    <div class="chart-placeholder">
-                        Top sellers chart will be displayed here
+                    <div class="chart-placeholder" id="topBooksChart">
+                        Loading top books...
                     </div>
                 </div>
 
                 <div class="chart-container">
                     <h3>🏷️ Revenue by Category</h3>
-                    <div class="chart-placeholder">
-                        Category revenue chart will be displayed here
+                    <div class="chart-placeholder" id="categoryRevenueChart">
+                        Loading category revenue...
                     </div>
                 </div>
             </section>
@@ -1300,16 +1018,6 @@
                             <input type="text" id="bookISBN" class="form-control">
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="bookPublisher">🏢 Publisher</label>
-                            <input type="text" id="bookPublisher" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="bookPublishDate">📅 Publish Date</label>
-                            <input type="date" id="bookPublishDate" class="form-control">
-                        </div>
-                    </div>
                     <div class="form-group">
                         <label for="bookDescription">📝 Description</label>
                         <textarea id="bookDescription" class="form-control" rows="4" placeholder="Enter book description..."></textarea>
@@ -1350,48 +1058,18 @@
         </div>
     </div>
 
-    <!-- Pre-Order Details Modal -->
-    <div class="modal" id="preorderDetailsModal">
-        <div class="modal-content">
+    <!-- Order Details Modal -->
+    <div class="modal" id="orderDetailsModal">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
-                <h3 id="preorderModalTitle">Pre-Order Details</h3>
-                <button class="close" onclick="closePreOrderModal()">&times;</button>
+                <h3 id="orderModalTitle">Order Details</h3>
+                <button class="close" onclick="closeOrderDetailsModal()">&times;</button>
             </div>
-            <div class="modal-body" id="preorderModalBody">
-                <!-- 动态加载内容 -->
+            <div class="modal-body" id="orderModalBody">
+                <!-- Dynamic content -->
             </div>
-            <div class="modal-footer" id="preorderModalFooter">
-                <!-- 动态加载按钮 -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Update Pre-Order Status Modal -->
-    <div class="modal" id="updatePreOrderStatusModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Update Pre-Order Status</h3>
-                <button class="close" onclick="closeUpdatePreOrderStatusModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="newPreOrderStatus">Select New Status:</label>
-                    <select id="newPreOrderStatus" class="form-control">
-                        <option value="pending">⏳ Pending</option>
-                        <option value="confirmed">✅ Confirmed</option>
-                        <option value="shipped">🚚 Shipped</option>
-                        <option value="delivered">📦 Delivered</option>
-                        <option value="cancelled">❌ Cancelled</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="preOrderNotes">Notes (Optional):</label>
-                    <textarea id="preOrderNotes" class="form-control" rows="3" placeholder="Add any notes about this status change..."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn" onclick="closeUpdatePreOrderStatusModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="confirmUpdatePreOrderStatus()">Update Status</button>
+            <div class="modal-footer" id="orderModalFooter">
+                <!-- Dynamic buttons -->
             </div>
         </div>
     </div>
@@ -1399,7 +1077,6 @@
     <script>
         // API endpoints
         const API_ENDPOINTS = {
-            // 从admin_panel.html继承的API
             books: 'get_book.php',
             bookDetail: 'get_book_detail.php',
             categories: 'get_categories.php',
@@ -1411,11 +1088,8 @@
             orders: 'getorder.php',
             orderDetail: 'get_single_order.php',
             updateOrder: 'update_order.php',
-            adminPreorders: 'admin_get_preorders.php',
-            adminPreorderDetail: 'admin_get_single_preorder.php',
-            adminUpdatePreOrder: 'admin_update_preorder.php',
-            adminCancelPreOrder: 'admin_cancel_preorder.php',
-            preorderStats: 'admin_get_preorder_stats.php'
+            salesOverview: 'sales_overview.php',
+            salesAnalytics: 'sales_analytics.php'
         };
 
         // Current state
@@ -1423,14 +1097,7 @@
         let currentCategories = [];
         let currentOrders = [];
         let currentInventoryFilter = 'all';
-        let warningShownThisSession = false;
-        
-        // 预购订单状态
-        let currentPreOrders = [];
-        let currentPreOrdersFiltered = [];
-        let currentPreOrderPage = 1;
-        let selectedPreOrderId = 0;
-        const PREORDERS_PER_PAGE = 15;
+        let currentOrderId = null;
 
         // Order status mapping
         const ORDER_STATUS_MAP = {
@@ -1440,23 +1107,6 @@
             'delivered': { text: '📦 Delivered', class: 'status-delivered' },
             'cancelled': { text: '❌ Cancelled', class: 'status-cancelled' }
         };
-
-        // 实时时钟函数
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            const dateString = now.toLocaleDateString('en-US', {
-                weekday: 'short',
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-            document.getElementById('adminWelcome').textContent = `Welcome, Admin • ${dateString} ${timeString}`;
-        }
 
         // Navigation
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -1477,7 +1127,6 @@
                     'books': 'Book Management',
                     'inventory': 'Inventory Management',
                     'orders': 'Order Management',
-                    'preorders': 'Pre-Order Management',
                     'categories': 'Category Management',
                     'analytics': 'Sales Analytics',
                     'settings': 'System Settings'
@@ -1493,6 +1142,7 @@
             switch(sectionId) {
                 case 'dashboard':
                     loadDashboardData();
+                    loadSalesOverview();
                     break;
                 case 'books':
                     loadBooksData();
@@ -1503,14 +1153,11 @@
                 case 'orders':
                     loadOrdersData();
                     break;
-                case 'preorders':
-                    loadPreOrdersData();
+                case 'analytics':
+                    loadSalesAnalytics();
                     break;
                 case 'categories':
                     loadCategoriesData();
-                    break;
-                case 'analytics':
-                    loadAnalyticsData();
                     break;
                 case 'settings':
                     loadSettingsData();
@@ -1521,7 +1168,6 @@
         // Load dashboard data
         async function loadDashboardData() {
             try {
-                // 从admin_panel.html的dashboard逻辑
                 const [booksResponse, categoriesResponse, ordersResponse] = await Promise.all([
                     fetch(API_ENDPOINTS.books),
                     fetch(API_ENDPOINTS.categories),
@@ -1531,27 +1177,6 @@
                 const booksData = await booksResponse.json();
                 const categoriesData = await categoriesResponse.json();
                 const ordersData = await ordersResponse.json();
-                
-              
-                const preorderStatsResponse = await fetch(API_ENDPOINTS.preorderStats);
-                const preorderStatsData = await preorderStatsResponse.json();
-                
-                if (preorderStatsData.success) {
-                    const stats = preorderStatsData.stats || {};
-                    const activePreOrders = (stats.pending || 0) + (stats.confirmed || 0) + (stats.shipped || 0);
-                    document.getElementById('totalPreOrders').textContent = activePreOrders;
-                } else {
-                    // 回退到原始方法
-                    const preordersResponse = await fetch(API_ENDPOINTS.preorders);
-                    const preordersData = await preordersResponse.json();
-                    if (preordersData.success) {
-                        const preorders = preordersData.preorders || [];
-                        const activePreOrders = preorders.filter(order => 
-                            order.status === 'pending' || order.status === 'confirmed'
-                        ).length;
-                        document.getElementById('totalPreOrders').textContent = activePreOrders;
-                    }
-                }
                 
                 if (booksData.success) {
                     const books = booksData.books || booksData.data || [];
@@ -1569,8 +1194,6 @@
                     
                     document.getElementById('lowStockCount').textContent = lowStockCount;
                     document.getElementById('outOfStock').textContent = outOfStockCount;
-                    
-                    checkStockWarnings(lowStockCount, outOfStockCount);
                 }
 
                 if (categoriesData.success) {
@@ -1588,838 +1211,436 @@
             }
         }
 
-        // 检查库存警告
-        function checkStockWarnings(lowStockCount, outOfStockCount) {
-            const lowStockCard = document.getElementById('lowStockCard');
-            const outOfStockCard = document.getElementById('outOfStockCard');
-            
-            lowStockCard.classList.remove('warning');
-            outOfStockCard.classList.remove('warning');
-            
-            let warningMessage = '';
-            let showWarning = false;
-            
-            if (outOfStockCount > 0) {
-                outOfStockCard.classList.add('warning');
-                warningMessage += `CRITICAL: You have ${outOfStockCount} item(s) out of stock!\n`;
-                showWarning = true;
-            }
-            
-            if (lowStockCount > 0) {
-                lowStockCard.classList.add('warning');
-                warningMessage += `WARNING: You have ${lowStockCount} item(s) with low stock!\n`;
-                showWarning = true;
-            }
-            
-            if (showWarning && !warningShownThisSession) {
-                showWarningModal(warningMessage);
-                warningShownThisSession = true;
-            }
-        }
-
-        // 显示警告弹窗（只显示一次）
-        function showWarningModal(message) {
-            const modal = document.createElement('div');
-            modal.className = 'modal warning-modal';
-            modal.style.display = 'flex';
-            modal.id = 'warningModal';
-            
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>⚠️ STOCK ALERT</h3>
-                        <button class="close" id="closeWarningModal">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="warning-icon">⚠️</div>
-                        <div style="text-align: center; margin-bottom: 20px;">
-                            <h4 style="color: var(--warning); margin-bottom: 15px;">Inventory Issues Detected</h4>
-                            <p style="line-height: 1.6; white-space: pre-line;">${message}</p>
-                        </div>
-                        <div class="warning-actions">
-                            <button class="btn btn-warning" id="viewInventoryBtn">
-                                📦 View Inventory
-                            </button>
-                            <button class="btn btn-primary" id="understandWarningBtn">
-                                👍 I Understand
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // 添加事件监听器
-            const closeModal = () => {
-                modal.remove();
-            };
-            
-            document.getElementById('closeWarningModal').addEventListener('click', closeModal);
-            document.getElementById('understandWarningBtn').addEventListener('click', closeModal);
-            document.getElementById('viewInventoryBtn').addEventListener('click', () => {
-                closeModal();
-                loadSectionData('inventory');
-            });
-            
-            // 点击外部关闭
-            modal.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    closeModal();
-                }
-            });
-        }
-
-        // ============================================
-        // PRE-ORDER MANAGEMENT FUNCTIONS (增强版)
-        // ============================================
-
-        // 加载预购订单数据
-        async function loadPreOrdersData() {
+        // Load sales overview
+        async function loadSalesOverview() {
             try {
-                document.getElementById('preordersTable').innerHTML = 
-                    '<tr><td colspan="9" class="loading">Loading pre-orders data...</td></tr>';
-                
-                // 尝试使用增强API，如果失败则使用原始API
-                let response;
-                try {
-                    response = await fetch(API_ENDPOINTS.adminPreorders);
-                } catch (e) {
-                    console.log('Using fallback preorders API');
-                    response = await fetch(API_ENDPOINTS.preorders);
-                }
-                
+                const response = await fetch(API_ENDPOINTS.salesOverview);
                 const data = await response.json();
                 
                 if (data.success) {
-                    currentPreOrders = data.preorders || [];
-                    currentPreOrdersFiltered = [...currentPreOrders];
-                    currentPreOrderPage = 1;
-                    
-                    updatePreOrderStats(data);
-                    displayPreOrders();
-                    updatePreOrderPagination();
+                    displaySalesOverview(data.data);
                 } else {
-                    document.getElementById('preordersTable').innerHTML = 
-                        '<tr><td colspan="9" class="error">Error loading pre-orders: ' + (data.error || 'Unknown error') + '</td></tr>';
+                    console.error('Error loading sales overview:', data.error);
                 }
             } catch (error) {
-                console.error('Error loading pre-orders:', error);
-                document.getElementById('preordersTable').innerHTML = 
-                    '<tr><td colspan="9" class="error">Error loading pre-orders</td></tr>';
+                console.error('Error loading sales overview:', error);
             }
         }
 
-        // 更新预购订单统计
-        function updatePreOrderStats(data) {
-            const stats = {
-                pending: 0,
-                confirmed: 0,
-                shipped: 0,
-                delivered: 0,
-                cancelled: 0,
-                total: 0,
-                totalAmount: 0
-            };
+        // Display sales overview
+        function displaySalesOverview(data) {
+            // Update today's revenue
+            document.getElementById('todayRevenue').textContent = `RM ${data.today.revenue.toFixed(2)}`;
             
-            currentPreOrders.forEach(order => {
-                const status = order.status;
-                if (stats[status] !== undefined) {
-                    stats[status]++;
-                }
-                stats.total++;
-                stats.totalAmount += parseFloat(order.total_amount || 0);
-            });
-            
-            document.getElementById('pendingPreOrders').textContent = stats.pending;
-            document.getElementById('confirmedPreOrders').textContent = stats.confirmed;
-            document.getElementById('shippedPreOrders').textContent = stats.shipped;
-            document.getElementById('deliveredPreOrders').textContent = stats.delivered;
-            document.getElementById('cancelledPreOrders').textContent = stats.cancelled;
-            document.getElementById('totalPreOrdersCount').textContent = stats.total;
-        }
-
-        // 显示预购订单（带分页）
-        function displayPreOrders() {
-            const preordersTable = document.getElementById('preordersTable');
-            
-            if (!currentPreOrdersFiltered || currentPreOrdersFiltered.length === 0) {
-                preordersTable.innerHTML = '<tr><td colspan="9" class="loading">No pre-orders found</td></tr>';
-                return;
-            }
-
-            // 分页
-            const startIndex = (currentPreOrderPage - 1) * PREORDERS_PER_PAGE;
-            const endIndex = startIndex + PREORDERS_PER_PAGE;
-            const pagePreorders = currentPreOrdersFiltered.slice(startIndex, endIndex);
-
-            preordersTable.innerHTML = pagePreorders.map(preorder => {
-                const statusInfo = ORDER_STATUS_MAP[preorder.status] || { 
-                    text: preorder.status.charAt(0).toUpperCase() + preorder.status.slice(1), 
-                    class: 'status-unknown' 
-                };
-                
-                // 格式化日期
-                const orderDate = formatDate(preorder.order_date);
-                const expectedDate = formatDate(preorder.expected_delivery_date);
-                
-                return `
-                <tr>
-                    <td><strong>#${preorder.pre_order_id}</strong></td>
-                    <td>
-                        <div><strong>${preorder.customer_name || 'Customer #' + preorder.customer_id}</strong></div>
-                        <div style="font-size: 0.8em; color: #666;">${preorder.customer_email || preorder.contact_email || 'No email'}</div>
-                    </td>
-                    <td>
-                        <div><strong>${preorder.book_title || 'Book #' + preorder.book_id}</strong></div>
-                        <div style="font-size: 0.8em; color: #666;">by ${preorder.book_author || preorder.author || 'Unknown Author'}</div>
-                    </td>
-                    <td>${preorder.quantity}</td>
-                    <td>${orderDate}</td>
-                    <td>${expectedDate}</td>
-                    <td><strong>RM ${parseFloat(preorder.total_amount || 0).toFixed(2)}</strong></td>
-                    <td>
-                        <span class="order-status ${statusInfo.class}">
-                            ${statusInfo.text}
-                        </span>
-                    </td>
-                    <td class="action-buttons">
-                        <button class="btn btn-sm btn-primary" onclick="viewPreOrderDetails(${preorder.pre_order_id})">
-                            👁️ View
-                        </button>
-                        <button class="btn btn-sm btn-warning" onclick="openUpdatePreOrderStatusModal(${preorder.pre_order_id})">
-                            ✏️ Update
-                        </button>
-                        ${preorder.status !== 'cancelled' && preorder.status !== 'delivered' ? `
-                        <button class="btn btn-sm btn-danger" onclick="cancelPreOrder(${preorder.pre_order_id})">
-                            ❌ Cancel
-                        </button>
-                        ` : ''}
-                    </td>
-                </tr>
+            // Update dashboard stats with sales data
+            const dashboardStats = document.getElementById('dashboardStats');
+            if (dashboardStats) {
+                const statsHTML = `
+                    <div class="stat-card">
+                        <div class="stat-number">${data.inventory.total_books}</div>
+                        <div class="stat-label">Total Books</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${data.today.orders}</div>
+                        <div class="stat-label">Today's Orders</div>
+                        <div style="font-size: 0.8em; color: ${data.growth_rates.orders_growth >= 0 ? 'var(--success)' : 'var(--danger)'}; margin-top: 5px;">
+                            ${data.growth_rates.orders_growth >= 0 ? '↑' : '↓'} ${Math.abs(data.growth_rates.orders_growth).toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">RM ${data.today.revenue.toFixed(2)}</div>
+                        <div class="stat-label">Today's Revenue</div>
+                        <div style="font-size: 0.8em; color: ${data.growth_rates.revenue_growth >= 0 ? 'var(--success)' : 'var(--danger)'}; margin-top: 5px;">
+                            ${data.growth_rates.revenue_growth >= 0 ? '↑' : '↓'} ${Math.abs(data.growth_rates.revenue_growth).toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${data.inventory.low_stock + data.inventory.out_of_stock}</div>
+                        <div class="stat-label">Stock Alerts</div>
+                        <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
+                            ${data.inventory.out_of_stock} out, ${data.inventory.low_stock} low
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${data.pending_orders.count}</div>
+                        <div class="stat-label">Pending Orders</div>
+                        <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
+                            RM ${data.pending_orders.amount.toFixed(2)}
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${data.active_customers.today}</div>
+                        <div class="stat-label">Active Today</div>
+                        <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
+                            ${data.active_customers.total} total
+                        </div>
+                    </div>
                 `;
-            }).join('');
-        }
-
-        // 更新分页控制
-        function updatePreOrderPagination() {
-            const totalPages = Math.ceil(currentPreOrdersFiltered.length / PREORDERS_PER_PAGE);
-            document.getElementById('preorderPageInfo').textContent = 
-                `Page ${currentPreOrderPage} of ${totalPages}`;
-            
-            document.getElementById('prevPageBtn').disabled = currentPreOrderPage <= 1;
-            document.getElementById('nextPageBtn').disabled = currentPreOrderPage >= totalPages;
-        }
-
-        // 翻页
-        function changePreOrderPage(direction) {
-            const totalPages = Math.ceil(currentPreOrdersFiltered.length / PREORDERS_PER_PAGE);
-            const newPage = currentPreOrderPage + direction;
-            
-            if (newPage >= 1 && newPage <= totalPages) {
-                currentPreOrderPage = newPage;
-                displayPreOrders();
-                updatePreOrderPagination();
-            }
-        }
-
-        // 筛选预购订单
-        function filterPreOrders() {
-            const statusFilter = document.getElementById('preorderStatusFilter').value;
-            const customerId = document.getElementById('preorderCustomerFilter').value;
-            const bookId = document.getElementById('preorderBookFilter').value;
-            
-            currentPreOrdersFiltered = currentPreOrders.filter(preorder => {
-                // 状态筛选
-                if (statusFilter !== 'all' && preorder.status !== statusFilter) {
-                    return false;
-                }
                 
-                // 客户ID筛选
-                if (customerId && preorder.customer_id != customerId) {
-                    return false;
-                }
-                
-                // 书籍ID筛选
-                if (bookId && preorder.book_id != bookId) {
-                    return false;
-                }
-                
-                return true;
-            });
-            
-            currentPreOrderPage = 1;
-            displayPreOrders();
-            updatePreOrderPagination();
-        }
-
-        // 搜索预购订单
-        function searchPreOrders() {
-            const searchTerm = document.getElementById('preorderSearch').value.toLowerCase();
-            
-            if (!searchTerm) {
-                currentPreOrdersFiltered = [...currentPreOrders];
-            } else {
-                currentPreOrdersFiltered = currentPreOrders.filter(preorder => 
-                    preorder.pre_order_id.toString().includes(searchTerm) ||
-                    (preorder.customer_name && preorder.customer_name.toLowerCase().includes(searchTerm)) ||
-                    (preorder.customer_email && preorder.customer_email.toLowerCase().includes(searchTerm)) ||
-                    (preorder.contact_email && preorder.contact_email.toLowerCase().includes(searchTerm)) ||
-                    (preorder.book_title && preorder.book_title.toLowerCase().includes(searchTerm)) ||
-                    (preorder.book_author && preorder.book_author.toLowerCase().includes(searchTerm)) ||
-                    (preorder.author && preorder.author.toLowerCase().includes(searchTerm))
-                );
+                dashboardStats.innerHTML = statsHTML;
             }
             
-            currentPreOrderPage = 1;
-            displayPreOrders();
-            updatePreOrderPagination();
+            // Update sales chart
+            updateSalesOverviewChart(data);
         }
 
-        // 查看预购订单详情
-        async function viewPreOrderDetails(preOrderId) {
-            try {
-                // 尝试使用增强API
-                let response;
-                try {
-                    response = await fetch(`${API_ENDPOINTS.adminPreorderDetail}?pre_order_id=${preOrderId}`);
-                } catch (e) {
-                    response = await fetch(`${API_ENDPOINTS.preorderDetail}?pre_order_id=${preOrderId}`);
-                }
+        // Update sales overview chart
+        function updateSalesOverviewChart(data) {
+            const chartContainer = document.getElementById('salesOverviewChart');
+            
+            if (!chartContainer) return;
+            
+            // Create hourly sales chart
+            let hourlyChartHTML = '';
+            if (data.recent_sales && data.recent_sales.length > 0) {
+                const maxRevenue = Math.max(...data.recent_sales.map(s => s.hourly_revenue));
                 
-                const data = await response.json();
-                
-                if (data.success) {
-                    showPreOrderDetails(data.preorder || data.data);
-                } else {
-                    alert('Error loading pre-order details: ' + (data.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Error loading pre-order details:', error);
-                alert('Error loading pre-order details');
-            }
-        }
-
-        // 显示预购订单详情弹窗
-        function showPreOrderDetails(preorder) {
-            const modal = document.getElementById('preorderDetailsModal');
-            const modalTitle = document.getElementById('preorderModalTitle');
-            const modalBody = document.getElementById('preorderModalBody');
-            const modalFooter = document.getElementById('preorderModalFooter');
-            
-            modalTitle.textContent = `Pre-Order #${preorder.pre_order_id} Details`;
-            
-            // 格式化日期
-            const orderDate = formatDate(preorder.order_date, true);
-            const expectedDate = formatDate(preorder.expected_delivery_date);
-            const updatedDate = formatDate(preorder.updated_at, true);
-            
-            modalBody.innerHTML = `
-                <div class="order-details-grid">
-                    <!-- Customer Information -->
-                    <div class="order-section">
-                        <h4>👤 Customer Information</h4>
-                        <div class="detail-row">
-                            <label>Customer ID:</label>
-                            <span>${preorder.customer_id || 'N/A'}</span>
+                hourlyChartHTML = `
+                    <div style="padding: 20px; height: 100%; display: flex; flex-direction: column;">
+                        <h4 style="margin-bottom: 15px; color: var(--primary);">Today's Sales by Hour</h4>
+                        <div style="display: flex; align-items: flex-end; height: 150px; gap: 5px; border-bottom: 1px solid #e9ecef; padding-bottom: 15px;">
+                            ${data.recent_sales.map(sale => {
+                                const height = maxRevenue > 0 ? (sale.hourly_revenue / maxRevenue * 100) : 0;
+                                const hour = sale.hour < 10 ? `0${sale.hour}:00` : `${sale.hour}:00`;
+                                
+                                return `
+                                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                                        <div style="width: 80%; background: linear-gradient(to top, var(--accent), #3498db); 
+                                                   height: ${height}%; border-radius: 3px 3px 0 0;" 
+                                                   title="RM ${sale.hourly_revenue.toFixed(2)} - ${sale.hourly_orders} orders">
+                                        </div>
+                                        <div style="font-size: 0.7rem; margin-top: 5px; color: #666;">${hour}</div>
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
-                        <div class="detail-row">
-                            <label>Name:</label>
-                            <span>${preorder.customer_name || preorder.contact_name || 'N/A'}</span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Email:</label>
-                            <span>${preorder.customer_email || preorder.contact_email || 'N/A'}</span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Phone:</label>
-                            <span>${preorder.customer_phone || preorder.contact_phone || 'N/A'}</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Book Information -->
-                    <div class="order-section">
-                        <h4>📚 Book Information</h4>
-                        <div class="detail-row">
-                            <label>Book ID:</label>
-                            <span>${preorder.book_id || 'N/A'}</span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Title:</label>
-                            <span><strong>${preorder.book_title || preorder.title || 'N/A'}</strong></span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Author:</label>
-                            <span>${preorder.book_author || preorder.author || 'N/A'}</span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Price:</label>
-                            <span>RM ${parseFloat(preorder.book_price || preorder.unit_price || 0).toFixed(2)}</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Order Information -->
-                    <div class="order-section">
-                        <h4>📋 Order Information</h4>
-                        <div class="detail-row">
-                            <label>Order Date:</label>
-                            <span>${orderDate}</span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Quantity:</label>
-                            <span>${preorder.quantity}</span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Total Amount:</label>
-                            <span style="font-weight: bold; color: var(--success);">
-                                RM ${parseFloat(preorder.total_amount || 0).toFixed(2)}
-                            </span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Status:</label>
-                            <span class="order-status ${ORDER_STATUS_MAP[preorder.status]?.class || 'status-unknown'}">
-                                ${ORDER_STATUS_MAP[preorder.status]?.text || preorder.status}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <!-- Delivery Information -->
-                    <div class="order-section">
-                        <h4>🚚 Delivery Information</h4>
-                        <div class="detail-row">
-                            <label>Expected Delivery:</label>
-                            <span>${expectedDate}</span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Last Updated:</label>
-                            <span>${updatedDate}</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Address Information -->
-                    ${preorder.shipping_address ? `
-                    <div class="order-section full-width">
-                        <h4>🏠 Shipping Address</h4>
-                        <div class="address-box">${preorder.shipping_address}</div>
-                    </div>
-                    ` : ''}
-                    
-                    ${preorder.billing_address ? `
-                    <div class="order-section full-width">
-                        <h4>🏢 Billing Address</h4>
-                        <div class="address-box">${preorder.billing_address}</div>
-                    </div>
-                    ` : ''}
-                    
-                    ${preorder.notes ? `
-                    <div class="order-section full-width">
-                        <h4>📝 Notes</h4>
-                        <div class="notes-box">${preorder.notes}</div>
-                    </div>
-                    ` : ''}
-                </div>
-            `;
-            
-            modalFooter.innerHTML = `
-                <button class="btn btn-warning" onclick="openUpdatePreOrderStatusModal(${preorder.pre_order_id})">
-                    ✏️ Update Status
-                </button>
-                <button class="btn btn-danger" onclick="cancelPreOrder(${preorder.pre_order_id})">
-                    ❌ Cancel Pre-Order
-                </button>
-                <button class="btn" onclick="closePreOrderModal()">
-                    Close
-                </button>
-            `;
-            
-            modal.style.display = 'flex';
-        }
-
-        // 打开更新状态弹窗
-        function openUpdatePreOrderStatusModal(preOrderId) {
-            selectedPreOrderId = preOrderId;
-            document.getElementById('updatePreOrderStatusModal').style.display = 'flex';
-        }
-
-        // 关闭更新状态弹窗
-        function closeUpdatePreOrderStatusModal() {
-            document.getElementById('updatePreOrderStatusModal').style.display = 'none';
-            selectedPreOrderId = 0;
-        }
-
-        // 确认更新预购订单状态
-        async function confirmUpdatePreOrderStatus() {
-            const newStatus = document.getElementById('newPreOrderStatus').value;
-            const notes = document.getElementById('preOrderNotes').value;
-            
-            if (!newStatus) {
-                alert('Please select a status');
-                return;
-            }
-            
-            try {
-                // 尝试使用增强API
-                let response;
-                try {
-                    response = await fetch(API_ENDPOINTS.adminUpdatePreOrder, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            pre_order_id: selectedPreOrderId,
-                            status: newStatus,
-                            notes: notes
-                        })
-                    });
-                } catch (e) {
-                    response = await fetch(API_ENDPOINTS.updatePreOrder, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            pre_order_id: selectedPreOrderId,
-                            status: newStatus
-                        })
-                    });
-                }
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert('Pre-order status updated successfully!');
-                    closeUpdatePreOrderStatusModal();
-                    closePreOrderModal();
-                    loadPreOrdersData();
-                } else {
-                    alert('Error updating pre-order status: ' + (data.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Error updating pre-order status:', error);
-                alert('Error updating pre-order status');
-            }
-        }
-
-        // 取消预购订单
-        async function cancelPreOrder(preOrderId) {
-            if (!confirm('Are you sure you want to cancel this pre-order?')) {
-                return;
-            }
-            
-            const reason = prompt('Please enter a reason for cancellation:', 'Cancelled by admin');
-            
-            try {
-                // 尝试使用增强API
-                let response;
-                try {
-                    response = await fetch(API_ENDPOINTS.adminCancelPreOrder, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            pre_order_id: preOrderId,
-                            reason: reason || 'No reason provided'
-                        })
-                    });
-                } catch (e) {
-                    response = await fetch(API_ENDPOINTS.cancelPreOrder, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            pre_order_id: preOrderId
-                        })
-                    });
-                }
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert('Pre-order cancelled successfully!');
-                    closePreOrderModal();
-                    loadPreOrdersData();
-                } else {
-                    alert('Error cancelling pre-order: ' + (data.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Error cancelling pre-order:', error);
-                alert('Error cancelling pre-order');
-            }
-        }
-
-        // 关闭预购订单弹窗
-        function closePreOrderModal() {
-            document.getElementById('preorderDetailsModal').style.display = 'none';
-        }
-
-        // 刷新预购订单
-        function refreshPreOrders() {
-            loadPreOrdersData();
-        }
-
-        // 导出预购订单
-        function exportPreOrders() {
-            const dataStr = JSON.stringify(currentPreOrdersFiltered, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `pre-orders-${new Date().toISOString().split('T')[0]}.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-        }
-
-        // 格式化日期辅助函数
-        function formatDate(dateString, includeTime = false) {
-            if (!dateString) return 'N/A';
-            
-            const date = new Date(dateString);
-            if (includeTime) {
-                return date.toLocaleString();
-            }
-            return date.toLocaleDateString();
-        }
-
-        // ============================================
-        // 从admin_panel.html继承的其他函数
-        // ============================================
-
-        // 查看订单详情 - 弹窗显示订单详情
-        async function viewOrderDetails(orderId) {
-            try {
-                console.log('Loading order details for order ID:', orderId);
-                
-                const response = await fetch(`${API_ENDPOINTS.orderDetail}?order_id=${orderId}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('Order details response:', data);
-                
-                if (data.success) {
-                    const order = data.order;
-                    showOrderDetailsModal(order);
-                } else {
-                    alert('Error loading order details: ' + (data.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Error loading order details:', error);
-                alert('Error loading order details: ' + error.message);
-            }
-        }
-
-        // 显示订单详情弹窗
-        function showOrderDetailsModal(order) {
-            console.log('Showing order details:', order);
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'flex';
-            modal.id = 'orderDetailsModal';
-            
-            // 格式化订单项
-            const itemsHtml = order.items && order.items.length > 0 ? order.items.map(item => `
-                <div class="order-item">
-                    <div class="item-title">${item.title || 'Unknown Book'}</div>
-                    <div class="item-details">
-                        <span>Quantity: ${item.quantity || 0}</span>
-                        <span>Price: RM ${parseFloat(item.unit_price || 0).toFixed(2)}</span>
-                        <span>Subtotal: RM ${parseFloat(item.subtotal || 0).toFixed(2)}</span>
-                    </div>
-                </div>
-            `).join('') : '<div class="order-item">No items found in this order</div>';
-            
-            modal.innerHTML = `
-                <div class="modal-content" style="max-width: 800px;">
-                    <div class="modal-header">
-                        <h3>📦 Order #${order.order_id} Details</h3>
-                        <button class="close" id="closeOrderModal">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="order-details-grid">
-                            <div class="order-section">
-                                <h4>👤 Customer Information</h4>
-                                <div class="detail-row">
-                                    <label>Customer ID:</label>
-                                    <span>${order.customer_id || 'N/A'}</span>
-                                </div>
-                                <div class="detail-row">
-                                    <label>Email:</label>
-                                    <span>${order.contact_email || 'N/A'}</span>
-                                </div>
-                                <div class="detail-row">
-                                    <label>Phone:</label>
-                                    <span>${order.contact_phone || 'N/A'}</span>
-                                </div>
-                            </div>
-                            
-                            <div class="order-section">
-                                <h4>📋 Order Information</h4>
-                                <div class="detail-row">
-                                    <label>Order Date:</label>
-                                    <span>${order.order_date ? new Date(order.order_date).toLocaleString() : 'N/A'}</span>
-                                </div>
-                                <div class="detail-row">
-                                    <label>Status:</label>
-                                    <span class="order-status ${ORDER_STATUS_MAP[order.status]?.class || 'status-unknown'}">
-                                        ${ORDER_STATUS_MAP[order.status]?.text || order.status || 'Unknown'}
-                                    </span>
-                                </div>
-                                <div class="detail-row">
-                                    <label>Total Amount:</label>
-                                    <span style="font-weight: bold; color: var(--success);">RM ${parseFloat(order.total_amount || 0).toFixed(2)}</span>
-                                </div>
-                            </div>
-                            
-                            <div class="order-section full-width">
-                                <h4>🏠 Shipping Address</h4>
-                                <div class="address-box">${order.shipping_address || 'No shipping address provided'}</div>
-                            </div>
-                            
-                            <div class="order-section full-width">
-                                <h4>🏢 Billing Address</h4>
-                                <div class="address-box">${order.billing_address || 'No billing address provided'}</div>
-                            </div>
-                            
-                            <div class="order-section full-width">
-                                <h4>📚 Order Items (${order.items ? order.items.length : 0} items)</h4>
-                                <div class="order-items-list">
-                                    ${itemsHtml}
-                                </div>
-                            </div>
-                            
-                            ${order.notes ? `
-                            <div class="order-section full-width">
-                                <h4>📝 Order Notes</h4>
-                                <div class="notes-box">${order.notes}</div>
-                            </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-primary" id="updateStatusBtn">
-                            ✏️ Update Status
-                        </button>
-                        <button class="btn" id="closeOrderModalBtn">❌ Close</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // 添加事件监听器
-            const closeModal = () => {
-                modal.remove();
-            };
-            
-            document.getElementById('closeOrderModal').addEventListener('click', closeModal);
-            document.getElementById('closeOrderModalBtn').addEventListener('click', closeModal);
-            document.getElementById('updateStatusBtn').addEventListener('click', () => {
-                closeModal();
-                openUpdateStatusModal(order.order_id, order.status);
-            });
-            
-            // 点击外部关闭
-            modal.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    closeModal();
-                }
-            });
-        }
-
-        // 打开更新状态弹窗
-        function openUpdateStatusModal(orderId, currentStatus) {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'flex';
-            modal.id = 'updateStatusModal';
-            
-            modal.innerHTML = `
-                <div class="modal-content" style="max-width: 500px;">
-                    <div class="modal-header">
-                        <h3>✏️ Update Order Status</h3>
-                        <button class="close" id="closeStatusModal">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="newOrderStatus">Select New Status:</label>
-                            <select id="newOrderStatus" class="form-control">
-                                <option value="pending" ${currentStatus === 'pending' ? 'selected' : ''}>⏳ Pending</option>
-                                <option value="confirmed" ${currentStatus === 'confirmed' ? 'selected' : ''}>✅ Confirmed</option>
-                                <option value="shipped" ${currentStatus === 'shipped' ? 'selected' : ''}>🚚 Shipped</option>
-                                <option value="delivered" ${currentStatus === 'delivered' ? 'selected' : ''}>📦 Delivered</option>
-                                <option value="cancelled" ${currentStatus === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
-                            </select>
-                        </div>
-                        <div class="current-status">
-                            Current Status: <span class="order-status ${ORDER_STATUS_MAP[currentStatus]?.class || 'status-unknown'}">
-                                ${ORDER_STATUS_MAP[currentStatus]?.text || currentStatus}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn" id="cancelStatusUpdate">❌ Cancel</button>
-                        <button class="btn btn-primary" id="confirmStatusUpdate">💾 Update Status</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // 添加事件监听器
-            const closeModal = () => {
-                modal.remove();
-            };
-            
-            document.getElementById('closeStatusModal').addEventListener('click', closeModal);
-            document.getElementById('cancelStatusUpdate').addEventListener('click', closeModal);
-            document.getElementById('confirmStatusUpdate').addEventListener('click', () => {
-                updateOrderStatus(orderId);
-            });
-            
-            // 点击外部关闭
-            modal.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    closeModal();
-                }
-            });
-        }
-
-        // 更新订单状态
-        async function updateOrderStatus(orderId) {
-            const newStatus = document.getElementById('newOrderStatus').value;
-            
-            if (!newStatus) {
-                alert('Please select a status');
-                return;
-            }
-            
-            if (confirm(`Are you sure you want to update order #${orderId} status to "${newStatus}"?`)) {
-                try {
-                    const response = await fetch(API_ENDPOINTS.updateOrder, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            order_id: orderId,
-                            status: newStatus
-                        })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        // 关闭弹窗
-                        const modal = document.querySelector('#updateStatusModal');
-                        if (modal) modal.remove();
                         
-                        alert('Order status updated successfully!');
-                        loadOrdersData();
-                    } else {
-                        alert('Error updating order status: ' + result.error);
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Error updating order status');
-                }
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.2rem; font-weight: bold; color: var(--success);">
+                                    RM ${data.today.revenue.toFixed(2)}
+                                </div>
+                                <div style="font-size: 0.8rem; color: #666;">Today</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.2rem; font-weight: bold; color: var(--warning);">
+                                    RM ${data.week.revenue.toFixed(2)}
+                                </div>
+                                <div style="font-size: 0.8rem; color: #666;">This Week</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.2rem; font-weight: bold; color: var(--info);">
+                                    RM ${data.month.revenue.toFixed(2)}
+                                </div>
+                                <div style="font-size: 0.8rem; color: #666;">This Month</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                hourlyChartHTML = '<div style="text-align: center; padding: 40px; color: #666;">No sales data available for today</div>';
             }
+            
+            chartContainer.innerHTML = hourlyChartHTML;
+        }
+
+        // Load sales analytics
+        async function loadSalesAnalytics(period = '30days') {
+            try {
+                const response = await fetch(`${API_ENDPOINTS.salesAnalytics}?period=${period}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displaySalesAnalytics(data);
+                } else {
+                    console.error('Error loading sales analytics:', data.error);
+                    showAnalyticsError(data.error);
+                }
+            } catch (error) {
+                console.error('Error loading sales analytics:', error);
+                showAnalyticsError('Failed to load analytics data');
+            }
+        }
+
+        // Display sales analytics
+        function displaySalesAnalytics(data) {
+            // Update analytics summary
+            updateAnalyticsSummary(data.summary);
+            
+            // Update sales trend chart
+            updateSalesTrendChart(data.sales_trend);
+            
+            // Update top books chart
+            updateTopBooksChart(data.top_books);
+            
+            // Update category revenue chart
+            updateCategoryRevenueChart(data.category_revenue);
+        }
+
+        // Update analytics summary
+        function updateAnalyticsSummary(summary) {
+            const summaryContainer = document.getElementById('analyticsSummary');
+            
+            if (!summaryContainer) return;
+            
+            const summaryHTML = `
+                <div class="stat-card" style="border-top-color: var(--success);">
+                    <div class="stat-number">${summary.total_orders || 0}</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card" style="border-top-color: var(--accent);">
+                    <div class="stat-number">RM ${(summary.total_revenue || 0).toFixed(2)}</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+                <div class="stat-card" style="border-top-color: var(--info);">
+                    <div class="stat-number">${summary.total_customers || 0}</div>
+                    <div class="stat-label">Customers</div>
+                </div>
+                <div class="stat-card" style="border-top-color: var(--warning);">
+                    <div class="stat-number">RM ${(summary.avg_order_value || 0).toFixed(2)}</div>
+                    <div class="stat-label">Avg Order Value</div>
+                </div>
+            `;
+            
+            summaryContainer.innerHTML = summaryHTML;
+        }
+
+        // Update sales trend chart
+        function updateSalesTrendChart(salesTrend) {
+            const chartContainer = document.getElementById('salesTrendChart');
+            
+            if (!chartContainer) return;
+            
+            if (!salesTrend || salesTrend.length === 0) {
+                chartContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No trend data available</div>';
+                return;
+            }
+            
+            // Reverse for chronological order
+            const trendData = [...salesTrend].reverse();
+            const maxRevenue = Math.max(...trendData.map(s => s.total_revenue));
+            const maxOrders = Math.max(...trendData.map(s => s.order_count));
+            
+            const chartHTML = `
+                <div style="padding: 20px; height: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div style="font-size: 0.9rem; color: #666;">
+                            ${trendData.length} days of data
+                        </div>
+                        <div style="display: flex; gap: 10px; font-size: 0.8rem;">
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <div style="width: 12px; height: 12px; background: var(--success); border-radius: 2px;"></div>
+                                <span>Revenue</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <div style="width: 12px; height: 12px; background: var(--accent); border-radius: 2px; opacity: 0.7;"></div>
+                                <span>Orders</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: flex-end; height: 200px; gap: 5px; border-bottom: 1px solid #e9ecef; padding-bottom: 10px;">
+                        ${trendData.map(day => {
+                            const date = new Date(day.date);
+                            const dateStr = `${date.getDate()}/${date.getMonth() + 1}`;
+                            const revenueHeight = maxRevenue > 0 ? (day.total_revenue / maxRevenue * 100) : 0;
+                            const ordersHeight = maxOrders > 0 ? (day.order_count / maxOrders * 100) : 0;
+                            
+                            return `
+                                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;">
+                                    <!-- Revenue bar -->
+                                    <div style="width: 70%; background: linear-gradient(to top, var(--success), #27ae60); 
+                                               height: ${revenueHeight}%; border-radius: 3px 3px 0 0; position: absolute; bottom: 0; left: 15%;"
+                                               title="${dateStr}: RM ${day.total_revenue.toFixed(2)} revenue">
+                                    </div>
+                                    <!-- Orders bar -->
+                                    <div style="width: 70%; background: linear-gradient(to top, var(--accent), #3498db); 
+                                               height: ${ordersHeight}%; border-radius: 3px 3px 0 0; position: absolute; bottom: 0; right: 15%; opacity: 0.7;"
+                                               title="${dateStr}: ${day.order_count} orders">
+                                    </div>
+                                    <div style="font-size: 0.7rem; margin-top: 110px; color: #666; transform: rotate(-45deg); transform-origin: left top;">
+                                        ${dateStr}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 15px; font-size: 0.8rem; color: #666;">
+                        <div>Total: RM ${trendData.reduce((sum, day) => sum + day.total_revenue, 0).toFixed(2)}</div>
+                        <div>Avg Daily: RM ${(trendData.reduce((sum, day) => sum + day.total_revenue, 0) / trendData.length).toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+            
+            chartContainer.innerHTML = chartHTML;
+        }
+
+        // Update top books chart
+        function updateTopBooksChart(topBooks) {
+            const chartContainer = document.getElementById('topBooksChart');
+            
+            if (!chartContainer) return;
+            
+            if (!topBooks || topBooks.length === 0) {
+                chartContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No top books data available</div>';
+                return;
+            }
+            
+            const maxRevenue = Math.max(...topBooks.map(b => b.total_revenue));
+            
+            const chartHTML = `
+                <div style="padding: 20px; height: 100%; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+                                <th style="padding: 10px; text-align: left; font-weight: bold; color: var(--primary);">#</th>
+                                <th style="padding: 10px; text-align: left; font-weight: bold; color: var(--primary);">Book</th>
+                                <th style="padding: 10px; text-align: left; font-weight: bold; color: var(--primary);">Revenue</th>
+                                <th style="padding: 10px; text-align: left; font-weight: bold; color: var(--primary);">Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${topBooks.map((book, index) => {
+                                const barWidth = maxRevenue > 0 ? (book.total_revenue / maxRevenue * 100) : 0;
+                                
+                                return `
+                                    <tr style="border-bottom: 1px solid #eee;">
+                                        <td style="padding: 10px; font-weight: bold; color: var(--primary); vertical-align: top;">
+                                            ${index + 1}
+                                        </td>
+                                        <td style="padding: 10px; vertical-align: top;">
+                                            <div style="font-weight: 500; margin-bottom: 4px;">${book.title}</div>
+                                            <div style="font-size: 0.8rem; color: #666;">
+                                                by ${book.author}
+                                            </div>
+                                            <div style="font-size: 0.7rem; color: #999;">
+                                                ${book.category}
+                                            </div>
+                                        </td>
+                                        <td style="padding: 10px; vertical-align: top; width: 200px;">
+                                            <div style="font-weight: bold; color: var(--success); margin-bottom: 4px;">
+                                                RM ${book.total_revenue.toFixed(2)}
+                                            </div>
+                                            <div style="background: #e9ecef; border-radius: 3px; height: 8px; overflow: hidden;">
+                                                <div style="background: linear-gradient(90deg, var(--success), #27ae60); 
+                                                         width: ${barWidth}%; height: 100%; border-radius: 3px;">
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 10px; vertical-align: top; text-align: center;">
+                                            <div style="font-weight: bold; color: var(--info);">
+                                                ${book.total_quantity}
+                                            </div>
+                                            <div style="font-size: 0.8rem; color: #666;">
+                                                ${book.order_count} orders
+                                            </div>
+                                            <div class="${getStockStatusClass(book.stock_quantity)}" style="margin-top: 4px; display: inline-block;">
+                                                ${book.stock_quantity} in stock
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            chartContainer.innerHTML = chartHTML;
+        }
+
+        // Update category revenue chart
+        function updateCategoryRevenueChart(categoryRevenue) {
+            const chartContainer = document.getElementById('categoryRevenueChart');
+            
+            if (!chartContainer) return;
+            
+            if (!categoryRevenue || categoryRevenue.length === 0) {
+                chartContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No category data available</div>';
+                return;
+            }
+            
+            const colors = ['#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', '#1abc9c', '#d35400', '#34495e', '#16a085', '#8e44ad'];
+            const maxRevenue = Math.max(...categoryRevenue.map(c => c.total_revenue));
+            const totalRevenue = categoryRevenue.reduce((sum, cat) => sum + cat.total_revenue, 0);
+            
+            const chartHTML = `
+                <div style="padding: 20px; height: 100%;">
+                    <div style="display: flex; height: 200px; margin-bottom: 20px;">
+                        <!-- Bar chart -->
+                        <div style="flex: 2; display: flex; align-items: flex-end; gap: 10px; padding-right: 20px;">
+                            ${categoryRevenue.map((category, index) => {
+                                const height = maxRevenue > 0 ? (category.total_revenue / maxRevenue * 100) : 0;
+                                const color = colors[index % colors.length];
+                                const percentage = totalRevenue > 0 ? (category.total_revenue / totalRevenue * 100) : 0;
+                                
+                                return `
+                                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                                        <div style="width: 80%; background: linear-gradient(to top, ${color}, ${color}80); 
+                                                   height: ${height}%; border-radius: 5px 5px 0 0; position: relative;"
+                                                   title="${category.category_name}: RM ${category.total_revenue.toFixed(2)} (${percentage.toFixed(1)}%)">
+                                            <div style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); 
+                                                       font-size: 0.7rem; color: #666; white-space: nowrap;">
+                                                ${percentage.toFixed(1)}%
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 0.7rem; margin-top: 5px; color: #666; text-align: center; 
+                                                   height: 40px; overflow: hidden; line-height: 1.2;">
+                                            ${category.category_name}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        
+                        <!-- Summary -->
+                        <div style="flex: 1; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <h4 style="color: var(--primary); margin-bottom: 15px;">Summary</h4>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--success); margin-bottom: 10px;">
+                                RM ${totalRevenue.toFixed(2)}
+                            </div>
+                            <div style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">
+                                Total Revenue
+                            </div>
+                            <div style="font-size: 0.8rem; color: #666;">
+                                ${categoryRevenue.length} categories
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Category details -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        ${categoryRevenue.slice(0, 4).map((category, index) => `
+                            <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid ${colors[index % colors.length]};">
+                                <div style="font-weight: bold; font-size: 0.9rem; margin-bottom: 5px;">${category.category_name}</div>
+                                <div style="color: var(--success); font-weight: bold;">
+                                    RM ${category.total_revenue.toFixed(2)}
+                                </div>
+                                <div style="font-size: 0.8rem; color: #666; margin-top: 2px;">
+                                    ${category.order_count} orders • ${category.total_quantity} items
+                                </div>
+                                <div style="font-size: 0.7rem; color: #999; margin-top: 2px;">
+                                    ${category.customer_count} customers
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            chartContainer.innerHTML = chartHTML;
+        }
+
+        // Show analytics error
+        function showAnalyticsError(error) {
+            const containers = ['salesTrendChart', 'topBooksChart', 'categoryRevenueChart'];
+            containers.forEach(containerId => {
+                const container = document.getElementById(containerId);
+                if (container) {
+                    container.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--danger);">${error}</div>`;
+                }
+            });
         }
 
         // Load books data
@@ -2433,11 +1654,11 @@
                     displayBooks(currentBooks);
                     loadCategoryFilter();
                 } else {
-                    document.getElementById('booksTable').innerHTML = '<tr><td colspan="10" class="error">Error loading books</td></tr>';
+                    document.getElementById('booksTable').innerHTML = '<tr><td colspan="8" class="error">Error loading books</td></tr>';
                 }
             } catch (error) {
                 console.error('Error loading books:', error);
-                document.getElementById('booksTable').innerHTML = '<tr><td colspan="10" class="error">Error loading books</td></tr>';
+                document.getElementById('booksTable').innerHTML = '<tr><td colspan="8" class="error">Error loading books</td></tr>';
             }
         }
 
@@ -2446,7 +1667,7 @@
             const booksTable = document.getElementById('booksTable');
             
             if (books.length === 0) {
-                booksTable.innerHTML = '<tr><td colspan="10" class="loading">No books found</td></tr>';
+                booksTable.innerHTML = '<tr><td colspan="8" class="loading">No books found</td></tr>';
                 return;
             }
 
@@ -2463,18 +1684,16 @@
                             ${getStockStatusText(book.stock_quantity)}
                         </span>
                     </td>
-                    <td>${book.rating || '0.0'}</td>
-                    <td>${book.total_sales || '0'}</td>
                     <td class="action-buttons">
                         <button class="btn btn-sm btn-primary" onclick="openEditBookModal(${book.book_id})">✏️ Edit</button>
-                        <button class="btn btn-sm btn-warning" onclick="setBookOutOfStock(${book.book_id})" ${book.stock_quantity === 0 ? 'disabled' : ''}>❌ Set Out of Stock</button>
+                        <button class="btn btn-sm btn-warning" onclick="openStockModal(${book.book_id}, '${book.title.replace(/'/g, "\\'")}', ${book.stock_quantity})">📦 Stock</button>
                         <button class="btn btn-sm btn-danger" onclick="deleteBook(${book.book_id})">🗑️ Delete</button>
                     </td>
                 </tr>
             `).join('');
         }
 
-        // 修复：Get stock status class - 使用正确的库存范围
+        // Get stock status class
         function getStockStatusClass(stock) {
             const stockNum = parseInt(stock);
             
@@ -2487,7 +1706,7 @@
             return 'in-stock';
         }
 
-        // 修复：Get stock status text - 使用正确的库存范围
+        // Get stock status text
         function getStockStatusText(stock) {
             const stockNum = parseInt(stock);
             
@@ -2520,63 +1739,6 @@
                 }
             } catch (error) {
                 console.error('Error loading categories:', error);
-            }
-        }
-
-        // 按库存状态筛选书籍
-        function filterByStock(stockType) {
-            let filteredBooks = [];
-            
-            switch(stockType) {
-                case 'low':
-                    filteredBooks = currentBooks.filter(book => {
-                        const stock = parseInt(book.stock_quantity);
-                        return stock >= 1 && stock <= 10;
-                    });
-                    break;
-                case 'out':
-                    filteredBooks = currentBooks.filter(book => {
-                        const stock = parseInt(book.stock_quantity);
-                        return stock === 0;
-                    });
-                    break;
-                case 'all':
-                default:
-                    filteredBooks = currentBooks;
-                    break;
-            }
-            
-            displayBooks(filteredBooks);
-        }
-
-        // 强制设置书籍为缺货状态
-        function setBookOutOfStock(bookId) {
-            if (confirm('Are you sure you want to set this book as Out of Stock? This will set stock quantity to 0.')) {
-                const stockData = {
-                    book_id: bookId,
-                    stock_quantity: 0
-                };
-
-                try {
-                    fetch(API_ENDPOINTS.updateStock, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(stockData)
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success) {
-                            loadSectionData('books');
-                            loadDashboardData();
-                            alert('Book set as Out of Stock successfully!');
-                        } else {
-                            alert('Error updating stock: ' + result.error);
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Error updating stock');
-                }
             }
         }
 
@@ -2664,7 +1826,7 @@
             document.getElementById('inventoryOutOfStock').textContent = outOfStockCount;
         }
 
-        // 应用库存筛选
+        // Apply inventory filter
         function applyInventoryFilter(books) {
             let filteredBooks = [];
             
@@ -2754,11 +1916,11 @@
                     updateOrderStats(currentOrders);
                     displayOrders(currentOrders);
                 } else {
-                    document.getElementById('ordersTable').innerHTML = '<tr><td colspan="9" class="error">Error loading orders</td></tr>';
+                    document.getElementById('ordersTable').innerHTML = '<tr><td colspan="7" class="error">Error loading orders</td></tr>';
                 }
             } catch (error) {
                 console.error('Error loading orders:', error);
-                document.getElementById('ordersTable').innerHTML = '<tr><td colspan="9" class="error">Error loading orders</td></tr>';
+                document.getElementById('ordersTable').innerHTML = '<tr><td colspan="7" class="error">Error loading orders</td></tr>';
             }
         }
 
@@ -2773,7 +1935,6 @@
             document.getElementById('confirmedOrders').textContent = confirmed;
             document.getElementById('shippedOrders').textContent = shipped;
             document.getElementById('deliveredOrders').textContent = delivered;
-            document.getElementById('totalOrdersCount').textContent = orders.length;
         }
 
         // Display orders
@@ -2781,7 +1942,7 @@
             const ordersTable = document.getElementById('ordersTable');
             
             if (orders.length === 0) {
-                ordersTable.innerHTML = '<tr><td colspan="9" class="loading">No orders found</td></tr>';
+                ordersTable.innerHTML = '<tr><td colspan="7" class="loading">No orders found</td></tr>';
                 return;
             }
 
@@ -2797,26 +1958,20 @@
                     </td>
                     <td>${new Date(order.order_date).toLocaleDateString()}</td>
                     <td>
-                        <div>${order.item_count} items</div>
-                        <div style="font-size: 0.8em; color: #666;">${order.total_quantity} total</div>
+                        <div>${order.item_count || 0} items</div>
+                        <div style="font-size: 0.8em; color: #666;">${order.total_quantity || 0} total</div>
                     </td>
-                    <td><strong>RM ${parseFloat(order.total_amount).toFixed(2)}</strong></td>
+                    <td><strong>RM ${parseFloat(order.total_amount || 0).toFixed(2)}</strong></td>
                     <td>
                         <span class="order-status ${statusInfo.class}">
                             ${statusInfo.text}
                         </span>
                     </td>
-                    <td>
-                        <span class="payment-status status-unknown">
-                            N/A
-                        </span>
-                    </td>
-                    <td>${new Date(order.updated_at).toLocaleDateString()}</td>
                     <td class="action-buttons">
                         <button class="btn btn-sm btn-primary" onclick="viewOrderDetails(${order.order_id})">
                             👁️ View
                         </button>
-                        <button class="btn btn-sm btn-warning" onclick="openUpdateStatusModal(${order.order_id}, '${order.status}')">
+                        <button class="btn btn-sm btn-warning" onclick="openUpdateOrderStatusModal(${order.order_id}, '${order.status}')">
                             ✏️ Update
                         </button>
                     </td>
@@ -2828,16 +1983,11 @@
         // Filter orders
         function filterOrders() {
             const statusFilter = document.getElementById('orderStatusFilter').value;
-            const customerIdFilter = document.getElementById('customerIdFilter').value;
             
             let filteredOrders = currentOrders || [];
             
             if (statusFilter !== 'all') {
                 filteredOrders = filteredOrders.filter(order => order.status === statusFilter);
-            }
-            
-            if (customerIdFilter) {
-                filteredOrders = filteredOrders.filter(order => order.customer_id == customerIdFilter);
             }
             
             displayOrders(filteredOrders);
@@ -2864,6 +2014,176 @@
         // Refresh orders
         function refreshOrders() {
             loadOrdersData();
+        }
+
+        // View order details
+        async function viewOrderDetails(orderId) {
+            try {
+                const response = await fetch(`${API_ENDPOINTS.orderDetail}?order_id=${orderId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showOrderDetailsModal(data.order);
+                } else {
+                    alert('Error loading order details: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error loading order details:', error);
+                alert('Error loading order details');
+            }
+        }
+
+        // Show order details modal
+        function showOrderDetailsModal(order) {
+            currentOrderId = order.order_id;
+            
+            document.getElementById('orderModalTitle').textContent = `Order #${order.order_id} Details`;
+            
+            const itemsHtml = order.items && order.items.length > 0 ? order.items.map(item => `
+                <div class="order-item" style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 8px;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">${item.title || 'Unknown Book'}</div>
+                    <div style="display: flex; gap: 15px; font-size: 0.9em; color: #666;">
+                        <span>Qty: ${item.quantity || 0}</span>
+                        <span>Price: RM ${parseFloat(item.unit_price || 0).toFixed(2)}</span>
+                        <span>Subtotal: RM ${parseFloat(item.subtotal || 0).toFixed(2)}</span>
+                    </div>
+                </div>
+            `).join('') : '<div style="color: #666; font-style: italic;">No items found</div>';
+            
+            document.getElementById('orderModalBody').innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">Customer Information</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
+                            <div style="margin-bottom: 8px;"><strong>Customer ID:</strong> ${order.customer_id || 'N/A'}</div>
+                            <div style="margin-bottom: 8px;"><strong>Email:</strong> ${order.contact_email || 'N/A'}</div>
+                            <div style="margin-bottom: 8px;"><strong>Phone:</strong> ${order.contact_phone || 'N/A'}</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">Order Information</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
+                            <div style="margin-bottom: 8px;"><strong>Order Date:</strong> ${new Date(order.order_date).toLocaleString()}</div>
+                            <div style="margin-bottom: 8px;">
+                                <strong>Status:</strong> 
+                                <span class="order-status ${ORDER_STATUS_MAP[order.status]?.class || 'status-unknown'}">
+                                    ${ORDER_STATUS_MAP[order.status]?.text || order.status}
+                                </span>
+                            </div>
+                            <div style="margin-bottom: 8px;"><strong>Total Amount:</strong> RM ${parseFloat(order.total_amount || 0).toFixed(2)}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="grid-column: 1 / -1;">
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">Shipping Address</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; white-space: pre-line;">
+                            ${order.shipping_address || 'No shipping address provided'}
+                        </div>
+                    </div>
+                    
+                    <div style="grid-column: 1 / -1;">
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">Order Items (${order.items ? order.items.length : 0})</h4>
+                        <div style="max-height: 200px; overflow-y: auto;">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('orderModalFooter').innerHTML = `
+                <button class="btn" onclick="closeOrderDetailsModal()">Close</button>
+                <button class="btn btn-warning" onclick="openUpdateOrderStatusModal(${order.order_id}, '${order.status}')">Update Status</button>
+            `;
+            
+            document.getElementById('orderDetailsModal').style.display = 'flex';
+        }
+
+        // Close order details modal
+        function closeOrderDetailsModal() {
+            document.getElementById('orderDetailsModal').style.display = 'none';
+            currentOrderId = null;
+        }
+
+        // Open update order status modal
+        function openUpdateOrderStatusModal(orderId, currentStatus) {
+            currentOrderId = orderId;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'updateStatusModal';
+            modal.style.display = 'flex';
+            
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h3>Update Order Status</h3>
+                        <button class="close" onclick="closeUpdateStatusModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="newOrderStatus">Select New Status:</label>
+                            <select id="newOrderStatus" class="form-control">
+                                <option value="pending" ${currentStatus === 'pending' ? 'selected' : ''}>⏳ Pending</option>
+                                <option value="confirmed" ${currentStatus === 'confirmed' ? 'selected' : ''}>✅ Confirmed</option>
+                                <option value="shipped" ${currentStatus === 'shipped' ? 'selected' : ''}>🚚 Shipped</option>
+                                <option value="delivered" ${currentStatus === 'delivered' ? 'selected' : ''}>📦 Delivered</option>
+                                <option value="cancelled" ${currentStatus === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" onclick="closeUpdateStatusModal()">Cancel</button>
+                        <button class="btn btn-primary" onclick="updateOrderStatus()">Update Status</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Close update status modal
+        function closeUpdateStatusModal() {
+            const modal = document.getElementById('updateStatusModal');
+            if (modal) modal.remove();
+            currentOrderId = null;
+        }
+
+        // Update order status
+        async function updateOrderStatus() {
+            if (!currentOrderId) return;
+            
+            const newStatus = document.getElementById('newOrderStatus').value;
+            
+            if (!newStatus) {
+                alert('Please select a status');
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_ENDPOINTS.updateOrder, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_id: currentOrderId,
+                        status: newStatus
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Order status updated successfully!');
+                    closeUpdateStatusModal();
+                    closeOrderDetailsModal();
+                    loadOrdersData();
+                } else {
+                    alert('Error updating order status: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error updating order status:', error);
+                alert('Error updating order status');
+            }
         }
 
         // Load categories data
@@ -2921,8 +2241,6 @@
                     document.getElementById('bookPrice').value = book.price;
                     document.getElementById('bookStock').value = book.stock_quantity;
                     document.getElementById('bookISBN').value = book.isbn || '';
-                    document.getElementById('bookPublisher').value = book.publisher || '';
-                    document.getElementById('bookPublishDate').value = book.publish_date || '';
                     document.getElementById('bookDescription').value = book.description || '';
                     
                     await loadCategoriesForModal();
@@ -2984,9 +2302,7 @@
                 price: document.getElementById('bookPrice').value,
                 stock_quantity: document.getElementById('bookStock').value,
                 isbn: document.getElementById('bookISBN').value,
-                description: document.getElementById('bookDescription').value,
-                publisher: document.getElementById('bookPublisher').value,
-                publish_date: document.getElementById('bookPublishDate').value
+                description: document.getElementById('bookDescription').value
             };
 
             // Validation
@@ -3079,10 +2395,6 @@
             alert('Add category functionality will be implemented here');
         }
 
-        function loadAnalyticsData() {
-            // Analytics functionality can be implemented later
-        }
-
         function loadSettingsData() {
             // Settings functionality can be implemented later
         }
@@ -3091,27 +2403,37 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Admin panel initialized');
             loadDashboardData();
+            loadSalesOverview();
             
-            // 初始时间显示
+            // Update clock
+            function updateClock() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                });
+                const dateString = now.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                document.getElementById('adminWelcome').textContent = `Welcome, Admin • ${dateString} ${timeString}`;
+            }
+            
             updateClock();
-            // 每秒更新一次时间
-            setInterval(updateClock, 1000);
-            
-            // 每2分钟自动刷新库存数据
-            setInterval(loadDashboardData, 120000);
+            setInterval(updateClock, 60000); // Update every minute
         });
 
         // Close modal when clicking outside
         window.onclick = function(event) {
-            const modal = document.getElementById('bookModal');
+            const bookModal = document.getElementById('bookModal');
             const stockModal = document.getElementById('stockModal');
-            const preorderDetailsModal = document.getElementById('preorderDetailsModal');
-            const updatePreOrderStatusModal = document.getElementById('updatePreOrderStatusModal');
+            const orderDetailsModal = document.getElementById('orderDetailsModal');
             
-            if (event.target === modal) closeModal();
+            if (event.target === bookModal) closeModal();
             if (event.target === stockModal) closeStockModal();
-            if (event.target === preorderDetailsModal) closePreOrderModal();
-            if (event.target === updatePreOrderStatusModal) closeUpdatePreOrderStatusModal();
+            if (event.target === orderDetailsModal) closeOrderDetailsModal();
         }
     </script>
 </body>
