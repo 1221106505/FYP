@@ -67,22 +67,92 @@ button:hover {
   background-color: #ff7675;
 }
 
+/* Modern Cart Layout */
+.cart-container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 20px auto;
+    background: #f5f5f5;
+    padding-bottom: 100px; /* Space for sticky bar */
+}
+
+.cart-header, .cart-item {
+    display: grid;
+    grid-template-columns: 50px 2fr 1fr 1fr 1fr 100px;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.cart-header {
+    font-weight: bold;
+    color: #888;
+    font-size: 14px;
+}
+
+/* Sticky Checkout Bar */
+.checkout-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 10px 5%;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.checkout-btn {
+    background-color: #ee4d2d; /* Shopee Orange */
+    color: white;
+    width: 200px;
+    height: 48px;
+    font-size: 18px;
+    border: none;
+    margin-left: 20px;
+}
+
+/* Quantity Selector UI */
+.qty-btn {
+    border: 1px solid #ddd;
+    background: white;
+    padding: 5px 10px;
+    cursor: pointer;
+}
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Your Book Cart</h2>
-    <div id="cartItems"></div>
-    <p class="total">Total: RM <span id="totalAmount">0.00</span></p>
+<div class="cart-container">
+    <h2>Shopping Cart</h2>
+    
+    <div class="cart-header">
+        <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
+        <span>Product</span>
+        <span>Unit Price</span>
+        <span>Quantity</span>
+        <span>Total Price</span>
+        <span>Actions</span>
+    </div>
 
-    <button onclick="goToPayment()">Proceed to Payment</button>
-    <button class="back-btn" onclick="goBack()">Back to Shop</button>
-  </div>
+    <div id="cartItems">
+        </div>
 
-  <script src="script.js"></script>
-</body>
-<script>
-
+    <div class="checkout-bar">
+        <div class="checkout-info">
+            <input type="checkbox" id="selectAllBottom"> 
+            <label for="selectAllBottom">Select All</label>
+            <span class="total-label">Total (<span id="itemCount">0</span> items): </span>
+            <span class="total-price">RM <span id="totalAmount">0.00</span></span>
+        </div>
+        <button class="checkout-btn" onclick="goToPayment()">Check Out</button>
+    </div>
+</div>
+  <script>
     // 🛒 Example book cart (you can later link this to your actual product page)
 let cart = JSON.parse(localStorage.getItem("cart")) || [
   { title: "Harry Potter", qty: 1, price: 30 },
@@ -153,11 +223,12 @@ if (document.getElementById("historyList")) {
 
 // 🔁 Navigation
 function goToPayment() {
-  window.location.href = "Payment.html";
+  window.location.href = ".../New Payment/Payment HTML.html";
 }
 function goBack() {
   window.history.back();
 }
 
 </script>
+</body>
 </html>
