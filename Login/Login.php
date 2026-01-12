@@ -55,7 +55,7 @@ if ($result->num_rows > 0) {
         error_log("Admin login successful, redirecting...");
         
         // 确保重定向URL正确
-        $redirect_url = "../Vistual BookStore/Main.html?login_success=1&username=" . urlencode($user['username']) . "&role=admin";
+        $redirect_url = "../System/Main.html?login_success=1&username=" . urlencode($user['username']) . "&role=admin";
         header("Location: " . $redirect_url);
         exit();
     } else {
@@ -95,7 +95,7 @@ if ($result->num_rows > 0) {
         
         error_log("Customer login successful, redirecting...");
         
-        $redirect_url = "../Vistual BookStore/Main.html?login_success=1&username=" . urlencode($user['username']) . "&role=customer";
+        $redirect_url = "../System/Main.html?login_success=1&username=" . urlencode($user['username']) . "&role=customer";
         header("Location: " . $redirect_url);
         exit();
     } else {

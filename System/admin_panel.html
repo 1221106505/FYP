@@ -1089,7 +1089,10 @@
             orderDetail: 'get_single_order.php',
             updateOrder: 'update_order.php',
             salesOverview: 'sales_overview.php',
-            salesAnalytics: 'sales_analytics.php'
+            salesAnalytics: 'sales_analytics.php',
+            addCategory: 'add_category.php',
+            updateCategory: 'update_category.php',
+            deleteCategory: 'delete_category.php'
         };
 
         // Current state
@@ -2186,36 +2189,288 @@
             }
         }
 
-        // Load categories data
+        // Load categories data - FIXED VERSION
         async function loadCategoriesData() {
             try {
-                const response = await fetch(API_ENDPOINTS.categories);
-                const data = await response.json();
+                const [categoriesResponse, booksResponse] = await Promise.all([
+                    fetch(API_ENDPOINTS.categories),
+                    fetch(API_ENDPOINTS.books)
+                ]);
                 
-                if (data.success) {
-                    const categories = data.categories || data.data || [];
+                const categoriesData = await categoriesResponse.json();
+                const booksData = await booksResponse.json();
+                
+                if (booksData.success) {
+                    currentBooks = booksData.books || booksData.data || [];
+                }
+                
+                if (categoriesData.success) {
+                    const categories = categoriesData.categories || categoriesData.data || [];
                     displayCategories(categories);
                 }
             } catch (error) {
                 console.error('Error loading categories:', error);
+                const categoriesTable = document.getElementById('categoriesTable');
+                categoriesTable.innerHTML = '<tr><td colspan="4" class="error">Error loading categories</td></tr>';
             }
         }
 
-        // Display categories
+        // Display categories - FIXED VERSION
         function displayCategories(categories) {
             const categoriesTable = document.getElementById('categoriesTable');
             
-            categoriesTable.innerHTML = categories.map(category => `
-                <tr>
-                    <td>${category.category_id}</td>
-                    <td><strong>${category.category_name}</strong></td>
-                    <td>${currentBooks.filter(book => book.category_id == category.category_id).length}</td>
-                    <td class="action-buttons">
-                        <button class="btn btn-sm btn-warning">✏️ Edit</button>
-                        <button class="btn btn-sm btn-danger">🗑️ Delete</button>
-                    </td>
-                </tr>
-            `).join('');
+            if (!categories || categories.length === 0) {
+                categoriesTable.innerHTML = '<tr><td colspan="4" class="loading">No categories found. Add your first category!</td></tr>';
+                return;
+            }
+            
+            categoriesTable.innerHTML = categories.map(category => {
+                // 计算该分类中的书籍数量
+                const bookCount = currentBooks ? 
+                    currentBooks.filter(book => book.category_id == category.category_id).length : 0;
+                
+                return `
+                    <tr>
+                        <td>${category.category_id}</td>
+                        <td>
+                            <strong>${category.category_name}</strong>
+                            ${category.description ? `<div style="font-size: 0.9em; color: #666; margin-top: 4px;">${category.description}</div>` : ''}
+                        </td>
+                        <td>
+                            <span class="${bookCount > 0 ? 'in-stock' : 'out-of-stock'}" style="display: inline-block;">
+                                ${bookCount} books
+                            </span>
+                        </td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-warning" onclick="openEditCategoryModal(${category.category_id}, '${category.category_name.replace(/'/g, "\\'")}', '${(category.description || '').replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
+                                ✏️ Edit
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCategory(${category.category_id})" ${bookCount > 0 ? 'disabled title="Cannot delete category with books"' : ''}>
+                                🗑️ Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Add category modal
+        async function openAddCategoryModal() {
+            const modalHTML = `
+                <div class="modal" id="addCategoryModal" style="display: flex;">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h3>➕ Add New Category</h3>
+                            <button class="close" onclick="closeAddCategoryModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="categoryForm">
+                                <div class="form-group">
+                                    <label for="categoryName">Category Name *</label>
+                                    <input type="text" id="categoryName" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="categoryDescription">Description</label>
+                                    <textarea id="categoryDescription" class="form-control" rows="3" placeholder="Optional description..."></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn" onclick="closeAddCategoryModal()">❌ Cancel</button>
+                            <button class="btn btn-primary" onclick="saveCategory()">💾 Save Category</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 移除现有模态框（如果存在）
+            const existingModal = document.getElementById('addCategoryModal');
+            if (existingModal) existingModal.remove();
+            
+            // 添加新模态框到页面
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        // Close add category modal
+        function closeAddCategoryModal() {
+            const modal = document.getElementById('addCategoryModal');
+            if (modal) modal.remove();
+        }
+
+        // 修复saveCategory函数
+// 修复saveCategory函数
+async function saveCategory() {
+    const categoryName = document.getElementById('categoryName').value;
+    const categoryDescription = document.getElementById('categoryDescription').value;
+    
+    if (!categoryName.trim()) {
+        alert('Please enter a category name');
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('category_name', categoryName);
+        formData.append('description', categoryDescription);
+        
+        const response = await fetch(API_ENDPOINTS.addCategory, {
+            method: 'POST',
+            body: new URLSearchParams({
+                category_name: categoryName,
+                description: categoryDescription
+            })
+        });
+        
+        const result = await response.json();
+        console.log('API Response:', result);
+        
+        if (result.success) {
+            alert('Category added successfully!');
+            closeAddCategoryModal();
+            await loadCategoriesData();
+            loadDashboardData();
+            
+            // 重新加载书籍管理页面的分类筛选器
+            if (document.getElementById('books').classList.contains('active')) {
+                loadCategoryFilter();
+            }
+        } else {
+            alert('Error adding category: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error adding category:', error);
+        alert('Error adding category: ' + error.message);
+    }
+}
+
+        // Edit category modal
+        async function openEditCategoryModal(categoryId, categoryName, categoryDescription = '') {
+            // 清理和转义字符串
+            const safeCategoryName = categoryName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            const safeDescription = (categoryDescription || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            
+            const modalHTML = `
+                <div class="modal" id="editCategoryModal" style="display: flex;">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h3>✏️ Edit Category</h3>
+                            <button class="close" onclick="closeEditCategoryModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editCategoryForm">
+                                <input type="hidden" id="editCategoryId" value="${categoryId}">
+                                <div class="form-group">
+                                    <label for="editCategoryName">Category Name *</label>
+                                    <input type="text" id="editCategoryName" class="form-control" value="${safeCategoryName}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editCategoryDescription">Description</label>
+                                    <textarea id="editCategoryDescription" class="form-control" rows="3">${safeDescription}</textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn" onclick="closeEditCategoryModal()">❌ Cancel</button>
+                            <button class="btn btn-primary" onclick="updateCategory()">💾 Update Category</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 移除现有模态框
+            const existingModal = document.getElementById('editCategoryModal');
+            if (existingModal) existingModal.remove();
+            
+            // 添加新模态框
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        // Close edit category modal
+        function closeEditCategoryModal() {
+            const modal = document.getElementById('editCategoryModal');
+            if (modal) modal.remove();
+        }
+
+        // Update category
+        async function updateCategory() {
+            const categoryId = document.getElementById('editCategoryId').value;
+            const categoryName = document.getElementById('editCategoryName').value;
+            const categoryDescription = document.getElementById('editCategoryDescription').value;
+            
+            if (!categoryName.trim()) {
+                alert('Please enter a category name');
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_ENDPOINTS.updateCategory, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        category_id: categoryId,
+                        category_name: categoryName,
+                        description: categoryDescription
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Category updated successfully!');
+                    closeEditCategoryModal();
+                    await loadCategoriesData();
+                    loadBooksData(); // 刷新书籍列表以更新分类信息
+                } else {
+                    alert('Error updating category: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error updating category:', error);
+                alert('Error updating category');
+            }
+        }
+
+        // Delete category
+        async function deleteCategory(categoryId) {
+            // 首先计算当前分类中的书籍数量
+            const bookCount = currentBooks ? 
+                currentBooks.filter(book => book.category_id == categoryId).length : 0;
+            
+            if (bookCount > 0) {
+                if (!confirm(`This category has ${bookCount} book(s).\n\nBooks in this category will be moved to "Uncategorized".\n\nAre you sure you want to delete this category?`)) {
+                    return;
+                }
+            } else {
+                if (!confirm('Are you sure you want to delete this category?')) {
+                    return;
+                }
+            }
+            
+            try {
+                const response = await fetch(API_ENDPOINTS.deleteCategory, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        category_id: categoryId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Category deleted successfully!');
+                    // 重新加载所有数据
+                    await Promise.all([
+                        loadCategoriesData(),
+                        loadBooksData()
+                    ]);
+                    loadDashboardData(); // 更新仪表板
+                } else {
+                    alert('Error deleting category: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error deleting category:', error);
+                alert('Error deleting category');
+            }
         }
 
         // Modal functions
@@ -2388,11 +2643,6 @@
                     alert('Error deleting book');
                 }
             }
-        }
-
-        // Placeholder functions
-        function openAddCategoryModal() {
-            alert('Add category functionality will be implemented here');
         }
 
         function loadSettingsData() {
