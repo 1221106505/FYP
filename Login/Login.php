@@ -1,4 +1,5 @@
 <?php
+// Login.php - 完整修复版
 session_start();
 require_once '../include/database.php';
 
@@ -54,8 +55,22 @@ if ($result->num_rows > 0) {
         
         error_log("Admin login successful, redirecting...");
         
-        // 确保重定向URL正确
-        $redirect_url = "../System/Main.html?login_success=1&username=" . urlencode($user['username']) . "&role=admin";
+        // 检查是否有重定向URL
+        if (isset($_GET['redirect']) && !empty($_GET['redirect'])) {
+            // 如果有重定向参数，跳转到指定页面
+            $redirect_url = urldecode($_GET['redirect']) . "?login_success=1&username=" . urlencode($user['username']) . "&role=admin";
+            error_log("Redirecting to: " . $redirect_url);
+        } elseif (isset($_SESSION['return_url']) && !empty($_SESSION['return_url'])) {
+            // 如果有session中的返回URL
+            $redirect_url = $_SESSION['return_url'] . "?login_success=1&username=" . urlencode($user['username']) . "&role=admin";
+            unset($_SESSION['return_url']);
+            error_log("Redirecting to session URL: " . $redirect_url);
+        } else {
+            // 否则跳转到Main页面
+            $redirect_url = "../System/Main.html?login_success=1&username=" . urlencode($user['username']) . "&role=admin";
+            error_log("Redirecting to default Main page: " . $redirect_url);
+        }
+        
         header("Location: " . $redirect_url);
         exit();
     } else {
@@ -95,7 +110,22 @@ if ($result->num_rows > 0) {
         
         error_log("Customer login successful, redirecting...");
         
-        $redirect_url = "../System/Main.html?login_success=1&username=" . urlencode($user['username']) . "&role=customer";
+        // 检查是否有重定向URL
+        if (isset($_GET['redirect']) && !empty($_GET['redirect'])) {
+            // 如果有重定向参数，跳转到指定页面
+            $redirect_url = urldecode($_GET['redirect']) . "?login_success=1&username=" . urlencode($user['username']) . "&role=customer";
+            error_log("Redirecting to: " . $redirect_url);
+        } elseif (isset($_SESSION['return_url']) && !empty($_SESSION['return_url'])) {
+            // 如果有session中的返回URL
+            $redirect_url = $_SESSION['return_url'] . "?login_success=1&username=" . urlencode($user['username']) . "&role=customer";
+            unset($_SESSION['return_url']);
+            error_log("Redirecting to session URL: " . $redirect_url);
+        } else {
+            // 否则跳转到Main页面
+            $redirect_url = "../System/Main.html?login_success=1&username=" . urlencode($user['username']) . "&role=customer";
+            error_log("Redirecting to default Main page: " . $redirect_url);
+        }
+        
         header("Location: " . $redirect_url);
         exit();
     } else {

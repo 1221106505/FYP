@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    
-    <title>User Login & Registration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login & Registration - Virtual BookStore</title>
     <style>
         * {
             margin: 0;
@@ -64,6 +64,7 @@
         input:focus {
             border-color: #2575fc;
             outline: none;
+            box-shadow: 0 0 0 2px rgba(37, 117, 252, 0.1);
         }
         
         .password-container {
@@ -79,6 +80,16 @@
             border: none;
             cursor: pointer;
             color: #777;
+            font-size: 18px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toggle-password:hover {
+            color: #2575fc;
         }
         
         .btn {
@@ -91,11 +102,20 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: opacity 0.3s;
+            transition: all 0.3s ease;
         }
         
         .btn:hover {
             opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 117, 252, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         .switch-form {
@@ -109,9 +129,11 @@
             text-decoration: none;
             font-weight: 500;
             cursor: pointer;
+            transition: color 0.3s ease;
         }
         
         .switch-form a:hover {
+            color: #6a11cb;
             text-decoration: underline;
         }
         
@@ -146,10 +168,163 @@
             color: #2575fc;
             text-decoration: none;
             font-weight: 500;
+            transition: color 0.3s ease;
         }
         
         .back-button:hover {
+            color: #6a11cb;
             text-decoration: underline;
+        }
+        
+        /* 新增样式 */
+        .validation-message {
+            margin-top: 5px;
+            font-size: 13px;
+            display: none;
+        }
+        
+        .validation-message.show {
+            display: block;
+        }
+        
+        .valid {
+            color: #28a745;
+        }
+        
+        .invalid {
+            color: #dc3545;
+        }
+        
+        .password-strength {
+            margin-top: 10px;
+            height: 5px;
+            border-radius: 3px;
+            background: #e9ecef;
+            overflow: hidden;
+        }
+        
+        .password-strength-meter {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+        
+        .password-strength-text {
+            font-size: 12px;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .username-status {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+        }
+        
+        .loading {
+            color: #6c757d;
+        }
+        
+        .available {
+            color: #28a745;
+        }
+        
+        .taken {
+            color: #dc3545;
+        }
+        
+        input.valid-border {
+            border-color: #28a745;
+        }
+        
+        input.invalid-border {
+            border-color: #dc3545;
+        }
+        
+        .validation-list {
+            margin-top: 5px;
+            font-size: 13px;
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .validation-list li {
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .validation-list .valid::before {
+            content: '✓';
+            color: #28a745;
+        }
+        
+        .validation-list .invalid::before {
+            content: '✗';
+            color: #dc3545;
+        }
+        
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .forgot-password {
+            color: #2575fc;
+            text-decoration: none;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        
+        .form-note {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .required {
+            color: #dc3545;
+        }
+        
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 30px 20px;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .login-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .password-container .username-status {
+                right: 50px;
+            }
         }
     </style>
 </head>
@@ -160,19 +335,30 @@
             <div id="login-form">
                 <h2>User Login</h2>
                 <div id="login-message" class="message hidden"></div>
-                <form id="loginForm" action="Login.php" method="POST">
+                <form id="loginForm" action="Login.php" method="POST" onsubmit="return handleLoginSubmit(event)">
                     <div class="form-group">
-                        <label for="login-username">Username</label>
-                        <input type="text" id="login-username" name="username" required>
+                        <label for="login-username">Username <span class="required">*</span></label>
+                        <input type="text" id="login-username" name="username" required 
+                               placeholder="Enter your username" autocomplete="username">
                     </div>
                     <div class="form-group">
-                        <label for="login-password">Password</label>
+                        <label for="login-password">Password <span class="required">*</span></label>
                         <div class="password-container">
-                            <input type="password" id="login-password" name="password" required>
-                            <button type="button" class="toggle-password" id="toggle-login-password">👁️</button>
+                            <input type="password" id="login-password" name="password" required 
+                                   placeholder="Enter your password" autocomplete="current-password">
+                            <button type="button" class="toggle-password" id="toggle-login-password" onclick="togglePassword('login-password', this)">👁️</button>
                         </div>
                     </div>
-                    <button type="submit" class="btn">Login</button>
+                    
+                    <div class="login-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember-me" name="remember_me">
+                            <label for="remember-me">Remember me</label>
+                        </div>
+                        <a href="#" class="forgot-password">Forgot Password?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="login-btn">Login</button>
                 </form>
                 <div class="switch-form">
                     Don't have an account? <a id="show-register">Register Now</a>
@@ -184,26 +370,55 @@
             <div id="register-form" class="hidden">
                 <h2>User Registration</h2>
                 <div id="register-message" class="message hidden"></div>
-                <form id="registerForm" action="Register.php" method="POST">
+                <form id="registerForm" action="Register.php" method="POST" onsubmit="return handleRegisterSubmit(event)">
                     <div class="form-group">
-                        <label for="register-username">Username</label>
-                        <input type="text" id="register-username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="register-password">Password</label>
+                        <label for="register-username">Username <span class="required">*</span></label>
                         <div class="password-container">
-                            <input type="password" id="register-password" name="password" required>
-                            <button type="button" class="toggle-password" id="toggle-register-password">👁️</button>
+                            <input type="text" id="register-username" name="username" required 
+                                   placeholder="Enter username (3-50 characters)" autocomplete="off"
+                                   oninput="checkUsernameAvailability(this.value)">
+                            <span id="username-status" class="username-status"></span>
+                            <button type="button" class="toggle-password" style="display: none;"></button>
                         </div>
+                        <div id="username-validation" class="validation-message"></div>
                     </div>
                     <div class="form-group">
-                        <label for="register-confirm-password">Confirm Password</label>
+                        <label for="register-password">Password <span class="required">*</span></label>
                         <div class="password-container">
-                            <input type="password" id="register-confirm-password" name="confirm_password" required>
-                            <button type="button" class="toggle-password" id="toggle-confirm-password">👁️</button>
+                            <input type="password" id="register-password" name="password" required 
+                                   placeholder="Enter password" autocomplete="new-password"
+                                   oninput="checkPasswordStrength()">
+                            <button type="button" class="toggle-password" id="toggle-register-password" onclick="togglePassword('register-password', this)">👁️</button>
                         </div>
+                        <div class="password-strength">
+                            <div id="password-strength-meter" class="password-strength-meter"></div>
+                        </div>
+                        <div id="password-strength-text" class="password-strength-text"></div>
+                        <div id="password-validation" class="validation-message"></div>
+                        <ul id="password-rules" class="validation-list">
+                            <li id="rule-length" class="invalid">At least 8 characters</li>
+                            <li id="rule-uppercase" class="invalid">Contains uppercase letter</li>
+                            <li id="rule-lowercase" class="invalid">Contains lowercase letter</li>
+                            <li id="rule-number" class="invalid">Contains number</li>
+                            <li id="rule-special" class="invalid">Contains special character (@#$%&!)</li>
+                        </ul>
                     </div>
-                    <button type="submit" class="btn">Register</button>
+                    <div class="form-group">
+                        <label for="register-confirm-password">Confirm Password <span class="required">*</span></label>
+                        <div class="password-container">
+                            <input type="password" id="register-confirm-password" name="confirm_password" required 
+                                   placeholder="Confirm password" autocomplete="new-password"
+                                   oninput="checkConfirmPassword()">
+                            <button type="button" class="toggle-password" id="toggle-confirm-password" onclick="togglePassword('register-confirm-password', this)">👁️</button>
+                        </div>
+                        <div id="confirm-validation" class="validation-message"></div>
+                    </div>
+                    
+                    <div class="form-note">
+                        By registering, you agree to our Terms of Service and Privacy Policy.
+                    </div>
+                    
+                    <button type="submit" class="btn" id="register-btn" disabled>Create Account</button>
                 </form>
                 <div class="switch-form">
                     Already have an account? <a id="show-login">Login Now</a>
@@ -214,77 +429,380 @@
     </div>
 
     <script>
+        // 全局变量
+        let usernameAvailable = false;
+        let passwordValid = false;
+        let confirmPasswordValid = false;
+        let usernameCheckTimeout = null;
+
+        // 处理登录表单提交
+        function handleLoginSubmit(event) {
+            event.preventDefault();
+            
+            // 获取当前URL参数中的redirect参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirect = urlParams.get('redirect');
+            
+            console.log('Redirect parameter:', redirect);
+            
+            // 创建隐藏的redirect字段
+            if (redirect) {
+                const redirectInput = document.createElement('input');
+                redirectInput.type = 'hidden';
+                redirectInput.name = 'redirect';
+                redirectInput.value = decodeURIComponent(redirect);
+                event.target.appendChild(redirectInput);
+            }
+            
+            // 验证表单
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!username || !password) {
+                showMessage('login-message', 'Please fill in all fields', 'error');
+                return false;
+            }
+            
+            // 显示加载状态
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = 'Logging in...';
+            
+            // 提交表单
+            event.target.submit();
+            return true;
+        }
+
+        // 处理注册表单提交
+        function handleRegisterSubmit(event) {
+            event.preventDefault();
+            
+            // 验证所有字段
+            if (!usernameAvailable || !passwordValid || !confirmPasswordValid) {
+                showMessage('register-message', 'Please fix the validation errors above', 'error');
+                return false;
+            }
+            
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            // 最终验证
+            if (!username || !password || !confirmPassword) {
+                showMessage('register-message', 'Please fill in all fields', 'error');
+                return false;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('register-message', 'Passwords do not match', 'error');
+                return false;
+            }
+            
+            if (password.length < 8) {
+                showMessage('register-message', 'Password must be at least 8 characters', 'error');
+                return false;
+            }
+            
+            // 显示加载状态
+            const registerBtn = document.getElementById('register-btn');
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = 'Creating Account...';
+            
+            // 提交表单
+            event.target.submit();
+            return true;
+        }
+
         // Toggle password visibility
-        document.getElementById('toggle-login-password').addEventListener('click', function() {
-            const passwordInput = document.getElementById('login-password');
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🔒';
-        });
-        
-        document.getElementById('toggle-register-password').addEventListener('click', function() {
-            const passwordInput = document.getElementById('register-password');
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🔒';
-        });
-        
-        document.getElementById('toggle-confirm-password').addEventListener('click', function() {
-            const passwordInput = document.getElementById('register-confirm-password');
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🔒';
-        });
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            button.textContent = type === 'password' ? '👁️' : '🔒';
+        }
         
         // Switch between login and register forms
         document.getElementById('show-register').addEventListener('click', function() {
             document.getElementById('login-form').classList.add('hidden');
             document.getElementById('register-form').classList.remove('hidden');
             clearMessages();
+            resetValidation();
         });
         
         document.getElementById('show-login').addEventListener('click', function() {
             document.getElementById('register-form').classList.add('hidden');
             document.getElementById('login-form').classList.remove('hidden');
             clearMessages();
+            resetValidation();
         });
         
-        // Login form validation
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
+        // 检查用户名可用性
+        function checkUsernameAvailability(username) {
+            const usernameInput = document.getElementById('register-username');
+            const statusElement = document.getElementById('username-status');
+            const validationElement = document.getElementById('username-validation');
             
-            if (!username || !password) {
-                e.preventDefault();
-                showMessage('login-message', 'Please fill in all fields', 'error');
+            // 清除之前的定时器
+            if (usernameCheckTimeout) {
+                clearTimeout(usernameCheckTimeout);
+            }
+            
+            if (username.length < 3) {
+                usernameInput.classList.remove('valid-border');
+                usernameInput.classList.add('invalid-border');
+                statusElement.textContent = '';
+                validationElement.textContent = 'Username must be at least 3 characters';
+                validationElement.className = 'validation-message invalid show';
+                usernameAvailable = false;
+                updateRegisterButton();
                 return;
             }
-        });
+            
+            if (username.length > 50) {
+                usernameInput.classList.remove('valid-border');
+                usernameInput.classList.add('invalid-border');
+                statusElement.textContent = '';
+                validationElement.textContent = 'Username must be less than 50 characters';
+                validationElement.className = 'validation-message invalid show';
+                usernameAvailable = false;
+                updateRegisterButton();
+                return;
+            }
+            
+            // 检查用户名格式
+            const usernameRegex = /^[a-zA-Z0-9_]+$/;
+            if (!usernameRegex.test(username)) {
+                usernameInput.classList.remove('valid-border');
+                usernameInput.classList.add('invalid-border');
+                statusElement.textContent = '';
+                validationElement.textContent = 'Username can only contain letters, numbers and underscores';
+                validationElement.className = 'validation-message invalid show';
+                usernameAvailable = false;
+                updateRegisterButton();
+                return;
+            }
+            
+            // 显示加载状态
+            statusElement.textContent = 'Checking...';
+            statusElement.className = 'username-status loading';
+            
+            // 使用防抖，避免频繁请求
+            usernameCheckTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch('check_username.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `username=${encodeURIComponent(username)}`
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    
+                    const data = await response.text();
+                    
+                    if (data === 'available') {
+                        usernameInput.classList.remove('invalid-border');
+                        usernameInput.classList.add('valid-border');
+                        statusElement.textContent = '✓ Available';
+                        statusElement.className = 'username-status available';
+                        validationElement.textContent = 'Username is available';
+                        validationElement.className = 'validation-message valid show';
+                        usernameAvailable = true;
+                    } else if (data === 'taken') {
+                        usernameInput.classList.remove('valid-border');
+                        usernameInput.classList.add('invalid-border');
+                        statusElement.textContent = '✗ Taken';
+                        statusElement.className = 'username-status taken';
+                        validationElement.textContent = 'Username is already taken';
+                        validationElement.className = 'validation-message invalid show';
+                        usernameAvailable = false;
+                    } else if (data === 'invalid') {
+                        usernameInput.classList.remove('valid-border');
+                        usernameInput.classList.add('invalid-border');
+                        statusElement.textContent = '✗ Invalid';
+                        statusElement.className = 'username-status taken';
+                        validationElement.textContent = 'Invalid username format';
+                        validationElement.className = 'validation-message invalid show';
+                        usernameAvailable = false;
+                    } else {
+                        validationElement.textContent = 'Error checking username';
+                        validationElement.className = 'validation-message invalid show';
+                        usernameAvailable = false;
+                    }
+                } catch (error) {
+                    console.error('Error checking username:', error);
+                    validationElement.textContent = 'Error checking username availability';
+                    validationElement.className = 'validation-message invalid show';
+                    usernameAvailable = false;
+                }
+                
+                updateRegisterButton();
+            }, 500); // 500ms防抖
+        }
         
-        // Register form validation
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            const username = document.getElementById('register-username').value;
+        // 检查密码强度
+        function checkPasswordStrength() {
+            const password = document.getElementById('register-password').value;
+            const strengthMeter = document.getElementById('password-strength-meter');
+            const strengthText = document.getElementById('password-strength-text');
+            const validationElement = document.getElementById('password-validation');
+            const passwordInput = document.getElementById('register-password');
+            
+            let score = 0;
+            const messages = [];
+            
+            // 检查密码规则
+            const hasLength = password.length >= 8;
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasLowercase = /[a-z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            const hasSpecial = /[@#$%&!]/.test(password);
+            
+            // 更新规则显示
+            updateRule('rule-length', hasLength);
+            updateRule('rule-uppercase', hasUppercase);
+            updateRule('rule-lowercase', hasLowercase);
+            updateRule('rule-number', hasNumber);
+            updateRule('rule-special', hasSpecial);
+            
+            // 计算分数
+            if (hasLength) score += 1;
+            if (hasUppercase) score += 1;
+            if (hasLowercase) score += 1;
+            if (hasNumber) score += 1;
+            if (hasSpecial) score += 1;
+            
+            // 确定强度等级
+            let strength = 'Very Weak';
+            let color = '#dc3545';
+            let width = '20%';
+            
+            if (score >= 4) {
+                strength = 'Strong';
+                color = '#28a745';
+                width = '80%';
+                passwordValid = true;
+            } else if (score >= 3) {
+                strength = 'Good';
+                color = '#17a2b8';
+                width = '60%';
+                passwordValid = true;
+            } else if (score >= 2) {
+                strength = 'Fair';
+                color = '#ffc107';
+                width = '40%';
+                passwordValid = false;
+            } else if (score >= 1) {
+                strength = 'Weak';
+                color = '#fd7e14';
+                width = '20%';
+                passwordValid = false;
+            } else {
+                passwordValid = false;
+            }
+            
+            // 更新UI
+            strengthMeter.style.width = width;
+            strengthMeter.style.backgroundColor = color;
+            strengthText.textContent = `Strength: ${strength}`;
+            strengthText.style.color = color;
+            
+            if (password.length === 0) {
+                validationElement.textContent = '';
+                validationElement.className = 'validation-message';
+                passwordInput.classList.remove('valid-border', 'invalid-border');
+            } else if (passwordValid) {
+                validationElement.textContent = 'Password strength is good';
+                validationElement.className = 'validation-message valid show';
+                passwordInput.classList.remove('invalid-border');
+                passwordInput.classList.add('valid-border');
+            } else {
+                validationElement.textContent = 'Password is too weak. Please follow the rules above.';
+                validationElement.className = 'validation-message invalid show';
+                passwordInput.classList.remove('valid-border');
+                passwordInput.classList.add('invalid-border');
+            }
+            
+            // 同时检查确认密码
+            checkConfirmPassword();
+            updateRegisterButton();
+        }
+        
+        // 更新规则显示
+        function updateRule(elementId, isValid) {
+            const element = document.getElementById(elementId);
+            element.className = isValid ? 'valid' : 'invalid';
+        }
+        
+        // 检查确认密码
+        function checkConfirmPassword() {
             const password = document.getElementById('register-password').value;
             const confirmPassword = document.getElementById('register-confirm-password').value;
+            const validationElement = document.getElementById('confirm-validation');
+            const confirmInput = document.getElementById('register-confirm-password');
             
-            if (!username || !password || !confirmPassword) {
-                e.preventDefault();
-                showMessage('register-message', 'Please fill in all fields', 'error');
-                return;
+            if (confirmPassword.length === 0) {
+                validationElement.textContent = '';
+                validationElement.className = 'validation-message';
+                confirmInput.classList.remove('valid-border', 'invalid-border');
+                confirmPasswordValid = false;
+            } else if (password === confirmPassword) {
+                validationElement.textContent = 'Passwords match';
+                validationElement.className = 'validation-message valid show';
+                confirmInput.classList.remove('invalid-border');
+                confirmInput.classList.add('valid-border');
+                confirmPasswordValid = true;
+            } else {
+                validationElement.textContent = 'Passwords do not match';
+                validationElement.className = 'validation-message invalid show';
+                confirmInput.classList.remove('valid-border');
+                confirmInput.classList.add('invalid-border');
+                confirmPasswordValid = false;
             }
             
-            if (password !== confirmPassword) {
-                e.preventDefault();
-                showMessage('register-message', 'Passwords do not match', 'error');
-                return;
+            updateRegisterButton();
+        }
+        
+        // 更新注册按钮状态
+        function updateRegisterButton() {
+            const registerBtn = document.getElementById('register-btn');
+            if (usernameAvailable && passwordValid && confirmPasswordValid) {
+                registerBtn.disabled = false;
+                registerBtn.style.opacity = '1';
+            } else {
+                registerBtn.disabled = true;
+                registerBtn.style.opacity = '0.6';
             }
+        }
+        
+        // 重置验证状态
+        function resetValidation() {
+            usernameAvailable = false;
+            passwordValid = false;
+            confirmPasswordValid = false;
             
-            if (password.length < 6) {
-                e.preventDefault();
-                showMessage('register-message', 'Password must be at least 6 characters', 'error');
-                return;
-            }
-        });
+            document.getElementById('register-username').classList.remove('valid-border', 'invalid-border');
+            document.getElementById('register-password').classList.remove('valid-border', 'invalid-border');
+            document.getElementById('register-confirm-password').classList.remove('valid-border', 'invalid-border');
+            
+            document.getElementById('username-status').textContent = '';
+            document.getElementById('password-strength-meter').style.width = '0%';
+            document.getElementById('password-strength-text').textContent = '';
+            
+            document.querySelectorAll('.validation-message').forEach(el => {
+                el.className = 'validation-message';
+                el.textContent = '';
+            });
+            
+            document.querySelectorAll('#password-rules li').forEach(el => {
+                el.className = 'invalid';
+            });
+            
+            updateRegisterButton();
+        }
         
         // Show message
         function showMessage(elementId, message, type) {
@@ -292,6 +810,13 @@
             messageElement.textContent = message;
             messageElement.className = `message ${type}`;
             messageElement.classList.remove('hidden');
+            
+            // 自动隐藏错误消息
+            if (type === 'error') {
+                setTimeout(() => {
+                    messageElement.classList.add('hidden');
+                }, 5000);
+            }
         }
         
         // Clear messages
@@ -302,43 +827,71 @@
 
         // Check for URL parameters to show messages
         window.addEventListener('load', function() {
+            console.log('Login page loaded');
             const urlParams = new URLSearchParams(window.location.search);
             const loginError = urlParams.get('login_error');
             const registerError = urlParams.get('register_error');
             const registerSuccess = urlParams.get('register_success');
             
+            console.log('URL Parameters:', { loginError, registerError, registerSuccess });
+            
             if (loginError) {
-                showMessage('login-message', loginError, 'error');
+                showMessage('login-message', decodeURIComponent(loginError), 'error');
+                // 确保显示登录表单
+                document.getElementById('register-form').classList.add('hidden');
+                document.getElementById('login-form').classList.remove('hidden');
             }
             if (registerError) {
-                showMessage('register-message', registerError, 'error');
+                // 显示注册表单并显示错误
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('register-form').classList.remove('hidden');
+                showMessage('register-message', decodeURIComponent(registerError), 'error');
             }
             if (registerSuccess) {
-                showMessage('register-message', registerSuccess, 'success');
+                // 显示登录表单并显示成功消息
+                document.getElementById('register-form').classList.add('hidden');
+                document.getElementById('login-form').classList.remove('hidden');
+                showMessage('login-message', decodeURIComponent(registerSuccess), 'success');
+            }
+            
+            // 检查是否有重定向参数
+            const redirect = urlParams.get('redirect');
+            if (redirect) {
+                console.log('Redirect parameter found:', redirect);
+                // 可以在页面上显示一些指示，告诉用户登录后会返回到该页面
+            }
+            
+            // 检查是否有登录成功的参数（从其他页面重定向回来）
+            const loginSuccess = urlParams.get('login_success');
+            const username = urlParams.get('username');
+            const role = urlParams.get('role');
+            
+            if (loginSuccess === '1' && username) {
+                console.log('User just logged in from redirect:', username, role);
+                // 清除URL参数
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+                
+                // 如果是重定向回来的，直接跳转到重定向页面
+                if (redirect) {
+                    window.location.href = decodeURIComponent(redirect);
+                }
+            }
+            
+            // 恢复登录按钮状态
+            const loginBtn = document.getElementById('login-btn');
+            if (loginBtn) {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = 'Login';
+            }
+            
+            // 恢复注册按钮状态
+            const registerBtn = document.getElementById('register-btn');
+            if (registerBtn) {
+                registerBtn.disabled = true;
+                registerBtn.innerHTML = 'Create Account';
             }
         });
-        window.addEventListener('load', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const loginError = urlParams.get('login_error');
-    const registerError = urlParams.get('register_error');
-    const registerSuccess = urlParams.get('register_success');
-    
-    if (loginError) {
-        showMessage('login-message', loginError, 'error');
-    }
-    if (registerError) {
-        // 如果注册失败，显示注册表单并显示错误
-        document.getElementById('login-form').classList.add('hidden');
-        document.getElementById('register-form').classList.remove('hidden');
-        showMessage('register-message', registerError, 'error');
-    }
-    if (registerSuccess) {
-        // 如果注册成功，显示登录表单并显示成功消息
-        document.getElementById('register-form').classList.add('hidden');
-        document.getElementById('login-form').classList.remove('hidden');
-        showMessage('login-message', registerSuccess, 'success');
-    }
-});
     </script>
 </body>
 </html>

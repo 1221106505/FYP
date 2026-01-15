@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Cart - BookStore</title>
+<link rel="stylesheet" href="../assets/cart/cart.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">📚</span>
+    <span class="name">BookStore</span>
+  </div>
+  <nav class="nav">
+    <a href="Main.html">Browse Books</a>
+    <a class="active" href="cart.html">Cart</a>
+  </nav>
+</header>
+
+<main class="container">
+  <section class="page-title">
+    <h1>🛒 My Shopping Cart</h1>
+    <p class="muted">Manage items, save for later, and checkout securely.</p>
+  </section>
+
+  <section class="grid">
+    <!-- LEFT: CART LIST -->
+    <div class="card">
+      <div class="card-head">
+        <label class="check">
+          <input type="checkbox" id="selectAll" />
+          <span>Select All</span>
+        </label>
+
+        <div class="actions">
+          <button class="btn ghost" id="btnRemoveSelected" disabled>Remove Selected</button>
+          <button class="btn ghost" id="btnClearCart">Clear Cart</button>
+        </div>
+      </div>
+
+      <div id="cartState" class="state"></div>
+
+      <div class="list" id="cartList"></div>
+
+      <div class="divider"></div>
+
+      <h3 class="section-title">Saved for later</h3>
+      <div class="list" id="savedList"></div>
+    </div>
+
+    <!-- RIGHT: SUMMARY -->
+    <aside class="card summary">
+      <h2>Order Summary</h2>
+
+      <div class="row">
+        <span>Subtotal (<span id="itemsCount">0</span> items)</span>
+        <strong>RM <span id="subtotal">0.00</span></strong>
+      </div>
+
+      <div class="row">
+        <span>Shipping</span>
+        <strong>RM <span id="shipping">5.00</span></strong>
+      </div>
+
+      <div class="row">
+        <span>Tax (6%)</span>
+        <strong>RM <span id="tax">0.00</span></strong>
+      </div>
+
+      <div class="row" id="discountRow" style="display:none;">
+  <span>Discount</span>
+  <strong>- RM <span id="discount">0.00</span></strong>
+</div>
+
+<div class="divider"></div>
+
+<label class="field">
+  <span class="label">Shipping Option</span>
+  <select id="shippingOption">
+    <option value="standard" selected>Standard (RM 5.00) • 2–3 days</option>
+    <option value="express">Express (RM 12.00) • Next day</option>
+  </select>
+</label>
+
+<label class="field">
+  <span class="label">Promo Code</span>
+  <div style="display:flex; gap:8px;">
+    <input id="promo" type="text" placeholder="e.g. SAVE10"
+      style="flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:14px;">
+    <button class="btn" id="btnApplyPromo" type="button">Apply</button>
+  </div>
+  <span class="tiny muted" id="promoMsg"></span>
+</label>
+
+<p class="tiny muted" id="deliveryEstimate"></p>
+
+
+      <div class="divider"></div>
+
+      <div class="row total">
+        <span>Total</span>
+        <strong>RM <span id="grandTotal">0.00</span></strong>
+      </div>
+
+      <div class="divider"></div>
+
+      <label class="field">
+        <span class="label">Payment Method</span>
+        <select id="paymentMethod">
+  <option value="Card">Card</option>
+  <option value="BANK">Bank Transfer</option>
+  <option value="COD">Cash on Delivery</option>
+</select>      
+      </label>
+
+      <!-- Secure Payment Details (Collapsible) -->
+<div class="secure-box">
+  <button class="secure-toggle" id="togglePayment" type="button" aria-expanded="false">
+    <span>🔒 Secure Payment Details</span>
+    <span id="toggleIcon">＋</span>
+  </button>
+
+  <div class="secure-body" id="paymentPanel" style="display:none;">
+    <!-- CARD FIELDS -->
+    <div class="pay-section" id="cardFields">
+      <label class="field">
+        <span class="label">Cardholder Name</span>
+        <input id="cardName" type="text" placeholder="e.g. DK Palany" />
+      </label>
+
+      <label class="field">
+        <span class="label">Card Number</span>
+        <input id="cardNumber" type="text" inputmode="numeric" placeholder="1234 5678 9012 3456" maxlength="19" />
+        <span class="tiny muted" id="cardNumberMsg"></span>
+      </label>
+
+      <div class="two-col">
+        <label class="field">
+          <span class="label">Expiry (MM/YY)</span>
+          <input id="cardExpiry" type="text" inputmode="numeric" placeholder="MM/YY" maxlength="5" />
+          <span class="tiny muted" id="cardExpiryMsg"></span>
+        </label>
+
+        <label class="field">
+          <span class="label">CVV</span>
+          <input id="cardCvv" type="password" inputmode="numeric" placeholder="***" maxlength="4" />
+          <span class="tiny muted" id="cardCvvMsg"></span>
+        </label>
+      </div>
+
+      <div class="hint">
+        We do <strong>not</strong> store CVV. Card number is saved as <strong>masked</strong> (e.g., **** **** **** 1234).
+      </div>
+    </div>
+
+   <!-- BANK TRANSFER (Manual) -->
+<div class="pay-section" id="bankFields" style="display:none;">
+  <div class="hint">
+    Transfer to our account using the details below. Include the <strong>Reference</strong> in the transfer remark.
+  </div>
+
+  <div class="bank-grid">
+    <div class="bank-card">
+      <div class="muted tiny">Bank</div>
+      <div><strong>Maybank</strong></div>
+    </div>
+
+    <div class="bank-card">
+      <div class="muted tiny">Account Name</div>
+      <div><strong>Visual BookStore Sdn Bhd</strong></div>
+    </div>
+
+    <div class="bank-card">
+      <div class="muted tiny">Account Number</div>
+      <div class="mono"><strong id="bankAcc">123456789012</strong></div>
+      <button class="btn" type="button" id="btnCopyAcc">Copy</button>
+    </div>
+
+    <div class="bank-card">
+      <div class="muted tiny">Reference</div>
+      <div class="mono"><strong id="bankRef">—</strong></div>
+      <button class="btn" type="button" id="btnCopyRef">Copy</button>
+    </div>
+  </div>
+
+  <div class="fpx-actions">
+    <button class="btn" type="button" id="btnGenBankRef">Generate Reference</button>
+    <span class="tiny muted" id="bankStatus"></span>
+  </div>
+
+  <div class="hint">
+    After you transfer, click checkout. Your order will be created with status <strong>Pending Payment Verification</strong>.
+  </div>
+</div>
+
+    <!-- COD -->
+    <div class="pay-section" id="codFields" style="display:none;">
+      <div class="hint">Cash on Delivery selected. You will pay when the book arrives.</div>
+    </div>
+
+    <p class="tiny muted" id="paymentError" style="margin:10px 0 0;"></p>
+  </div>
+</div>
+
+
+      <label class="field">
+        <span class="label">Delivery Address</span>
+        <textarea id="address" rows="3" placeholder="Enter delivery address..."></textarea>
+      </label>
+
+      <button class="btn primary" id="btnCheckout">Proceed to Checkout</button>
+      <div style="display:flex; gap:10px; margin-top:10px;">
+  <button class="btn" id="btnPreviewReceipt" type="button">Preview Receipt</button>
+  <button class="btn" id="btnPrintReceipt" type="button">Print / Save as PDF</button>
+</div>
+
+<!-- Receipt Modal -->
+<div class="modal" id="receiptModal" aria-hidden="true">
+  <div class="modal-backdrop" id="receiptBackdrop"></div>
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3 style="margin:0;">Receipt Preview</h3>
+      <button class="btn" id="btnCloseReceipt" type="button">Close</button>
+    </div>
+
+    <div class="modal-body" id="receiptContent">
+      <!-- JS will inject receipt HTML here -->
+    </div>
+  </div>
+</div>
+
+
+      <p class="tiny muted" id="msg"></p>
+    </aside>
+  </section>
+</main>
+
+<script src="../assets/cart/cart.js"></script>
+</body>
+</html>
