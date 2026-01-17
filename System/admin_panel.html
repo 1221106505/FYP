@@ -593,6 +593,115 @@
             color: #721c24;
         }
 
+        /* 新添加的样式 */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .form-control:read-only {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        #bookISBN {
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 通知样式 */
+        .custom-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .custom-notification.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .custom-notification.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .custom-notification.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .custom-notification.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* ISBN生成样式 */
+        .isbn-generator {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .isbn-generator .form-control {
+            flex: 1;
+        }
+
+        .isbn-generated {
+            background-color: #e8f5e8 !important;
+            border-color: #27ae60 !important;
+            color: #155724 !important;
+        }
+
+        .auto-gen-label {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .admin-container {
@@ -634,6 +743,10 @@
             }
             
             .search-box {
+                flex-direction: column;
+            }
+            
+            .isbn-generator {
                 flex-direction: column;
             }
         }
@@ -754,12 +867,13 @@
                                 <th>Category</th>
                                 <th>Price</th>
                                 <th>Stock</th>
+                                <th>ISBN</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="booksTable">
-                            <tr><td colspan="8" class="loading">Loading books data...</td></tr>
+                            <tr><td colspan="9" class="loading">Loading books data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1014,8 +1128,28 @@
                             <input type="number" id="bookStock" class="form-control" min="0" required>
                         </div>
                         <div class="form-group">
-                            <label for="bookISBN">🔢 ISBN</label>
-                            <input type="text" id="bookISBN" class="form-control">
+                            <label for="bookISBN">🔢 ISBN 
+                                <span class="auto-gen-label" id="isbnStatusLabel">Auto-generated</span>
+                            </label>
+                            <div class="isbn-generator">
+                                <input type="text" id="bookISBN" class="form-control" readonly>
+                                <button type="button" class="btn btn-sm btn-info" onclick="regenerateISBN()" style="white-space: nowrap;">
+                                    <i>🔄</i> Regenerate
+                                </button>
+                            </div>
+                            <small style="color: #666; font-size: 0.85em; display: block; margin-top: 4px;">
+                                ISBN is automatically generated. Click "Regenerate" to get a new one.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bookPublisher">🏢 Publisher</label>
+                            <input type="text" id="bookPublisher" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="bookPublishDate">📅 Publish Date</label>
+                            <input type="date" id="bookPublishDate" class="form-control">
                         </div>
                     </div>
                     <div class="form-group">
@@ -1101,6 +1235,7 @@
         let currentOrders = [];
         let currentInventoryFilter = 'all';
         let currentOrderId = null;
+        let currentGeneratedISBN = '';
 
         // Order status mapping
         const ORDER_STATUS_MAP = {
@@ -1110,6 +1245,105 @@
             'delivered': { text: '📦 Delivered', class: 'status-delivered' },
             'cancelled': { text: '❌ Cancelled', class: 'status-cancelled' }
         };
+
+        // ============ ISBN FUNCTIONS ============
+        
+        // 生成格式为 978-XXXXXXXXXXX 的ISBN（例如：978-1491950357）
+        function generateRandomISBN() {
+            // ISBN-13前缀（图书行业专用）
+            const prefix = "978";
+            
+            // 生成10位数字
+            let middleDigits = "";
+            for (let i = 0; i < 10; i++) {
+                middleDigits += Math.floor(Math.random() * 10);
+            }
+            
+            // 格式化为：978-加上10位数字
+            return `${prefix}-${middleDigits}`;
+        }
+
+        // 验证ISBN格式：978-XXXXXXXXXXX（共13位数字）
+        function isValidISBN(isbn) {
+            if (!isbn || typeof isbn !== 'string') return false;
+            
+            // 检查格式: 978-加上10位数字
+            const isbnPattern = /^978-\d{10}$/;
+            return isbnPattern.test(isbn);
+        }
+
+        // 重新生成ISBN
+        function regenerateISBN() {
+            const newISBN = generateRandomISBN();
+            setGeneratedISBN(newISBN);
+            showNotification(`New ISBN generated: ${newISBN}`, 'info');
+        }
+
+        // 设置生成的ISBN
+        function setGeneratedISBN(isbn) {
+            let cleanISBN = String(isbn || '').trim();
+            
+            // 确保ISBN是有效的格式
+            if (!isValidISBN(cleanISBN)) {
+                console.warn('ISBN format invalid, regenerating:', cleanISBN);
+                const newISBN = generateRandomISBN();
+                setGeneratedISBN(newISBN);
+                return;
+            }
+            
+            currentGeneratedISBN = cleanISBN;
+            const isbnInput = document.getElementById('bookISBN');
+            isbnInput.value = cleanISBN;
+            isbnInput.classList.add('isbn-generated');
+            
+            // 更新状态标签
+            const statusLabel = document.getElementById('isbnStatusLabel');
+            if (statusLabel) {
+                statusLabel.textContent = 'Auto-generated';
+                statusLabel.style.background = '#3498db';
+            }
+        }
+
+        // 格式化ISBN（如果需要）
+        function formatISBN(rawISBN) {
+            // 如果已经是978-xxxxxxxxxxx格式，直接返回
+            if (isValidISBN(rawISBN)) {
+                return rawISBN;
+            }
+            
+            // 清理所有非数字字符
+            const cleanDigits = rawISBN.replace(/\D/g, '');
+            
+            // 如果不是13位，返回原始值
+            if (cleanDigits.length !== 13) {
+                return rawISBN;
+            }
+            
+            // 格式化为978-xxxxxxxxxxx
+            return `${cleanDigits.substring(0, 3)}-${cleanDigits.substring(3, 13)}`;
+        }
+
+        // 显示通知函数
+        function showNotification(message, type = 'info') {
+            // 移除现有的通知
+            const existingNotification = document.querySelector('.custom-notification');
+            if (existingNotification) existingNotification.remove();
+            
+            const notification = document.createElement('div');
+            notification.className = `custom-notification ${type}`;
+            notification.innerHTML = `
+                <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3秒后自动移除
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
 
         // Navigation
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -1657,11 +1891,11 @@
                     displayBooks(currentBooks);
                     loadCategoryFilter();
                 } else {
-                    document.getElementById('booksTable').innerHTML = '<tr><td colspan="8" class="error">Error loading books</td></tr>';
+                    document.getElementById('booksTable').innerHTML = '<tr><td colspan="9" class="error">Error loading books</td></tr>';
                 }
             } catch (error) {
                 console.error('Error loading books:', error);
-                document.getElementById('booksTable').innerHTML = '<tr><td colspan="8" class="error">Error loading books</td></tr>';
+                document.getElementById('booksTable').innerHTML = '<tr><td colspan="9" class="error">Error loading books</td></tr>';
             }
         }
 
@@ -1670,7 +1904,7 @@
             const booksTable = document.getElementById('booksTable');
             
             if (books.length === 0) {
-                booksTable.innerHTML = '<tr><td colspan="8" class="loading">No books found</td></tr>';
+                booksTable.innerHTML = '<tr><td colspan="9" class="loading">No books found</td></tr>';
                 return;
             }
 
@@ -1682,6 +1916,9 @@
                     <td>${book.category_name || 'N/A'}</td>
                     <td>RM ${parseFloat(book.price).toFixed(2)}</td>
                     <td>${book.stock_quantity}</td>
+                    <td style="font-family: 'Courier New', monospace;">
+                        ${book.isbn || '<span style="color:#999;font-style:italic">Auto-generated</span>'}
+                    </td>
                     <td>
                         <span class="${getStockStatusClass(book.stock_quantity)}">
                             ${getStockStatusText(book.stock_quantity)}
@@ -2028,11 +2265,11 @@
                 if (data.success) {
                     showOrderDetailsModal(data.order);
                 } else {
-                    alert('Error loading order details: ' + (data.error || 'Unknown error'));
+                    showNotification('Error loading order details: ' + (data.error || 'Unknown error'), 'error');
                 }
             } catch (error) {
                 console.error('Error loading order details:', error);
-                alert('Error loading order details');
+                showNotification('Error loading order details', 'error');
             }
         }
 
@@ -2159,7 +2396,7 @@
             const newStatus = document.getElementById('newOrderStatus').value;
             
             if (!newStatus) {
-                alert('Please select a status');
+                showNotification('Please select a status', 'warning');
                 return;
             }
             
@@ -2176,16 +2413,16 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert('Order status updated successfully!');
+                    showNotification('Order status updated successfully!', 'success');
                     closeUpdateStatusModal();
                     closeOrderDetailsModal();
                     loadOrdersData();
                 } else {
-                    alert('Error updating order status: ' + result.error);
+                    showNotification('Error updating order status: ' + result.error, 'error');
                 }
             } catch (error) {
                 console.error('Error updating order status:', error);
-                alert('Error updating order status');
+                showNotification('Error updating order status', 'error');
             }
         }
 
@@ -2298,50 +2535,49 @@
         }
 
         // 修复saveCategory函数
-// 修复saveCategory函数
-async function saveCategory() {
-    const categoryName = document.getElementById('categoryName').value;
-    const categoryDescription = document.getElementById('categoryDescription').value;
-    
-    if (!categoryName.trim()) {
-        alert('Please enter a category name');
-        return;
-    }
-    
-    try {
-        const formData = new FormData();
-        formData.append('category_name', categoryName);
-        formData.append('description', categoryDescription);
-        
-        const response = await fetch(API_ENDPOINTS.addCategory, {
-            method: 'POST',
-            body: new URLSearchParams({
-                category_name: categoryName,
-                description: categoryDescription
-            })
-        });
-        
-        const result = await response.json();
-        console.log('API Response:', result);
-        
-        if (result.success) {
-            alert('Category added successfully!');
-            closeAddCategoryModal();
-            await loadCategoriesData();
-            loadDashboardData();
+        async function saveCategory() {
+            const categoryName = document.getElementById('categoryName').value;
+            const categoryDescription = document.getElementById('categoryDescription').value;
             
-            // 重新加载书籍管理页面的分类筛选器
-            if (document.getElementById('books').classList.contains('active')) {
-                loadCategoryFilter();
+            if (!categoryName.trim()) {
+                showNotification('Please enter a category name', 'warning');
+                return;
             }
-        } else {
-            alert('Error adding category: ' + result.error);
+            
+            try {
+                const formData = new FormData();
+                formData.append('category_name', categoryName);
+                formData.append('description', categoryDescription);
+                
+                const response = await fetch(API_ENDPOINTS.addCategory, {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        category_name: categoryName,
+                        description: categoryDescription
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('API Response:', result);
+                
+                if (result.success) {
+                    showNotification('Category added successfully!', 'success');
+                    closeAddCategoryModal();
+                    await loadCategoriesData();
+                    loadDashboardData();
+                    
+                    // 重新加载书籍管理页面的分类筛选器
+                    if (document.getElementById('books').classList.contains('active')) {
+                        loadCategoryFilter();
+                    }
+                } else {
+                    showNotification('Error adding category: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding category:', error);
+                showNotification('Error adding category: ' + error.message, 'error');
+            }
         }
-    } catch (error) {
-        console.error('Error adding category:', error);
-        alert('Error adding category: ' + error.message);
-    }
-}
 
         // Edit category modal
         async function openEditCategoryModal(categoryId, categoryName, categoryDescription = '') {
@@ -2398,7 +2634,7 @@ async function saveCategory() {
             const categoryDescription = document.getElementById('editCategoryDescription').value;
             
             if (!categoryName.trim()) {
-                alert('Please enter a category name');
+                showNotification('Please enter a category name', 'warning');
                 return;
             }
             
@@ -2416,16 +2652,16 @@ async function saveCategory() {
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert('Category updated successfully!');
+                    showNotification('Category updated successfully!', 'success');
                     closeEditCategoryModal();
                     await loadCategoriesData();
                     loadBooksData(); // 刷新书籍列表以更新分类信息
                 } else {
-                    alert('Error updating category: ' + result.error);
+                    showNotification('Error updating category: ' + result.error, 'error');
                 }
             } catch (error) {
                 console.error('Error updating category:', error);
-                alert('Error updating category');
+                showNotification('Error updating category', 'error');
             }
         }
 
@@ -2457,7 +2693,7 @@ async function saveCategory() {
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert('Category deleted successfully!');
+                    showNotification('Category deleted successfully!', 'success');
                     // 重新加载所有数据
                     await Promise.all([
                         loadCategoriesData(),
@@ -2465,19 +2701,32 @@ async function saveCategory() {
                     ]);
                     loadDashboardData(); // 更新仪表板
                 } else {
-                    alert('Error deleting category: ' + result.error);
+                    showNotification('Error deleting category: ' + result.error, 'error');
                 }
             } catch (error) {
                 console.error('Error deleting category:', error);
-                alert('Error deleting category');
+                showNotification('Error deleting category', 'error');
             }
         }
 
-        // Modal functions
+        // ============ BOOK MODAL FUNCTIONS ============
+        
         function openAddBookModal() {
             document.getElementById('modalTitle').textContent = 'Add New Book';
             document.getElementById('bookForm').reset();
             document.getElementById('bookId').value = '';
+            
+            // 重置ISBN字段
+            const isbnInput = document.getElementById('bookISBN');
+            isbnInput.readOnly = true;
+            isbnInput.classList.remove('isbn-generated');
+            
+            // 立即生成有效的ISBN
+            const newISBN = generateRandomISBN();
+            setGeneratedISBN(newISBN);
+            
+            showNotification(`ISBN automatically generated: ${newISBN}`, 'info');
+            
             loadCategoriesForModal();
             document.getElementById('bookModal').style.display = 'flex';
         }
@@ -2495,8 +2744,32 @@ async function saveCategory() {
                     document.getElementById('bookAuthor').value = book.author;
                     document.getElementById('bookPrice').value = book.price;
                     document.getElementById('bookStock').value = book.stock_quantity;
-                    document.getElementById('bookISBN').value = book.isbn || '';
+                    
+                    // 编辑模式：使用现有ISBN，如果为空则生成新的
+                    const isbnInput = document.getElementById('bookISBN');
+                    if (book.isbn && book.isbn.trim() !== '') {
+                        isbnInput.value = book.isbn;
+                        isbnInput.readOnly = false;
+                        isbnInput.classList.remove('isbn-generated');
+                        
+                        const statusLabel = document.getElementById('isbnStatusLabel');
+                        statusLabel.textContent = 'Manual';
+                        statusLabel.style.background = '#f39c12';
+                    } else {
+                        // 如果数据库中没有ISBN，生成一个新的
+                        const newISBN = generateRandomISBN();
+                        isbnInput.value = newISBN;
+                        isbnInput.readOnly = true;
+                        isbnInput.classList.add('isbn-generated');
+                        
+                        const statusLabel = document.getElementById('isbnStatusLabel');
+                        statusLabel.textContent = 'Auto-generated';
+                        statusLabel.style.background = '#3498db';
+                    }
+                    
                     document.getElementById('bookDescription').value = book.description || '';
+                    document.getElementById('bookPublisher').value = book.publisher || '';
+                    document.getElementById('bookPublishDate').value = book.publish_date || '';
                     
                     await loadCategoriesForModal();
                     document.getElementById('bookCategory').value = book.category_id;
@@ -2505,12 +2778,16 @@ async function saveCategory() {
                 }
             } catch (error) {
                 console.error('Error loading book:', error);
-                alert('Error loading book data');
+                showNotification('Error loading book data', 'error');
             }
         }
 
         function closeModal() {
             document.getElementById('bookModal').style.display = 'none';
+            // 重置ISBN字段状态
+            const isbnInput = document.getElementById('bookISBN');
+            isbnInput.readOnly = true;
+            isbnInput.classList.remove('isbn-generated');
         }
 
         function openStockModal(bookId, bookTitle, currentStock) {
@@ -2549,22 +2826,54 @@ async function saveCategory() {
 
         // Save book
         async function saveBook() {
+            const bookId = document.getElementById('bookId').value;
+            const isEditing = !!bookId;
+            
+            // 收集表单数据
             const bookData = {
-                id: document.getElementById('bookId').value,
                 title: document.getElementById('bookTitle').value,
                 author: document.getElementById('bookAuthor').value,
                 category_id: document.getElementById('bookCategory').value,
                 price: document.getElementById('bookPrice').value,
                 stock_quantity: document.getElementById('bookStock').value,
-                isbn: document.getElementById('bookISBN').value,
-                description: document.getElementById('bookDescription').value
+                isbn: document.getElementById('bookISBN').value.trim(),
+                description: document.getElementById('bookDescription').value,
+                publisher: document.getElementById('bookPublisher').value,
+                publish_date: document.getElementById('bookPublishDate').value
             };
 
-            // Validation
-            if (!bookData.title || !bookData.author || !bookData.category_id || !bookData.price || bookData.stock_quantity === '') {
-                alert('Please fill in all required fields');
+            // 如果是新增书籍且ISBN为空，自动生成一个
+            if (!isEditing && (!bookData.isbn || bookData.isbn === '')) {
+                const newISBN = generateRandomISBN();
+                bookData.isbn = newISBN;
+                document.getElementById('bookISBN').value = newISBN;
+            }
+            
+            // 验证ISBN格式
+            if (bookData.isbn && !isValidISBN(bookData.isbn)) {
+                showNotification('Invalid ISBN format. Please use format: 978-XXXXXXXXXXX (e.g., 978-1491950357)', 'error');
                 return;
             }
+
+            // 如果是编辑模式，添加book_id
+            if (isEditing) {
+                bookData.id = bookId;
+            }
+
+            // 验证必填字段
+            const requiredFields = ['title', 'author', 'category_id', 'price', 'stock_quantity'];
+            const missingFields = requiredFields.filter(field => !bookData[field]);
+            
+            if (missingFields.length > 0) {
+                showNotification(`Please fill in all required fields: ${missingFields.join(', ')}`, 'error');
+                return;
+            }
+
+            // 显示保存中状态
+            const saveButton = document.querySelector('#bookModal .modal-footer .btn-primary');
+            const originalText = saveButton.textContent;
+            saveButton.innerHTML = '<span class="spinner"></span> Saving...';
+            saveButton.disabled = true;
 
             try {
                 const response = await fetch(API_ENDPOINTS.saveBook, {
@@ -2576,16 +2885,29 @@ async function saveCategory() {
                 const result = await response.json();
                 
                 if (result.success) {
+                    showNotification(result.message, 'success');
+                    
                     closeModal();
-                    loadSectionData('books');
-                    loadDashboardData();
-                    alert('Book saved successfully!');
+                    
+                    // 刷新相关数据
+                    setTimeout(() => {
+                        if (document.getElementById('books').classList.contains('active')) {
+                            loadBooksData();
+                        } else if (document.getElementById('inventory').classList.contains('active')) {
+                            loadInventoryData();
+                        }
+                        loadDashboardData();
+                    }, 500);
                 } else {
-                    alert('Error saving book: ' + result.error);
+                    showNotification(`Error: ${result.error}`, 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error saving book');
+                showNotification('Error saving book. Please try again.', 'error');
+            } finally {
+                // 恢复按钮状态
+                saveButton.innerHTML = originalText;
+                saveButton.disabled = false;
             }
         }
 
@@ -2606,16 +2928,16 @@ async function saveCategory() {
                 const result = await response.json();
                 
                 if (result.success) {
+                    showNotification('Stock updated successfully!', 'success');
                     closeStockModal();
                     loadSectionData('inventory');
                     loadDashboardData();
-                    alert('Stock updated successfully!');
                 } else {
-                    alert('Error updating stock: ' + result.error);
+                    showNotification('Error updating stock: ' + result.error, 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error updating stock');
+                showNotification('Error updating stock. Please try again.', 'error');
             }
         }
 
@@ -2632,15 +2954,15 @@ async function saveCategory() {
                     const result = await response.json();
                     
                     if (result.success) {
+                        showNotification('Book deleted successfully!', 'success');
                         loadSectionData('books');
                         loadDashboardData();
-                        alert('Book deleted successfully!');
                     } else {
-                        alert('Error deleting book: ' + result.error);
+                        showNotification('Error deleting book: ' + result.error, 'error');
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('Error deleting book');
+                    showNotification('Error deleting book. Please try again.', 'error');
                 }
             }
         }
@@ -2673,6 +2995,12 @@ async function saveCategory() {
             
             updateClock();
             setInterval(updateClock, 60000); // Update every minute
+            
+            // 测试ISBN生成
+            console.log('Testing ISBN generation...');
+            const testISBN = generateRandomISBN();
+            console.log('Generated ISBN:', testISBN);
+            console.log('Is valid?', isValidISBN(testISBN));
         });
 
         // Close modal when clicking outside

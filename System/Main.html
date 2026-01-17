@@ -499,44 +499,70 @@
       box-shadow: var(--shadow-lg);
     }
 
+    /* 书籍封面样式 - 更新 */
     .book-cover {
-      width: 90px; /* 减小宽度 */
-      height: 120px; /* 减小高度 */
+      width: 100px; /* 调整为适合卡片的大小 */
+      height: 140px; /* 调整为适合卡片的大小 */
+      border-radius: 6px;
+      margin: 0 auto 15px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--shadow);
       background: linear-gradient(135deg, var(--secondary), var(--primary-dark));
-      border-radius: 6px; /* 减小圆角 */
-      margin: 0 auto 15px; /* 减小下边距 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .book-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* 确保图片覆盖整个区域 */
+      transition: transform 0.3s ease;
+    }
+
+    .book-cover:hover img {
+      transform: scale(1.05);
+    }
+
+    /* 如果图片加载失败，显示备用内容 */
+    .book-cover .cover-fallback {
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--white);
-      font-size: 1.25rem; /* 减小字体大小 */
+      font-size: 1.25rem;
       font-weight: 600;
-      box-shadow: var(--shadow);
+      background: linear-gradient(135deg, var(--secondary), var(--primary-dark));
     }
 
     .book-title {
-      font-size: 1rem; /* 减小字体大小 */
+      font-size: 0.95rem; /* 稍微减小字体大小 */
       color: var(--primary);
-      margin-bottom: 6px; /* 减小边距 */
+      margin-bottom: 6px;
       font-weight: 600;
       line-height: 1.3;
       display: -webkit-box;
       -webkit-line-clamp: 2; /* 限制标题显示2行 */
       -webkit-box-orient: vertical;
       overflow: hidden;
-      min-height: 2.6em; /* 确保高度一致 */
+      min-height: 2.5em; /* 确保高度一致 */
+      width: 100%;
     }
 
     .book-author {
       color: var(--dark-gray);
-      margin-bottom: 10px; /* 减小边距 */
-      font-size: 0.85rem; /* 减小字体大小 */
-      min-height: 1.2em; /* 确保高度一致 */
+      margin-bottom: 10px;
+      font-size: 0.8rem; /* 减小字体大小 */
+      min-height: 1.2em;
+      width: 100%;
     }
 
     .book-price {
       color: var(--accent);
-      font-size: 1.125rem; /* 减小字体大小 */
+      font-size: 1rem; /* 减小字体大小 */
       font-weight: 700;
       margin-top: auto; /* 确保价格在底部对齐 */
     }
@@ -772,6 +798,11 @@
       .books-showcase {
         grid-template-columns: repeat(2, 1fr); /* 平板显示2列 */
       }
+      
+      .book-cover {
+        width: 90px;
+        height: 130px;
+      }
     }
 
     @media (max-width: 768px) {
@@ -819,20 +850,19 @@
       
       .book-cover {
         width: 80px;
-        height: 110px;
-        font-size: 1.125rem;
+        height: 120px;
       }
       
       .book-title {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
       }
       
       .book-author {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
       }
       
       .book-price {
-        font-size: 1rem;
+        font-size: 0.9rem;
       }
     }
 
@@ -865,6 +895,11 @@
         max-width: 200px;
         margin: 0 auto;
       }
+      
+      .book-cover {
+        width: 90px;
+        height: 130px;
+      }
     }
   </style>
 </head>
@@ -889,8 +924,6 @@
         <p class="hero-subtitle">Explore thousands of books across all genres. From bestsellers to hidden gems, your reading adventure starts here.</p>
         <div class="hero-buttons">
           <button class="btn-primary" onclick="location.href='customer_view.html'">Browse Books</button>
-          <!-- 动态按钮 -->
-         
         </div>
       </div>
       <div class="hero-visual">
@@ -906,20 +939,7 @@
   <!-- 欢迎消息 -->
   <div id="welcomeMessage" class="welcome-message hidden"></div>
 
-  <!-- 快速操作区域（只有登录用户才显示） -->
-  <section id="quickAccessSection" class="quick-actions hidden">
-    <div class="container">
-      <div class="section-header">
-        <h2>Quick Access</h2>
-        <p>Get where you need to go in just one click</p>
-      </div>
-      <div class="actions-grid" id="quickAccessGrid">
-        <!-- 动态内容：登录用户显示功能 -->
-      </div>
-    </div>
-  </section>
-
-  <!-- 书籍展示 -->
+  <!-- 书籍展示现在在第二个位置 -->
   <section class="showcase-section">
     <div class="container">
       <div class="section-header">
@@ -934,6 +954,19 @@
       <div class="showcase-actions">
         <button class="btn-primary" onclick="location.href='customer_view.html'">View All Books</button>
         <button class="btn-outline" onclick="loadRandomBestsellers()">Show More Books</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 快速操作区域现在在第三个位置 -->
+  <section id="quickAccessSection" class="quick-actions hidden">
+    <div class="container">
+      <div class="section-header">
+        <h2>Quick Access</h2>
+        <p>Get where you need to go in just one click</p>
+      </div>
+      <div class="actions-grid" id="quickAccessGrid">
+        <!-- 动态内容：登录用户显示功能 -->
       </div>
     </div>
   </section>
@@ -1026,36 +1059,47 @@
   </footer>
 
   <script>
-    // Main.js - 修复版
+    // Main.js - 完整修正版
     const API_ENDPOINTS = {
       checkLogin: 'check_login.php',
       books: 'get_book.php'
     };
 
+    // 查看书籍详情函数
+    function viewBookDetail(bookId) {
+      console.log('Viewing book detail for ID:', bookId);
+      window.location.href = `book_detail.html?book_id=${bookId}`;
+    }
+
+    // 生成书籍封面缩写
+    function getBookCoverAbbreviation(title) {
+      if (!title) return 'BK';
+      const words = title.split(' ').filter(word => word.length > 0);
+      if (words.length >= 2) {
+        return (words[0][0] + words[1][0]).toUpperCase();
+      } else if (words.length === 1 && words[0].length >= 2) {
+        return words[0].substring(0, 2).toUpperCase();
+      } else {
+        return 'BK';
+      }
+    }
+
     // 检查登录状态并更新UI
     function checkLoginStatus() {
       console.log('Checking login status...');
-      
       fetch(API_ENDPOINTS.checkLogin, {
         credentials: 'include',
-        headers: {
-          'Cache-Control': 'no-cache'
-        }
+        headers: { 'Cache-Control': 'no-cache' }
       })
         .then(response => {
-          console.log('Login check response status:', response.status);
-          if (!response.ok) {
-            throw new Error('Network response was not ok: ' + response.status);
-          }
+          if (!response.ok) throw new Error('Network response was not ok');
           return response.json();
         })
         .then(data => {
-          console.log('Login status data:', data);
           updateUserInterface(data);
         })
         .catch(error => {
           console.error('Error checking login status:', error);
-          // 如果check_login.php不存在，使用URL参数回退
           fallbackToURLParams();
         });
     }
@@ -1066,14 +1110,9 @@
       const quickAccessSection = document.getElementById('quickAccessSection');
       const quickAccessGrid = document.getElementById('quickAccessGrid');
       
-      if (!userInfo) {
-        console.warn('User info element not found');
-        return;
-      }
+      if (!userInfo) return;
 
       if (userData.logged_in) {
-        console.log('Updating user interface for:', userData.username, 'Role:', userData.user_type);
-        
         let userTypeDisplay = '';
         let isAdmin = false;
         
@@ -1082,35 +1121,21 @@
           isAdmin = true;
         }
         
-        // 用户已登录，显示用户欢迎信息
         userInfo.innerHTML = `
           <div class="user-welcome ${isAdmin ? 'admin' : ''}">
             <span>Welcome, ${userData.username} ${userTypeDisplay}</span>
             <div class="user-actions">
-              ${isAdmin ? `
-                <a href="admin_panel.html">
-                  <button class="btn-profile">⚙️ Admin Panel</button>
-                </a>
-              ` : ''}
-              <a href="user_profile.html">
-                <button class="btn-profile">👤 Profile</button>
-              </a>
-              <a href="logout.php">
-                <button class="btn-logout">🚪 Logout</button>
-              </a>
+              ${isAdmin ? `<a href="admin_panel.html"><button class="btn-profile">⚙️ Admin Panel</button></a>` : ''}
+              <a href="user_profile.html"><button class="btn-profile">👤 Profile</button></a>
+              <a href="logout.php"><button class="btn-logout">🚪 Logout</button></a>
             </div>
           </div>
         `;
         
-        // 显示Quick Access区域
-        if (quickAccessSection) {
-          quickAccessSection.classList.remove('hidden');
-        }
+        if (quickAccessSection) quickAccessSection.classList.remove('hidden');
         
-        // 更新Quick Access内容
         if (quickAccessGrid) {
           if (isAdmin) {
-            // Admin用户看到的快速访问
             quickAccessGrid.innerHTML = `
               <div class="action-card" onclick="location.href='customer_view.html'">
                 <div class="action-icon">🔍</div>
@@ -1129,7 +1154,6 @@
               </div>
             `;
           } else {
-            // 普通用户看到的快速访问
             quickAccessGrid.innerHTML = `
               <div class="action-card" onclick="location.href='customer_view.html'">
                 <div class="action-icon">🔍</div>
@@ -1155,12 +1179,6 @@
           }
         }
         
-        // 更新页面上的其他admin相关元素
-        if (isAdmin) {
-          showAdminElements();
-        }
-        
-        // 显示欢迎消息
         const welcomeMessage = document.getElementById('welcomeMessage');
         if (welcomeMessage) {
           const roleText = isAdmin ? ' (Administrator)' : '';
@@ -1169,67 +1187,18 @@
             <p>Ready to continue your reading journey? ${isAdmin ? 'Access the admin panel to manage the store.' : 'Explore our latest book collections!'}</p>
           `;
           welcomeMessage.classList.remove('hidden');
-          
-          setTimeout(() => {
-            welcomeMessage.classList.add('hidden');
-          }, 5000);
+          setTimeout(() => welcomeMessage.classList.add('hidden'), 5000);
         }
       } else {
-        // 用户未登录，显示登录按钮
-        userInfo.innerHTML = `
-          <a href="../Login/Login.html">
-            <button class="btn-login">🔐 Login</button>
-          </a>
-        `;
-        
-        // 隐藏Quick Access区域
-        if (quickAccessSection) {
-          quickAccessSection.classList.add('hidden');
-        }
-        
+        userInfo.innerHTML = `<a href="../Login/Login.html"><button class="btn-login">🔐 Login</button></a>`;
+        if (quickAccessSection) quickAccessSection.classList.add('hidden');
         const welcomeMessage = document.getElementById('welcomeMessage');
-        if (welcomeMessage) {
-          welcomeMessage.classList.add('hidden');
-        }
-        
-        // 隐藏所有admin相关元素
-        hideAdminElements();
+        if (welcomeMessage) welcomeMessage.classList.add('hidden');
       }
     }
 
-    // 显示admin元素
-    function showAdminElements() {
-      const adminElements = [
-        document.getElementById('adminPanelBtn'),
-        document.getElementById('profileBtn'),
-        document.getElementById('adminFooterLink')
-      ];
-      
-      adminElements.forEach(element => {
-        if (element) {
-          element.classList.remove('hidden');
-        }
-      });
-    }
-
-    // 隐藏admin元素
-    function hideAdminElements() {
-      const adminElements = [
-        document.getElementById('adminPanelBtn'),
-        document.getElementById('profileBtn'),
-        document.getElementById('adminFooterLink')
-      ];
-      
-      adminElements.forEach(element => {
-        if (element) {
-          element.classList.add('hidden');
-        }
-      });
-    }
-
-    // 回退方案：如果check_login.php不存在，使用URL参数
+    // 回退方案
     function fallbackToURLParams() {
-      console.log('Falling back to URL params for login status');
       const urlParams = new URLSearchParams(window.location.search);
       const loginSuccess = urlParams.get('login_success');
       const username = urlParams.get('username');
@@ -1246,35 +1215,7 @@
       }
     }
 
-    // 检查URL参数显示欢迎消息
-    function checkURLParams() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const loginSuccess = urlParams.get('login_success');
-      const username = urlParams.get('username');
-      const role = urlParams.get('role');
-      
-      if (loginSuccess === '1' && username) {
-        const welcomeMsg = document.getElementById('welcomeMessage');
-        if (welcomeMsg) {
-          const roleText = role === 'admin' ? ' (Administrator)' : '';
-          welcomeMsg.innerHTML = `
-            <h3>Welcome back, ${decodeURIComponent(username)}${roleText}! 🎉</h3>
-            <p>Login successful! ${role === 'admin' ? 'Access the admin panel to manage the store.' : 'Start exploring our book collection!'}</p>
-          `;
-          welcomeMsg.classList.remove('hidden');
-          
-          setTimeout(() => {
-            welcomeMsg.classList.add('hidden');
-          }, 5000);
-        }
-        
-        // 清除URL参数但不刷新页面
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, newUrl);
-      }
-    }
-
-    // 随机打乱数组函数
+    // 随机打乱数组
     function shuffleArray(array) {
       const newArray = [...array];
       for (let i = newArray.length - 1; i > 0; i--) {
@@ -1284,121 +1225,109 @@
       return newArray;
     }
 
-    // 生成书籍封面缩写
-    function getBookCoverAbbreviation(title) {
-      if (!title) return 'BK';
-      
-      const words = title.split(' ').filter(word => word.length > 0);
-      if (words.length >= 2) {
-        return (words[0][0] + words[1][0]).toUpperCase();
-      } else if (words.length === 1 && words[0].length >= 2) {
-        return words[0].substring(0, 2).toUpperCase();
-      } else {
-        return 'BK';
-      }
-    }
-
-    // 加载随机畅销书籍
+    // 加载随机畅销书籍 - 更新版，显示封面
     function loadRandomBestsellers() {
-      console.log('Loading random bestsellers...');
+      console.log('Loading random bestsellers with covers...');
       
       fetch(API_ENDPOINTS.books, {
-        headers: {
-          'Cache-Control': 'no-cache'
-        }
+        headers: { 'Cache-Control': 'no-cache' }
       })
         .then(response => {
-          console.log('Books API response status:', response.status);
-          if (!response.ok) {
-            throw new Error('Failed to fetch books: ' + response.status);
-          }
+          if (!response.ok) throw new Error('Failed to fetch books');
           return response.json();
         })
         .then(data => {
           const booksGrid = document.getElementById('booksGrid');
-          if (!booksGrid) {
-            console.warn('Books grid element not found');
-            return;
-          }
+          if (!booksGrid) return;
           
           if (data.success && data.books && data.books.length > 0) {
-            console.log('Loaded', data.books.length, 'books from API');
-            // 随机打乱书籍数组并取前8本
+            console.log('Loaded books with covers:', data.books.length);
+            
+            // 随机打乱并取前8本
             const shuffledBooks = shuffleArray(data.books);
             const randomBestsellers = shuffledBooks.slice(0, 8);
             
-            booksGrid.innerHTML = randomBestsellers.map(book => `
-              <div class="book-card" onclick="location.href='book_details.html?id=${book.id}'">
-                <div class="book-cover">${getBookCoverAbbreviation(book.title)}</div>
-                <h4 class="book-title">${book.title || 'Unknown Title'}</h4>
-                <p class="book-author">${book.author || 'Unknown Author'}</p>
-                <div class="book-price">RM ${parseFloat(book.price || 0).toFixed(2)}</div>
-              </div>
-            `).join('');
+            // 创建书籍卡片，包含封面图片
+            booksGrid.innerHTML = randomBestsellers.map(book => {
+              const bookId = book.book_id;
+              const title = book.title || 'Unknown Title';
+              const author = book.author || 'Unknown Author';
+              const price = book.price || 0;
+              const coverImage = book.cover_image;
+              const fallbackText = getBookCoverAbbreviation(title);
+              
+              return `
+                <div class="book-card" onclick="viewBookDetail(${bookId})" title="Click to view '${title}' details">
+                  <div class="book-cover">
+                    ${coverImage ? 
+                      `<img src="${coverImage}" alt="${title}" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'cover-fallback\\'>${fallbackText}</div>';" />` :
+                      `<div class="cover-fallback">${fallbackText}</div>`
+                    }
+                  </div>
+                  <h4 class="book-title">${title}</h4>
+                  <p class="book-author">${author}</p>
+                  <div class="book-price">RM ${parseFloat(price).toFixed(2)}</div>
+                </div>
+              `;
+            }).join('');
             
-            console.log('Loaded 8 random books:', randomBestsellers);
           } else {
             console.warn('No books data from API, showing defaults');
-            // 如果没有从数据库获取到数据，显示默认书籍
             showDefaultBooks();
           }
         })
         .catch(error => {
-          console.error('Error loading random books:', error);
-          // 如果API调用失败，显示默认书籍
+          console.error('Error loading books:', error);
           showDefaultBooks();
         });
     }
 
-    // 显示默认书籍（备用方案）
+    // 显示默认书籍
     function showDefaultBooks() {
       const booksGrid = document.getElementById('booksGrid');
       if (!booksGrid) return;
       
       const defaultBooks = [
-        { title: 'Atomic Habits', author: 'James Clear', price: 18.99 },
-        { title: 'Dune', author: 'Frank Herbert', price: 16.99 },
-        { title: 'The Hobbit', author: 'J.R.R. Tolkien', price: 14.99 },
-        { title: 'Harry Potter and the Philosopher\'s Stone', author: 'J.K. Rowling', price: 12.99 },
-        { title: 'The Midnight Library', author: 'Matt Haig', price: 15.99 },
-        { title: 'Project Hail Mary', author: 'Andy Weir', price: 17.99 },
-        { title: 'The Silent Patient', author: 'Alex Michaelides', price: 13.99 },
-        { title: 'Where the Crawdads Sing', author: 'Delia Owens', price: 16.49 }
+        { book_id: 1, title: 'Atomic Habits', author: 'James Clear', price: 18.99 },
+        { book_id: 2, title: 'Dune', author: 'Frank Herbert', price: 16.99 },
+        { book_id: 3, title: 'The Hobbit', author: 'J.R.R. Tolkien', price: 14.99 },
+        { book_id: 4, title: 'Harry Potter and the Philosopher\'s Stone', author: 'J.K. Rowling', price: 12.99 },
+        { book_id: 5, title: 'The Midnight Library', author: 'Matt Haig', price: 15.99 },
+        { book_id: 6, title: 'Project Hail Mary', author: 'Andy Weir', price: 17.99 },
+        { book_id: 7, title: 'The Silent Patient', author: 'Alex Michaelides', price: 13.99 },
+        { book_id: 8, title: 'Where the Crawdads Sing', author: 'Delia Owens', price: 16.49 }
       ];
       
-      booksGrid.innerHTML = defaultBooks.map(book => `
-        <div class="book-card">
-          <div class="book-cover">${getBookCoverAbbreviation(book.title)}</div>
-          <h4 class="book-title">${book.title}</h4>
-          <p class="book-author">${book.author}</p>
-          <div class="book-price">RM ${book.price.toFixed(2)}</div>
-        </div>
-      `).join('');
-      
-      console.log('Showing 8 default books');
+      booksGrid.innerHTML = defaultBooks.map(book => {
+        const fallbackText = getBookCoverAbbreviation(book.title);
+        return `
+          <div class="book-card" onclick="viewBookDetail(${book.book_id})" title="Click to view '${book.title}' details">
+            <div class="book-cover">
+              <div class="cover-fallback">${fallbackText}</div>
+            </div>
+            <h4 class="book-title">${book.title}</h4>
+            <p class="book-author">${book.author}</p>
+            <div class="book-price">RM ${book.price.toFixed(2)}</div>
+          </div>
+        `;
+      }).join('');
     }
 
     // 页面加载时执行
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Virtual BookStore - Main Page Loaded');
-      
-      // 设置一个延迟，确保DOM完全加载
       setTimeout(() => {
         checkLoginStatus();
-        checkURLParams();
         loadRandomBestsellers();
       }, 100);
     });
 
-    // 导出函数供全局使用
+    // 导出到全局作用域
     window.checkLoginStatus = checkLoginStatus;
     window.updateUserInterface = updateUserInterface;
     window.loadRandomBestsellers = loadRandomBestsellers;
     window.showDefaultBooks = showDefaultBooks;
-    window.getBookCoverAbbreviation = getBookCoverAbbreviation;
-    window.shuffleArray = shuffleArray;
-    window.showAdminElements = showAdminElements;
-    window.hideAdminElements = hideAdminElements;
+    window.viewBookDetail = viewBookDetail;
   </script>
 </body>
 </html>

@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Details - Virtual BookStore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6d28d9;
+            --primary-dark: #5b21b6;
+            --secondary: #f1f5f9;
+            --accent: #10b981;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #e74c3c;
+            --pre-order: #3b82f6;
+            --pre-order-dark: #1d4ed8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 8px 0;
+            position: relative;
+        }
+
+        .nav a:hover {
+            color: var(--primary);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .user-welcome {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .username {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 1.2rem;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .cart-icon:hover {
+            background-color: var(--secondary);
+            color: var(--primary);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background-color: var(--secondary);
+            color: var(--text);
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background-color: var(--secondary);
+            color: var(--text);
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Book Detail */
+        .book-detail-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+        }
+
+        .book-detail-header {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .book-image {
+            flex: 0 0 300px;
+            height: 400px;
+            background: linear-gradient(135deg, var(--secondary), #e2e8f0);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .book-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .book-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .book-image i {
+            font-size: 4rem;
+            color: var(--text-light);
+            opacity: 0.5;
+        }
+
+        .book-status {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .status-in-stock {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-out-of-stock {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .status-pre-order {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: var(--pre-order);
+        }
+
+        .status-low-stock {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .book-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .book-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .book-author {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .book-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stars {
+            color: #f59e0b;
+            font-size: 1.2rem;
+        }
+
+        .rating-text {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .book-price-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .current-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .original-price {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            text-decoration: line-through;
+        }
+
+        .discount-badge {
+            background-color: var(--accent);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .pre-order-info {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--pre-order);
+        }
+
+        .pre-order-info h3 {
+            color: var(--pre-order);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .expected-date {
+            font-size: 1.1rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .book-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--secondary);
+            border-radius: 8px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .book-description {
+            margin-bottom: 30px;
+        }
+
+        .description-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .description-content {
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .description-content p {
+            margin-bottom: 15px;
+        }
+
+        .book-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .add-to-cart-btn {
+            background-color: var(--secondary);
+            color: var(--text);
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        .buy-now-btn {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .buy-now-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .pre-order-btn {
+            background-color: var(--pre-order);
+            color: white;
+        }
+
+        .pre-order-btn:hover {
+            background-color: var(--pre-order-dark);
+        }
+
+        .out-of-stock-btn {
+            background-color: var(--danger);
+            color: white;
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Additional Info */
+        .additional-info {
+            margin-top: 40px;
+        }
+
+        .additional-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .specs-table tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .specs-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .specs-table td {
+            padding: 15px 20px;
+        }
+
+        .specs-label {
+            width: 30%;
+            font-weight: 600;
+            color: var(--text);
+            background-color: var(--secondary);
+        }
+
+        .specs-value {
+            color: var(--text-light);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background-color: var(--success);
+        }
+
+        .toast.error {
+            background-color: var(--danger);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-light);
+        }
+
+        .loading i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 60px;
+            color: var(--danger);
+        }
+
+        .error-message i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .book-detail-header {
+                flex-direction: column;
+            }
+
+            .book-image {
+                width: 100%;
+                height: 350px;
+            }
+
+            .book-title {
+                font-size: 1.8rem;
+            }
+
+            .book-actions {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .book-meta-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .specs-table td {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .specs-label {
+                width: 100%;
+                padding-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-book"></i>
+                <h1>Virtual BookStore</h1>
+            </div>
+            <div class="nav">
+                <a href="Main.html">Home</a>
+                <a href="customer_view.html">Books</a>
+                <a href="../System/cart/cart.html">Cart</a>
+                <a href="user_profile.html">Profile</a>
+            </div>
+            <div class="user-actions">
+                <div class="user-welcome">
+                    Welcome, <span class="username" id="username">Guest</span>
+                </div>
+                <div class="cart-icon" onclick="viewCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </div>
+                <a href="../Login/Login.html" class="logout-btn">Logout</a>
+            </div>
+        </header>
+
+        <!-- Back Button -->
+        <a href="customer_view.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Books
+        </a>
+
+        <!-- Book Detail Content -->
+        <div id="bookDetailContent">
+            <div class="loading">
+                <i class="fas fa-spinner"></i>
+                <p>Loading book details...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle" id="toast-icon"></i>
+        <span id="toast-message">Book added to cart!</span>
+    </div>
+
+    <script>
+        // API endpoints
+        const CHECK_LOGIN_API = 'check_login.php';
+        const BOOK_DETAIL_API = 'get_book_detail.php';
+        const ADD_TO_CART_API = 'add_to_cart.php';
+        const ADD_PRE_ORDER_API = 'add_pre_order.php';
+        const GET_CART_API = 'get_cart.php';
+
+        // Get book ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookId = urlParams.get('id') || urlParams.get('book_id');
+        
+        // DOM Elements
+        const bookDetailContent = document.getElementById('bookDetailContent');
+        const cartCount = document.querySelector('.cart-count');
+        const usernameElement = document.getElementById('username');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        const toastIcon = document.getElementById('toast-icon');
+
+        let currentUser = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            
+            if (bookId) {
+                loadBookDetail(bookId);
+            } else {
+                showError('Book ID is missing');
+            }
+        });
+
+        // Check login status
+        async function checkLoginStatus() {
+            try {
+                const response = await fetch(CHECK_LOGIN_API, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.logged_in) {
+                    currentUser = data;
+                    usernameElement.textContent = data.username;
+                } else {
+                    usernameElement.textContent = 'Guest';
+                }
+                
+                updateCartCount();
+            } catch (error) {
+                console.error('Error checking login status:', error);
+            }
+        }
+
+        // Load book detail
+        async function loadBookDetail(bookId) {
+            try {
+                const response = await fetch(`${BOOK_DETAIL_API}?book_id=${bookId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayBookDetail(data.book);
+                } else {
+                    showError('Book not found');
+                }
+            } catch (error) {
+                console.error('Error loading book details:', error);
+                showError('Failed to load book details');
+            }
+        }
+
+        // Display book detail
+        function displayBookDetail(book) {
+            const isPreOrder = book.pre_order_available == 1;
+            const isOutOfStock = book.stock_quantity <= 0;
+            const isLowStock = !isOutOfStock && book.stock_quantity < 10;
+            
+            // Determine status and text
+            let statusClass = 'status-in-stock';
+            let statusText = 'In Stock';
+            
+            if (isPreOrder) {
+                statusClass = 'status-pre-order';
+                statusText = 'Pre-Order';
+            } else if (isOutOfStock) {
+                statusClass = 'status-out-of-stock';
+                statusText = 'Out of Stock';
+            } else if (isLowStock) {
+                statusClass = 'status-low-stock';
+                statusText = 'Low Stock';
+            }
+            
+            // Create stars for rating
+            const rating = parseFloat(book.rating) || 0;
+            const stars = createStars(rating);
+            
+            // Format price
+            const price = parseFloat(book.price).toFixed(2);
+            const preOrderPrice = book.pre_order_price ? parseFloat(book.pre_order_price).toFixed(2) : null;
+            
+            // Create action buttons based on availability
+            let actionButtonsHtml = '';
+            
+            if (isOutOfStock) {
+                actionButtonsHtml = `
+                    <button class="action-btn out-of-stock-btn" disabled>
+                        <i class="fas fa-times-circle"></i> Out of Stock
+                    </button>
+                    <button class="action-btn pre-order-btn" onclick="addPreOrder(${book.book_id}, '${escapeHtml(book.title)}')">
+                        <i class="fas fa-clock"></i> Pre-Order Now
+                    </button>
+                `;
+            } else if (isPreOrder) {
+                actionButtonsHtml = `
+                    <button class="action-btn pre-order-btn" onclick="addPreOrder(${book.book_id}, '${escapeHtml(book.title)}')">
+                        <i class="fas fa-clock"></i> Pre-Order Now
+                    </button>
+                `;
+            } else {
+                actionButtonsHtml = `
+                    <button class="action-btn add-to-cart-btn" onclick="addToCart(${book.book_id}, '${escapeHtml(book.title)}')">
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
+                    <button class="action-btn buy-now-btn" onclick="buyNow(${book.book_id}, '${escapeHtml(book.title)}')">
+                        <i class="fas fa-bolt"></i> Buy Now
+                    </button>
+                `;
+            }
+            
+            // Format description with paragraphs
+            const formattedDescription = book.description ? 
+                book.description.split('\n').map(p => `<p>${escapeHtml(p)}</p>`).join('') : 
+                '<p>No description available.</p>';
+            
+            // Pre-order info
+            let preOrderInfoHtml = '';
+            if (isPreOrder && book.expected_date) {
+                const expectedDate = new Date(book.expected_date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                preOrderInfoHtml = `
+                    <div class="pre-order-info">
+                        <h3><i class="fas fa-clock"></i> Pre-Order Available</h3>
+                        <p class="expected-date">Expected Release: ${expectedDate}</p>
+                        ${book.pre_order_deadline ? 
+                            `<p class="expected-date">Pre-order deadline: ${new Date(book.pre_order_deadline).toLocaleDateString()}</p>` : ''}
+                        ${book.pre_order_discount && book.pre_order_discount > 0 ? 
+                            `<p class="expected-date">Pre-order discount: ${book.pre_order_discount}% off</p>` : ''}
+                    </div>
+                `;
+            }
+            
+            // Price section
+            let priceSectionHtml = '';
+            if (isPreOrder && preOrderPrice) {
+                priceSectionHtml = `
+                    <div class="book-price-section">
+                        <span class="original-price">RM ${price}</span>
+                        <span class="current-price">RM ${preOrderPrice}</span>
+                        ${book.pre_order_discount && book.pre_order_discount > 0 ? 
+                            `<span class="discount-badge">${book.pre_order_discount}% OFF</span>` : ''}
+                    </div>
+                `;
+            } else {
+                priceSectionHtml = `
+                    <div class="book-price-section">
+                        <span class="current-price">RM ${price}</span>
+                    </div>
+                `;
+            }
+            
+            // Build the HTML
+            bookDetailContent.innerHTML = `
+                <div class="book-detail-container">
+                    <div class="book-detail-header">
+                        <div class="book-image">
+                            ${book.cover_image && book.cover_image !== '' ? 
+                                `<img src="${book.cover_image}" 
+                                       alt="${escapeHtml(book.title)}"
+                                       onerror="this.src='https://placehold.co/300x400/cccccc/333333/png?text=${encodeURIComponent(book.title.substring(0, 20))}'">` : 
+                                `<i class="fas fa-book-open"></i>`
+                            }
+                            <div class="book-status ${statusClass}">${statusText}</div>
+                        </div>
+                        <div class="book-info">
+                            <h1 class="book-title">${escapeHtml(book.title)}</h1>
+                            <p class="book-author">by ${escapeHtml(book.author || 'Unknown Author')}</p>
+                            
+                            <div class="book-rating">
+                                <div class="stars">
+                                    ${stars}
+                                </div>
+                                <span class="rating-text">${rating.toFixed(1)}/5.0 (${book.total_sales || 0} sold)</span>
+                            </div>
+                            
+                            ${priceSectionHtml}
+                            
+                            ${preOrderInfoHtml}
+                            
+                            <div class="book-meta-grid">
+                                <div class="meta-item">
+                                    <span class="meta-label">Category</span>
+                                    <span class="meta-value">${escapeHtml(book.category_name || 'Uncategorized')}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">ISBN</span>
+                                    <span class="meta-value">${book.isbn || 'N/A'}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Publisher</span>
+                                    <span class="meta-value">${escapeHtml(book.publisher || 'Unknown')}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Published Date</span>
+                                    <span class="meta-value">${book.publish_date ? new Date(book.publish_date).toLocaleDateString() : 'Unknown'}</span>
+                                </div>
+                                ${!isOutOfStock ? `
+                                <div class="meta-item">
+                                    <span class="meta-label">Stock Available</span>
+                                    <span class="meta-value">${book.stock_quantity} units</span>
+                                </div>` : ''}
+                            </div>
+                            
+                            <div class="book-actions">
+                                ${actionButtonsHtml}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="book-description">
+                        <h2 class="description-title">Description</h2>
+                        <div class="description-content">
+                            ${formattedDescription}
+                        </div>
+                    </div>
+                    
+                    <div class="additional-info">
+                        <h2 class="additional-title">Additional Information</h2>
+                        <table class="specs-table">
+                            <tr>
+                                <td class="specs-label">ISBN</td>
+                                <td class="specs-value">${book.isbn || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td class="specs-label">Publisher</td>
+                                <td class="specs-value">${escapeHtml(book.publisher || 'Unknown')}</td>
+                            </tr>
+                            <tr>
+                                <td class="specs-label">Publication Date</td>
+                                <td class="specs-value">${book.publish_date ? new Date(book.publish_date).toLocaleDateString() : 'Unknown'}</td>
+                            </tr>
+                            <tr>
+                                <td class="specs-label">Language</td>
+                                <td class="specs-value">English</td>
+                            </tr>
+                            <tr>
+                                <td class="specs-label">Dimensions</td>
+                                <td class="specs-value">Standard Paperback</td>
+                            </tr>
+                            <tr>
+                                <td class="specs-label">Weight</td>
+                                <td class="specs-value">Approx. 500g</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create star rating
+        function createStars(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            
+            let starsHtml = '';
+            
+            // Full stars
+            for (let i = 0; i < fullStars; i++) {
+                starsHtml += '<i class="fas fa-star"></i>';
+            }
+            
+            // Half star
+            if (hasHalfStar) {
+                starsHtml += '<i class="fas fa-star-half-alt"></i>';
+            }
+            
+            // Empty stars
+            for (let i = 0; i < emptyStars; i++) {
+                starsHtml += '<i class="far fa-star"></i>';
+            }
+            
+            return starsHtml;
+        }
+
+        // Show error message
+        function showError(message) {
+            bookDetailContent.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h2>${escapeHtml(message)}</h2>
+                    <p>Please try again or go back to the <a href="customer_view.html">books page</a>.</p>
+                </div>
+            `;
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Add to cart for regular items
+        async function addToCart(bookId, bookTitle) {
+            if (!currentUser || !currentUser.logged_in) {
+                showToast('Please login to add items to cart', 'error');
+                setTimeout(() => {
+                    window.location.href = '../Login/Login.html?redirect=book_detail&id=' + bookId;
+                }, 2000);
+                return;
+            }
+            
+            try {
+                const response = await fetch(ADD_TO_CART_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        book_id: bookId,
+                        quantity: 1
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(`"${bookTitle}" added to cart!`, 'success');
+                    updateCartCount();
+                } else {
+                    showToast(data.error || 'Failed to add to cart', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showToast('Error adding to cart. Please try again.', 'error');
+            }
+        }
+
+        // Add pre-order
+        async function addPreOrder(bookId, bookTitle) {
+            if (!currentUser || !currentUser.logged_in) {
+                showToast('Please login to pre-order items', 'error');
+                setTimeout(() => {
+                    window.location.href = '../Login/Login.html?redirect=book_detail&id=' + bookId;
+                }, 2000);
+                return;
+            }
+            
+            try {
+                const response = await fetch(ADD_PRE_ORDER_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        book_id: bookId,
+                        quantity: 1
+                    })
+                });
+
+                const rawText = await response.text();
+                console.log('Pre-order response:', rawText);
+                
+                try {
+                    const data = JSON.parse(rawText);
+                    
+                    if (data.success) {
+                        let message = `"${bookTitle}" pre-ordered successfully!`;
+                        if (data.expected_date) {
+                            const expectedDate = new Date(data.expected_date);
+                            const formattedDate = expectedDate.toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+                            message += ` Expected: ${formattedDate}`;
+                        }
+                        showToast(message, 'success');
+                    } else {
+                        showToast(data.error || 'Failed to add pre-order', 'error');
+                    }
+                } catch (jsonError) {
+                    console.error('Invalid JSON response:', rawText.substring(0, 200));
+                    showToast('Server error - invalid response', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding pre-order:', error);
+                showToast('Error adding pre-order. Please try again.', 'error');
+            }
+        }
+
+        // Buy now
+        async function buyNow(bookId, bookTitle) {
+            await addToCart(bookId, bookTitle);
+            setTimeout(() => {
+                window.location.href = '../System/cart/cart.html';
+            }, 1500);
+        }
+
+        // Update cart count
+        async function updateCartCount() {
+            if (!currentUser || !currentUser.logged_in) {
+                cartCount.textContent = '0';
+                return;
+            }
+            
+            try {
+                const response = await fetch(GET_CART_API, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        cartCount.textContent = data.total_items;
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating cart count:', error);
+            }
+        }
+
+        // View cart
+        function viewCart() {
+            if (!currentUser || !currentUser.logged_in) {
+                showToast('Please login to view cart', 'error');
+                setTimeout(() => {
+                    window.location.href = '../Login/Login.html?redirect=cart';
+                }, 2000);
+                return;
+            }
+            
+            window.location.href = '../System/cart/cart.html';
+        }
+
+        // Show toast
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

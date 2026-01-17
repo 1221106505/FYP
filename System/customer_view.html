@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookStore - Browse Books</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
             --primary: #6d28d9;
@@ -289,8 +289,9 @@
             z-index: 2;
         }
 
+        /* 修改图片容器样式 */
         .book-image {
-            height: 200px;
+            height: 240px; /* 从200px调整为240px，更合适的高度 */
             background: linear-gradient(135deg, var(--secondary), #e2e8f0);
             display: flex;
             align-items: center;
@@ -298,17 +299,29 @@
             color: var(--text-light);
             position: relative;
             overflow: hidden;
+            border-bottom: 1px solid var(--border);
         }
 
+        /* 图片样式 */
         .book-image img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain; /* 从cover改为contain，保持完整图片比例 */
+            padding: 15px; /* 添加内边距，让图片不会紧贴边缘 */
+            transition: transform 0.5s ease;
         }
 
+        /* 悬停效果 */
+        .book-card:hover .book-image img {
+            transform: scale(1.08);
+        }
+
+        /* 占位符图标 */
         .book-placeholder {
-            font-size: 3rem;
+            font-size: 3.5rem; /* 稍微增大图标 */
             opacity: 0.5;
+            position: absolute;
+            z-index: 1;
         }
 
         .stock-badge {
@@ -320,30 +333,38 @@
             font-size: 0.8rem;
             font-weight: 600;
             z-index: 2;
+            backdrop-filter: blur(4px);
         }
 
         .stock-badge.in-stock {
-            background-color: rgba(16, 185, 129, 0.2);
+            background-color: rgba(16, 185, 129, 0.25);
             color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .stock-badge.low-stock {
-            background-color: rgba(245, 158, 11, 0.2);
+            background-color: rgba(245, 158, 11, 0.25);
             color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
         .stock-badge.out-of-stock {
-            background-color: rgba(239, 68, 68, 0.2);
+            background-color: rgba(239, 68, 68, 0.25);
             color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .stock-badge.pre-order {
-            background-color: rgba(59, 130, 246, 0.2);
+            background-color: rgba(59, 130, 246, 0.25);
             color: var(--pre-order);
+            border: 1px solid rgba(59, 130, 246, 0.3);
         }
 
         .book-info {
             padding: 20px;
+            height: calc(100% - 240px); /* 根据图片高度调整信息区域高度 */
+            display: flex;
+            flex-direction: column;
         }
 
         .book-title {
@@ -355,6 +376,12 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
             color: var(--text);
+            cursor: pointer;
+            min-height: 2.8em; /* 保持标题区域高度一致 */
+        }
+
+        .book-title:hover {
+            color: var(--primary);
         }
 
         .book-author {
@@ -371,6 +398,7 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            flex-grow: 1; /* 描述区域占据剩余空间 */
         }
 
         .book-meta {
@@ -409,6 +437,7 @@
         .book-actions {
             display: flex;
             gap: 10px;
+            margin-top: auto; /* 将按钮推到底部 */
         }
 
         .book-actions button {
@@ -559,6 +588,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .book-detail-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .book-detail-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 15px;
+            transition: transform 0.3s;
         }
 
         .book-detail-info {
@@ -571,6 +614,11 @@
             font-weight: 700;
             margin-bottom: 10px;
             color: var(--text);
+            cursor: pointer;
+        }
+
+        .book-detail-title:hover {
+            color: var(--primary);
         }
 
         .book-detail-author {
@@ -633,6 +681,25 @@
             font-size: 1rem;
         }
 
+        .view-detail-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .view-detail-btn:hover {
+            background-color: #0da271;
+        }
+
         .toast {
             position: fixed;
             bottom: 20px;
@@ -662,6 +729,13 @@
 
         .toast.error {
             background-color: var(--danger);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1024px) {
+            .books-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
         }
 
         @media (max-width: 768px) {
@@ -694,6 +768,14 @@
             .book-detail {
                 flex-direction: column;
             }
+
+            .book-image {
+                height: 220px; /* 中等屏幕下调整高度 */
+            }
+            
+            .book-info {
+                height: calc(100% - 220px);
+            }
         }
 
         @media (max-width: 480px) {
@@ -703,6 +785,18 @@
             
             .book-actions {
                 flex-direction: column;
+            }
+            
+            .book-image {
+                height: 200px; /* 小屏幕下调整高度 */
+            }
+            
+            .book-info {
+                height: calc(100% - 200px);
+            }
+            
+            .book-title {
+                min-height: auto;
             }
         }
     </style>
@@ -790,7 +884,9 @@
                 <h3>Book Details</h3>
                 <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
-            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be inserted here -->
+            </div>
         </div>
     </div>
 
@@ -901,6 +997,14 @@
                 
                 if (data.success) {
                     allBooks = data.books;
+                    // 确保每本书都有封面
+                    allBooks.forEach(book => {
+                        if (!book.cover_image || book.cover_image === '') {
+                            // 如果没有封面，使用默认占位图
+                            book.cover_image = 'https://placehold.co/300x400/4a7b9d/ffffff/png?text=' + 
+                                encodeURIComponent(book.title.substring(0, 20));
+                        }
+                    });
                     filteredBooks = [...allBooks];
                     displayBooks(filteredBooks);
                 }
@@ -963,9 +1067,7 @@
             // Price
             const price = parseFloat(book.price).toFixed(2);
             
-            // ================================================
-            // 修改这里：缺货书籍显示 Out of Stock + Pre-Order 按钮
-            // ================================================
+            // 按钮HTML
             let button1Html = '';
             let button2Html = '';
             
@@ -1006,13 +1108,20 @@
                 expectedDateHtml = `<div class="expected-date">Expected: ${expectedDate}</div>`;
             }
             
-            card.innerHTML += `
-                <div class="book-image" onclick="viewBookDetail(${book.book_id})">
-                    <i class="fas fa-book-open book-placeholder"></i>
+            // 封面图片HTML
+            const coverImageHtml = book.cover_image && book.cover_image !== '' 
+                ? `<img src="${book.cover_image}" 
+                       alt="${escapeHtml(book.title)}"
+                       onerror="this.src='https://placehold.co/300x400/cccccc/333333/png?text=${encodeURIComponent(book.title.substring(0, 20))}'">`
+                : `<i class="fas fa-book-open book-placeholder"></i>`;
+            
+            card.innerHTML = `
+                <div class="book-image" onclick="viewBookDetailPage(${book.book_id})">
+                    ${coverImageHtml}
                     <div class="stock-badge ${stockStatus}">${stockText}</div>
                 </div>
                 <div class="book-info">
-                    <h3 class="book-title" onclick="viewBookDetail(${book.book_id})">${escapeHtml(book.title)}</h3>
+                    <h3 class="book-title" onclick="viewBookDetailPage(${book.book_id})">${escapeHtml(book.title)}</h3>
                     <p class="book-author">by ${escapeHtml(book.author || 'Unknown Author')}</p>
                     <p class="book-description">${escapeHtml(book.description || 'No description available.')}</p>
                     ${expectedDateHtml}
@@ -1108,7 +1217,12 @@
             displayBooks(filteredBooks);
         }
 
-        // View book details
+        // View book details page (NEW FUNCTION)
+        function viewBookDetailPage(bookId) {
+            window.location.href = `book_detail.html?id=${bookId}`;
+        }
+
+        // View book details in modal (existing function)
         async function viewBookDetail(bookId) {
             try {
                 const response = await fetch(`${BOOK_DETAIL_API}?book_id=${bookId}`);
@@ -1152,9 +1266,14 @@
             // Price
             const price = parseFloat(book.price).toFixed(2);
             
-            // ================================================
-            // 修改这里：详情弹窗也显示相同的按钮
-            // ================================================
+            // 封面图片HTML - 模态框中也修复
+            const coverImageHtml = book.cover_image && book.cover_image !== '' 
+                ? `<img src="${book.cover_image}" 
+                       alt="${escapeHtml(book.title)}"
+                       onerror="this.src='https://placehold.co/300x400/cccccc/333333/png?text=${encodeURIComponent(book.title.substring(0, 20))}'">`
+                : `<i class="fas fa-book-open" style="font-size: 4rem; color: var(--text-light);"></i>`;
+            
+            // Action buttons
             let actionButtonsHtml = '';
             if (isOutOfStock) {
                 // 缺货书籍：显示 Out of Stock + Pre-Order 按钮
@@ -1180,11 +1299,11 @@
             
             modalBody.innerHTML = `
                 <div class="book-detail">
-                    <div class="book-detail-image">
-                        <i class="fas fa-book-open" style="font-size: 4rem; color: var(--text-light);"></i>
+                    <div class="book-detail-image" onclick="viewBookDetailPage(${book.book_id}); closeModal();">
+                        ${coverImageHtml}
                     </div>
                     <div class="book-detail-info">
-                        <h2 class="book-detail-title">${escapeHtml(book.title)}</h2>
+                        <h2 class="book-detail-title" onclick="viewBookDetailPage(${book.book_id}); closeModal();">${escapeHtml(book.title)}</h2>
                         <p class="book-detail-author">by ${escapeHtml(book.author || 'Unknown Author')}</p>
                         ${isPreOrder ? `
                         <div class="pre-order-detail">
@@ -1229,6 +1348,9 @@
                                 <span class="detail-meta-value">${book.isbn}</span>
                             </div>` : ''}
                         </div>
+                        <button class="view-detail-btn" onclick="viewBookDetailPage(${book.book_id}); closeModal();">
+                            <i class="fas fa-external-link-alt"></i> View Full Details
+                        </button>
                         <div class="modal-actions">
                             ${actionButtonsHtml}
                         </div>
