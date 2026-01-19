@@ -762,12 +762,10 @@
             </div>
             <ul class="nav-links">
                 <li><a href="#" class="nav-link active" data-section="dashboard"><i>📊</i> Dashboard</a></li>
-                <li><a href="#" class="nav-link" data-section="books"><i>📚</i> Book Management</a></li>
-                <li><a href="#" class="nav-link" data-section="inventory"><i>📦</i> Inventory</a></li>
+                <li><a href="#" class="nav-link" data-section="book-inventory"><i>📚</i> Book & Inventory Management</a></li>
                 <li><a href="#" class="nav-link" data-section="orders"><i>📦</i> Order Management</a></li>
                 <li><a href="#" class="nav-link" data-section="categories"><i>🏷️</i> Categories</a></li>
                 <li><a href="#" class="nav-link" data-section="analytics"><i>📈</i> Sales Report</a></li>
-                
             </ul>
         </nav>
 
@@ -823,14 +821,11 @@
                     <h3>🚀 Quick Actions</h3>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <button class="btn btn-primary" onclick="loadSectionData('books')">
-                        <i>📚</i> Manage Books
+                    <button class="btn btn-primary" onclick="loadSectionData('book-inventory')">
+                        <i>📚</i> Manage Books & Inventory
                     </button>
                     <button class="btn btn-success" onclick="openAddBookModal()">
                         <i>➕</i> Add New Book
-                    </button>
-                    <button class="btn btn-warning" onclick="loadSectionData('inventory')">
-                        <i>📦</i> View Inventory
                     </button>
                     <button class="btn btn-info" onclick="loadSectionData('orders')">
                         <i>📦</i> View Orders
@@ -841,62 +836,17 @@
                 </div>
             </section>
 
-            <!-- Book Management Section -->
-            <section id="books" class="content-section">
+            <!-- Combined Book & Inventory Management Section -->
+            <section id="book-inventory" class="content-section">
                 <div class="section-header">
-                    <h2>📚 Book Management</h2>
+                    <h2>📚 Book & Inventory Management</h2>
                     <button class="btn btn-primary" onclick="openAddBookModal()">
                         <i>➕</i> Add New Book
                     </button>
                 </div>
 
-                <div class="search-box">
-                    <input type="text" id="bookSearch" class="search-input" placeholder="🔍 Search books by title, author, or ISBN..." onkeyup="searchBooks()">
-                    <select id="categoryFilter" class="form-control" style="width: 200px;" onchange="filterBooks()">
-                        <option value="all">All Categories</option>
-                    </select>
-                </div>
-
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Title</th>
-                                <th>Author</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Stock</th>
-                                <th>ISBN</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="booksTable">
-                            <tr><td colspan="9" class="loading">Loading books data...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Inventory Section -->
-            <section id="inventory" class="content-section">
-                <div class="section-header">
-                    <h2>📦 Inventory Management</h2>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-success" onclick="loadAllStockItems()">
-                            <i>📦</i> All Stock
-                        </button>
-                        <button class="btn btn-warning" onclick="loadLowStockItems()">
-                            <i>⚠️</i> Low Stock
-                        </button>
-                        <button class="btn btn-danger" onclick="loadOutOfStockItems()">
-                            <i>❌</i> Out of Stock
-                        </button>
-                    </div>
-                </div>
-
-                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                <!-- Inventory Summary Stats -->
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 25px;">
                     <div class="stat-card" style="border-top-color: var(--success);">
                         <div class="stat-number" id="inStockCount">0</div>
                         <div class="stat-label">In Stock</div>
@@ -909,23 +859,59 @@
                         <div class="stat-number" id="inventoryOutOfStock">0</div>
                         <div class="stat-label">Out of Stock</div>
                     </div>
+                    <div class="stat-card" style="border-top-color: var(--accent);">
+                        <div class="stat-number" id="totalBookCount">0</div>
+                        <div class="stat-label">Total Books</div>
+                    </div>
                 </div>
 
+                <!-- Search and Filter Controls -->
+                <div class="search-box">
+                    <input type="text" id="bookSearch" class="search-input" placeholder="🔍 Search books by title, author, or ISBN..." onkeyup="searchBooks()">
+                    <select id="categoryFilter" class="form-control" style="width: 200px;" onchange="filterBooks()">
+                        <option value="all">All Categories</option>
+                    </select>
+                    <select id="stockFilter" class="form-control" style="width: 200px;" onchange="filterByStock()">
+                        <option value="all">All Stock Status</option>
+                        <option value="in_stock">In Stock</option>
+                        <option value="low_stock">Low Stock</option>
+                        <option value="out_of_stock">Out of Stock</option>
+                    </select>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="btn btn-success" onclick="loadAllBooks()">
+                        <i>📚</i> Show All Books
+                    </button>
+                    <button class="btn btn-warning" onclick="showLowStockBooks()">
+                        <i>⚠️</i> Low Stock Alert
+                    </button>
+                    <button class="btn btn-danger" onclick="showOutOfStockBooks()">
+                        <i>❌</i> Out of Stock
+                    </button>
+                    
+                </div>
+
+                <!-- Books Table -->
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Book ID</th>
+                                <th>ID</th>
                                 <th>Title</th>
-                                <th>Current Stock</th>
+                                <th>Author</th>
+                                <th>Category</th>
                                 <th>Price</th>
+                                <th>Stock</th>
+                                <th>ISBN</th>
                                 <th>Status</th>
                                 <th>Last Updated</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="inventoryTable">
-                            <tr><td colspan="7" class="loading">Loading inventory data...</td></tr>
+                        <tbody id="booksInventoryTable">
+                            <tr><td colspan="10" class="loading">Loading books and inventory data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1361,8 +1347,7 @@
                 
                 const sectionTitles = {
                     'dashboard': 'Dashboard',
-                    'books': 'Book Management',
-                    'inventory': 'Inventory Management',
+                    'book-inventory': 'Book & Inventory Management',
                     'orders': 'Order Management',
                     'categories': 'Category Management',
                     'analytics': 'Sales Report Section',
@@ -1381,11 +1366,8 @@
                     loadDashboardData();
                     loadSalesOverview();
                     break;
-                case 'books':
-                    loadBooksData();
-                    break;
-                case 'inventory':
-                    loadInventoryData();
+                case 'book-inventory':
+                    loadBookInventoryData();
                     break;
                 case 'orders':
                     loadOrdersData();
@@ -1396,9 +1378,7 @@
                 case 'categories':
                     loadCategoriesData();
                     break;
-                case 'settings':
-                    loadSettingsData();
-                    break;
+                
             }
         }
 
@@ -1616,7 +1596,7 @@
 
         // Update analytics summary
         function updateAnalyticsSummary(summary) {
-            const summaryContainer = document.getElementById('Summary Report');
+            const summaryContainer = document.getElementById('analyticsSummary');
             
             if (!summaryContainer) return;
             
@@ -1880,35 +1860,74 @@
             });
         }
 
-        // Load books data
-        async function loadBooksData() {
+        // ============ COMBINED BOOK & INVENTORY FUNCTIONS ============
+
+        // Load combined book and inventory data
+        async function loadBookInventoryData() {
             try {
-                const response = await fetch(API_ENDPOINTS.books);
-                const data = await response.json();
-                
-                if (data.success) {
-                    currentBooks = data.books || data.data || [];
-                    displayBooks(currentBooks);
+                const [booksResponse, categoriesResponse] = await Promise.all([
+                    fetch(API_ENDPOINTS.books),
+                    fetch(API_ENDPOINTS.categories)
+                ]);
+
+                const booksData = await booksResponse.json();
+                const categoriesData = await categoriesResponse.json();
+
+                if (booksData.success) {
+                    currentBooks = booksData.books || booksData.data || [];
+                    updateBookInventoryStats(currentBooks);
+                    displayBookInventory(currentBooks);
+                    
+                    // Update total book count
+                    document.getElementById('totalBookCount').textContent = currentBooks.length;
+                }
+
+                if (categoriesData.success) {
+                    currentCategories = categoriesData.categories || categoriesData.data || [];
                     loadCategoryFilter();
-                } else {
-                    document.getElementById('booksTable').innerHTML = '<tr><td colspan="9" class="error">Error loading books</td></tr>';
                 }
             } catch (error) {
-                console.error('Error loading books:', error);
-                document.getElementById('booksTable').innerHTML = '<tr><td colspan="9" class="error">Error loading books</td></tr>';
+                console.error('Error loading book inventory:', error);
+                document.getElementById('booksInventoryTable').innerHTML = '<tr><td colspan="10" class="error">Error loading data</td></tr>';
             }
         }
 
-        // Display books
-        function displayBooks(books) {
-            const booksTable = document.getElementById('booksTable');
+        // Update book inventory statistics
+        function updateBookInventoryStats(books) {
+            const inStockCount = books.filter(book => {
+                const stock = parseInt(book.stock_quantity);
+                return stock > 10;
+            }).length;
+            
+            const lowStockCount = books.filter(book => {
+                const stock = parseInt(book.stock_quantity);
+                return stock >= 1 && stock <= 10;
+            }).length;
+            
+            const outOfStockCount = books.filter(book => {
+                const stock = parseInt(book.stock_quantity);
+                return stock === 0;
+            }).length;
+            
+            document.getElementById('inStockCount').textContent = inStockCount;
+            document.getElementById('inventoryLowStock').textContent = lowStockCount;
+            document.getElementById('inventoryOutOfStock').textContent = outOfStockCount;
+        }
+
+        // Display book inventory
+        function displayBookInventory(books) {
+            const tableBody = document.getElementById('booksInventoryTable');
             
             if (books.length === 0) {
-                booksTable.innerHTML = '<tr><td colspan="9" class="loading">No books found</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="10" class="loading">No books found</td></tr>';
                 return;
             }
 
-            booksTable.innerHTML = books.map(book => `
+            tableBody.innerHTML = books.map(book => {
+                const stockStatusClass = getStockStatusClass(book.stock_quantity);
+                const stockStatusText = getStockStatusText(book.stock_quantity);
+                
+                return `
                 <tr>
                     <td>${book.book_id}</td>
                     <td><strong>${book.title}</strong></td>
@@ -1920,17 +1939,19 @@
                         ${book.isbn || '<span style="color:#999;font-style:italic">Auto-generated</span>'}
                     </td>
                     <td>
-                        <span class="${getStockStatusClass(book.stock_quantity)}">
-                            ${getStockStatusText(book.stock_quantity)}
+                        <span class="${stockStatusClass}">
+                            ${stockStatusText}
                         </span>
                     </td>
+                    <td>${book.updated_at || 'N/A'}</td>
                     <td class="action-buttons">
                         <button class="btn btn-sm btn-primary" onclick="openEditBookModal(${book.book_id})">✏️ Edit</button>
                         <button class="btn btn-sm btn-warning" onclick="openStockModal(${book.book_id}, '${book.title.replace(/'/g, "\\'")}', ${book.stock_quantity})">📦 Stock</button>
                         <button class="btn btn-sm btn-danger" onclick="deleteBook(${book.book_id})">🗑️ Delete</button>
                     </td>
                 </tr>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Get stock status class
@@ -1987,7 +2008,7 @@
             const searchTerm = document.getElementById('bookSearch').value;
             
             if (searchTerm.length < 2) {
-                displayBooks(currentBooks);
+                displayBookInventory(currentBooks);
                 return;
             }
             
@@ -1997,14 +2018,14 @@
                 
                 if (data.success) {
                     const searchResults = data.books || data.data || [];
-                    displayBooks(searchResults);
+                    displayBookInventory(searchResults);
                 } else {
                     const filteredBooks = currentBooks.filter(book => 
                         book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         (book.isbn && book.isbn.toLowerCase().includes(searchTerm.toLowerCase()))
                     );
-                    displayBooks(filteredBooks);
+                    displayBookInventory(filteredBooks);
                 }
             } catch (error) {
                 console.error('Error searching books:', error);
@@ -2013,7 +2034,7 @@
                     book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     (book.isbn && book.isbn.toLowerCase().includes(searchTerm.toLowerCase()))
                 );
-                displayBooks(filteredBooks);
+                displayBookInventory(filteredBooks);
             }
         }
 
@@ -2021,129 +2042,67 @@
         function filterBooks() {
             const categoryId = document.getElementById('categoryFilter').value;
             if (categoryId === 'all') {
-                displayBooks(currentBooks);
+                displayBookInventory(currentBooks);
             } else {
                 const filteredBooks = currentBooks.filter(book => book.category_id == categoryId);
-                displayBooks(filteredBooks);
+                displayBookInventory(filteredBooks);
             }
         }
 
-        // Load inventory data
-        async function loadInventoryData() {
-            try {
-                const response = await fetch(API_ENDPOINTS.stock);
-                const data = await response.json();
-                
-                if (data.success) {
-                    const books = data.books;
-                    updateInventoryStats(books);
-                    applyInventoryFilter(books);
-                }
-            } catch (error) {
-                console.error('Error loading inventory:', error);
-            }
-        }
-
-        // Update inventory statistics
-        function updateInventoryStats(books) {
-            const inStockCount = books.filter(book => {
-                const stock = parseInt(book.stock_quantity);
-                return stock > 10;
-            }).length;
+        // Filter by stock status
+        function filterByStock() {
+            const stockFilter = document.getElementById('stockFilter').value;
             
-            const lowStockCount = books.filter(book => {
-                const stock = parseInt(book.stock_quantity);
-                return stock >= 1 && stock <= 10;
-            }).length;
+            let filteredBooks = currentBooks || [];
             
-            const outOfStockCount = books.filter(book => {
-                const stock = parseInt(book.stock_quantity);
-                return stock === 0;
-            }).length;
-            
-            document.getElementById('inStockCount').textContent = inStockCount;
-            document.getElementById('inventoryLowStock').textContent = lowStockCount;
-            document.getElementById('inventoryOutOfStock').textContent = outOfStockCount;
-        }
-
-        // Apply inventory filter
-        function applyInventoryFilter(books) {
-            let filteredBooks = [];
-            
-            switch(currentInventoryFilter) {
-                case 'low':
-                    filteredBooks = books.filter(book => {
+            switch(stockFilter) {
+                case 'in_stock':
+                    filteredBooks = filteredBooks.filter(book => {
+                        const stock = parseInt(book.stock_quantity);
+                        return stock > 10;
+                    });
+                    break;
+                case 'low_stock':
+                    filteredBooks = filteredBooks.filter(book => {
                         const stock = parseInt(book.stock_quantity);
                         return stock >= 1 && stock <= 10;
                     });
                     break;
-                case 'out':
-                    filteredBooks = books.filter(book => {
+                case 'out_of_stock':
+                    filteredBooks = filteredBooks.filter(book => {
                         const stock = parseInt(book.stock_quantity);
                         return stock === 0;
                     });
                     break;
                 case 'all':
                 default:
-                    filteredBooks = books;
+                    // Show all books
                     break;
             }
             
-            displayInventory(filteredBooks);
+            displayBookInventory(filteredBooks);
         }
 
-        // Display inventory
-        function displayInventory(books) {
-            const inventoryTable = document.getElementById('inventoryTable');
-            
-            if (books.length === 0) {
-                inventoryTable.innerHTML = '<tr><td colspan="7" class="loading">No inventory data found</td></tr>';
-                return;
-            }
-
-            inventoryTable.innerHTML = books.map(book => {
-                const stockStatusClass = getStockStatusClass(book.stock_quantity);
-                const stockStatusText = getStockStatusText(book.stock_quantity);
-                
-                return `
-                <tr>
-                    <td>${book.book_id}</td>
-                    <td><strong>${book.title}</strong></td>
-                    <td>${book.stock_quantity}</td>
-                    <td>RM ${parseFloat(book.price).toFixed(2)}</td>
-                    <td>
-                        <span class="${stockStatusClass}">
-                            ${stockStatusText}
-                        </span>
-                    </td>
-                    <td>${book.updated_at || 'N/A'}</td>
-                    <td class="action-buttons">
-                        <button class="btn btn-sm btn-primary" onclick="openStockModal(${book.book_id}, '${book.title.replace(/'/g, "\\'")}', ${book.stock_quantity})">
-                            📦 Update Stock
-                        </button>
-                    </td>
-                </tr>
-                `;
-            }).join('');
+        // Load all books
+        function loadAllBooks() {
+            document.getElementById('stockFilter').value = 'all';
+            document.getElementById('categoryFilter').value = 'all';
+            displayBookInventory(currentBooks);
         }
 
-        // Load all stock items
-        function loadAllStockItems() {
-            currentInventoryFilter = 'all';
-            loadInventoryData();
+        // Show low stock books
+        function showLowStockBooks() {
+            document.getElementById('stockFilter').value = 'low_stock';
+            filterByStock();
         }
 
-        // Load low stock items
-        function loadLowStockItems() {
-            currentInventoryFilter = 'low';
-            loadInventoryData();
+        // Show out of stock books
+        function showOutOfStockBooks() {
+            document.getElementById('stockFilter').value = 'out_of_stock';
+            filterByStock();
         }
 
-        // Load out of stock items
-        function loadOutOfStockItems() {
-            currentInventoryFilter = 'out';
-            loadInventoryData();
-        }
+    
 
         // Load orders data
         async function loadOrdersData() {
@@ -2567,7 +2526,7 @@
                     loadDashboardData();
                     
                     // 重新加载书籍管理页面的分类筛选器
-                    if (document.getElementById('books').classList.contains('active')) {
+                    if (document.getElementById('book-inventory').classList.contains('active')) {
                         loadCategoryFilter();
                     }
                 } else {
@@ -2655,7 +2614,7 @@
                     showNotification('Category updated successfully!', 'success');
                     closeEditCategoryModal();
                     await loadCategoriesData();
-                    loadBooksData(); // 刷新书籍列表以更新分类信息
+                    loadBookInventoryData(); // 刷新书籍列表以更新分类信息
                 } else {
                     showNotification('Error updating category: ' + result.error, 'error');
                 }
@@ -2697,7 +2656,7 @@
                     // 重新加载所有数据
                     await Promise.all([
                         loadCategoriesData(),
-                        loadBooksData()
+                        loadBookInventoryData()
                     ]);
                     loadDashboardData(); // 更新仪表板
                 } else {
@@ -2891,10 +2850,8 @@
                     
                     // 刷新相关数据
                     setTimeout(() => {
-                        if (document.getElementById('books').classList.contains('active')) {
-                            loadBooksData();
-                        } else if (document.getElementById('inventory').classList.contains('active')) {
-                            loadInventoryData();
+                        if (document.getElementById('book-inventory').classList.contains('active')) {
+                            loadBookInventoryData();
                         }
                         loadDashboardData();
                     }, 500);
@@ -2930,7 +2887,7 @@
                 if (result.success) {
                     showNotification('Stock updated successfully!', 'success');
                     closeStockModal();
-                    loadSectionData('inventory');
+                    loadSectionData('book-inventory');
                     loadDashboardData();
                 } else {
                     showNotification('Error updating stock: ' + result.error, 'error');
@@ -2955,7 +2912,7 @@
                     
                     if (result.success) {
                         showNotification('Book deleted successfully!', 'success');
-                        loadSectionData('books');
+                        loadSectionData('book-inventory');
                         loadDashboardData();
                     } else {
                         showNotification('Error deleting book: ' + result.error, 'error');

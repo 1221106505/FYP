@@ -349,28 +349,6 @@
             font-size: 1.1rem;
         }
 
-        .pre-order-badge {
-            display: inline-block;
-            background-color: var(--pre-order);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: 5px;
-        }
-
-        .available-badge {
-            display: inline-block;
-            background-color: var(--success);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: 5px;
-        }
-
         .item-stock {
             font-size: 0.85rem;
             color: var(--text-light);
@@ -604,55 +582,13 @@
             background-color: #e2e8f0;
         }
 
-        /* Pre-order Button */
-        .pre-order-btn {
-            padding: 8px 16px;
-            background-color: var(--pre-order);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .pre-order-btn:hover {
-            background-color: #2563eb;
-        }
-
-        .pre-order-btn:disabled {
-            background-color: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        .checkout-preorder-btn {
-            padding: 8px 16px;
-            background-color: var(--success);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .checkout-preorder-btn:hover {
-            background-color: #0d9c6c;
-        }
-
-        .cancel-preorder-btn {
-            padding: 8px 16px;
-            background-color: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .cancel-preorder-btn:hover {
-            background-color: #dc2626;
+        /* 移除pre-order相关的样式，因为我们不再支持 */
+        .pre-order-btn, 
+        .checkout-preorder-btn, 
+        .cancel-preorder-btn,
+        .pre-order-badge,
+        .available-badge {
+            display: none !important;
         }
 
         /* Toast Notification */
@@ -676,7 +612,7 @@
 
         .toast.show {
             transform: translateY(0);
-            opacity: 1;
+            opacity = 1;
         }
 
         .toast.success {
@@ -716,7 +652,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height = 100%;
             background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
             align-items: center;
@@ -925,11 +861,8 @@
                         <label for="selectAll">Select All</label>
                     </div>
                     <div class="action-buttons">
-                        <button class="action-btn" onclick="removeSelected()">
+                        <button class="action-btn" onclick="confirmRemoveSelected()">
                             <i class="fas fa-trash"></i> Remove Selected
-                        </button>
-                        <button class="action-btn" onclick="saveForLater()">
-                            <i class="far fa-bookmark"></i> Save for Later
                         </button>
                     </div>
                 </div>
@@ -1081,8 +1014,6 @@
     const CREATE_ORDER_API = 'create_order.php';
     const GET_PAYMENT_API = 'get_payment.php';
     const PROCESS_PAYMENT_API = 'process_payment.php';
-    const CONVERT_TO_PREORDER_API = 'convert_to_preorder.php';
-    const PROCESS_PREORDER_API = 'process_preorder.php';
 
     // DOM Elements
     const cartItemsScroll = document.getElementById('cartItemsScroll');
@@ -1117,13 +1048,6 @@
     // Initialize cart
     document.addEventListener('DOMContentLoaded', function() {
         checkLoginStatus();
-        
-        // 监听复选框点击事件
-        document.addEventListener('click', function(e) {
-            if (e.target.type === 'checkbox' && e.target.classList.contains('item-checkbox')) {
-                updateSelectedItems(e.target);
-            }
-        });
     });
 
     // Check login status
@@ -1170,6 +1094,7 @@
                 cartData = data;
                 displayCartItems();
                 updateCartCount();
+                updateSummary();
             } else {
                 showToast(data.error || 'Failed to load cart', 'error');
                 displayEmptyCart();
@@ -1192,13 +1117,11 @@
         
         cartData.cart_items.forEach(item => {
             const subtotal = (item.price * item.quantity).toFixed(2);
-            const isPreOrder = item.is_pre_order == 1;
-            const stockStatus = getStockStatus(item.stock_quantity, isPreOrder, item.pre_order_status);
-            const canSelect = !isPreOrder && item.stock_quantity > 0;
-            const isPreOrderAvailable = isPreOrder && item.pre_order_status === 'available';
+            const stockStatus = getStockStatus(item.stock_quantity);
+            const canSelect = item.stock_quantity > 0;
             
             html += `
-                <div class="cart-item" data-cart-id="${item.cart_id}" data-book-id="${item.book_id}" data-is-preorder="${isPreOrder}">
+                <div class="cart-item" data-cart-id="${item.cart_id}" data-book-id="${item.book_id}" data-price="${item.price}">
                     <div class="item-checkbox">
                         <input type="checkbox" class="item-checkbox" 
                                data-cart-id="${item.cart_id}"
@@ -1215,64 +1138,42 @@
                     <div class="item-details">
                         <h3 class="item-title" onclick="viewBookDetail(${item.book_id})">
                             ${escapeHtml(item.title)}
-                            ${isPreOrder ? '<span class="pre-order-badge">PRE-ORDER</span>' : ''}
-                            ${isPreOrderAvailable ? '<span class="available-badge">AVAILABLE</span>' : ''}
                         </h3>
                         <p class="item-author">by ${escapeHtml(item.author || 'Unknown Author')}</p>
                         <span class="item-category">${escapeHtml(item.category_name || 'Uncategorized')}</span>
                         <div class="item-price">RM ${parseFloat(item.price).toFixed(2)} each</div>
                         <div class="item-stock ${stockStatus.class}">
                             ${stockStatus.text}
-                            ${item.expected_date ? `<br><small>Expected: ${item.expected_date}</small>` : ''}
                         </div>
                     </div>
                     <div class="item-actions">
-                        ${isPreOrder ? 
-                            isPreOrderAvailable ? 
-                                `<button class="checkout-preorder-btn" onclick="processAvailablePreorder(${item.cart_id})">
-                                    <i class="fas fa-check"></i> Checkout Now
-                                </button>
-                                <button class="cancel-preorder-btn" onclick="cancelPreorder(${item.cart_id})">
-                                    <i class="fas fa-times"></i> Cancel
-                                </button>` 
-                                :
-                                `<button class="cancel-preorder-btn" onclick="cancelPreorder(${item.cart_id})">
-                                    <i class="fas fa-times"></i> Cancel Pre-order
-                                </button>`
-                            :
-                            `<div class="quantity-control">
-                                <button class="quantity-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity - 1})" 
-                                        ${item.stock_quantity <= 0 ? 'disabled' : ''}>
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <input 
-                                    type="number" 
-                                    class="quantity-input" 
-                                    value="${item.quantity}" 
-                                    min="1" 
-                                    max="${Math.max(item.stock_quantity, item.quantity)}"
-                                    onchange="updateQuantity(${item.cart_id}, this.value)"
-                                    ${item.stock_quantity <= 0 ? 'disabled' : ''}
-                                >
-                                <button class="quantity-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity + 1})" 
-                                        ${item.stock_quantity <= 0 ? 'disabled' : ''}>
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                            ${item.stock_quantity <= 0 && item.pre_order_available == 1 ? 
-                                `<button class="pre-order-btn" onclick="convertToPreorder(${item.cart_id})">
-                                    <i class="fas fa-clock"></i> Convert to Pre-order
-                                </button>` 
-                                : 
-                                item.stock_quantity <= 0 ? 
-                                `<span style="color: var(--danger); font-size: 0.9rem;">Out of Stock</span>` 
-                                : ''}`
-                        }
-                        <button class="remove-btn" onclick="removeFromCart(${item.cart_id})">
+                        <div class="quantity-control">
+                            <button class="quantity-btn minus-btn" data-cart-id="${item.cart_id}" 
+                                    ${item.stock_quantity <= 0 ? 'disabled' : ''}>
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input 
+                                type="number" 
+                                class="quantity-input" 
+                                value="${item.quantity}" 
+                                min="1" 
+                                max="${Math.max(item.stock_quantity, item.quantity)}"
+                                data-cart-id="${item.cart_id}"
+                                ${item.stock_quantity <= 0 ? 'disabled' : ''}
+                            >
+                            <button class="quantity-btn plus-btn" data-cart-id="${item.cart_id}" 
+                                    ${item.stock_quantity <= 0 ? 'disabled' : ''}>
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        ${item.stock_quantity <= 0 ? 
+                            `<span style="color: var(--danger); font-size: 0.9rem;">Out of Stock</span>` 
+                            : ''}
+                        <button class="remove-btn" onclick="confirmRemoveSingle(${item.cart_id}, '${escapeHtml(item.title)}')">
                             <i class="fas fa-trash"></i> Remove
                         </button>
                     </div>
-                    <div class="item-total">
+                    <div class="item-total" id="item-total-${item.cart_id}">
                         RM ${subtotal}
                     </div>
                 </div>
@@ -1280,18 +1181,97 @@
         });
 
         cartItemsScroll.innerHTML = html;
+        
+        // 绑定事件
+        setupEventListeners();
+        
         updateSelectedSummary();
         updateSummary();
     }
 
-    // Get stock status
-    function getStockStatus(stockQuantity, isPreOrder = false, preOrderStatus = 'pending') {
-        if (isPreOrder) {
-            if (preOrderStatus === 'available') {
-                return { class: 'in-stock', text: 'Pre-Order Available for Checkout' };
+    // 设置事件监听器
+    function setupEventListeners() {
+        // 使用事件委托处理数量按钮点击
+        cartItemsScroll.addEventListener('click', function(e) {
+            // 减号按钮
+            if (e.target.closest('.minus-btn')) {
+                const button = e.target.closest('.minus-btn');
+                const cartId = parseInt(button.dataset.cartId);
+                const quantityInput = button.parentElement.querySelector('.quantity-input');
+                if (quantityInput) {
+                    const currentQuantity = parseInt(quantityInput.value);
+                    if (currentQuantity > 1) {
+                        updateQuantity(cartId, currentQuantity - 1);
+                    }
+                }
             }
-            return { class: 'pre-order-stock', text: 'Pre-Order Item' };
-        } else if (stockQuantity <= 0) {
+            
+            // 加号按钮
+            if (e.target.closest('.plus-btn')) {
+                const button = e.target.closest('.plus-btn');
+                const cartId = parseInt(button.dataset.cartId);
+                const quantityInput = button.parentElement.querySelector('.quantity-input');
+                if (quantityInput) {
+                    const currentQuantity = parseInt(quantityInput.value);
+                    const maxQuantity = parseInt(quantityInput.max);
+                    if (currentQuantity < maxQuantity) {
+                        updateQuantity(cartId, currentQuantity + 1);
+                    }
+                }
+            }
+        });
+        
+        // 输入框变化事件
+        cartItemsScroll.addEventListener('change', function(e) {
+            if (e.target.classList.contains('quantity-input')) {
+                const input = e.target;
+                const cartId = parseInt(input.dataset.cartId);
+                const newQuantity = parseInt(input.value);
+                if (!isNaN(newQuantity) && newQuantity >= 1) {
+                    updateQuantity(cartId, newQuantity);
+                }
+            }
+            
+            // 复选框变化事件
+            if (e.target.classList.contains('item-checkbox')) {
+                updateSelectedItems(e.target);
+            }
+        });
+        
+        // 输入框输入事件（实时更新）
+        cartItemsScroll.addEventListener('input', function(e) {
+            if (e.target.classList.contains('quantity-input')) {
+                const input = e.target;
+                const cartId = parseInt(input.dataset.cartId);
+                const newQuantity = parseInt(input.value);
+                const price = parseFloat(document.querySelector(`[data-cart-id="${cartId}"]`).dataset.price);
+                
+                if (!isNaN(newQuantity) && newQuantity >= 1) {
+                    // 实时更新总价显示
+                    const itemTotalElement = document.getElementById(`item-total-${cartId}`);
+                    if (itemTotalElement) {
+                        itemTotalElement.textContent = `RM ${(price * newQuantity).toFixed(2)}`;
+                    }
+                    
+                    // 更新选中商品的数据
+                    if (selectedItems.has(cartId)) {
+                        const item = selectedItemsData.get(cartId);
+                        if (item) {
+                            item.quantity = newQuantity;
+                            item.subtotal = price * newQuantity;
+                            selectedItemsData.set(cartId, item);
+                            updateSelectedSummary();
+                            updateSummary();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Get stock status (简化版本，移除pre-order相关)
+    function getStockStatus(stockQuantity) {
+        if (stockQuantity <= 0) {
             return { class: 'out-of-stock', text: 'Out of Stock' };
         } else if (stockQuantity < 10) {
             return { class: 'low-stock', text: `Low Stock (${stockQuantity} left)` };
@@ -1323,6 +1303,10 @@
         selectedSummary.style.display = 'none';
         checkoutBtn.disabled = true;
         cartCountElement.textContent = '0';
+        selectedItems.clear();
+        selectedItemsData.clear();
+        selectAllCheckbox.checked = false;
+        updateSummary();
     }
 
     // Toggle select all
@@ -1342,14 +1326,16 @@
                 const price = parseFloat(checkbox.dataset.price);
                 const quantity = parseInt(checkbox.dataset.quantity);
                 
-                selectedItems.add(cartId);
-                selectedItemsData.set(cartId, {
-                    bookId: bookId,
-                    title: title,
-                    price: price,
-                    quantity: quantity,
-                    subtotal: price * quantity
-                });
+                if (!isNaN(cartId) && !isNaN(price) && !isNaN(quantity)) {
+                    selectedItems.add(cartId);
+                    selectedItemsData.set(cartId, {
+                        bookId: bookId,
+                        title: title,
+                        price: price,
+                        quantity: quantity,
+                        subtotal: price * quantity
+                    });
+                }
             }
         });
         
@@ -1367,23 +1353,25 @@
         const price = parseFloat(checkbox.dataset.price);
         const quantity = parseInt(checkbox.dataset.quantity);
         
-        if (checkbox.checked) {
-            selectedItems.add(cartId);
-            selectedItemsData.set(cartId, {
-                bookId: bookId,
-                title: title,
-                price: price,
-                quantity: quantity,
-                subtotal: price * quantity
-            });
-        } else {
-            selectedItems.delete(cartId);
-            selectedItemsData.delete(cartId);
-            selectAllCheckbox.checked = false;
+        if (!isNaN(cartId) && !isNaN(price) && !isNaN(quantity)) {
+            if (checkbox.checked) {
+                selectedItems.add(cartId);
+                selectedItemsData.set(cartId, {
+                    bookId: bookId,
+                    title: title,
+                    price: price,
+                    quantity: quantity,
+                    subtotal: price * quantity
+                });
+            } else {
+                selectedItems.delete(cartId);
+                selectedItemsData.delete(cartId);
+                selectAllCheckbox.checked = false;
+            }
+            
+            updateSelectedSummary();
+            updateSummary();
         }
-        
-        updateSelectedSummary();
-        updateSummary();
     }
 
     // Update selected items summary
@@ -1391,6 +1379,7 @@
         if (selectedItems.size === 0) {
             selectedSummary.style.display = 'none';
             checkoutBtn.disabled = true;
+            selectAllCheckbox.checked = false;
             return;
         }
         
@@ -1411,6 +1400,12 @@
         
         selectedItemsList.innerHTML = html;
         selectedCountElement.textContent = selectedItems.size;
+        
+        // 如果所有可选商品都被选中，则勾选selectAll
+        const selectableCheckboxes = document.querySelectorAll('.item-checkbox:not(:disabled)');
+        const allSelected = selectableCheckboxes.length > 0 && 
+                          Array.from(selectableCheckboxes).every(cb => cb.checked);
+        selectAllCheckbox.checked = allSelected;
     }
 
     // Update order summary
@@ -1424,7 +1419,9 @@
 
         let subtotal = 0;
         selectedItemsData.forEach(item => {
-            subtotal += item.subtotal;
+            if (item && typeof item.subtotal === 'number') {
+                subtotal += item.subtotal;
+            }
         });
         
         const shipping = 5.00;
@@ -1443,7 +1440,7 @@
         }
     }
 
-    // Update quantity
+    // Update quantity - 简化版本
     async function updateQuantity(cartId, newQuantity) {
         newQuantity = parseInt(newQuantity);
         if (isNaN(newQuantity) || newQuantity < 1) {
@@ -1451,6 +1448,43 @@
         }
 
         try {
+            // 立即更新UI
+            const cartItem = document.querySelector(`[data-cart-id="${cartId}"]`);
+            const price = parseFloat(cartItem ? cartItem.dataset.price : 0);
+            
+            // 更新输入框
+            const quantityInput = document.querySelector(`.quantity-input[data-cart-id="${cartId}"]`);
+            if (quantityInput) {
+                quantityInput.value = newQuantity;
+            }
+            
+            // 更新总价显示
+            const itemTotalElement = document.getElementById(`item-total-${cartId}`);
+            if (itemTotalElement) {
+                itemTotalElement.textContent = `RM ${(price * newQuantity).toFixed(2)}`;
+            }
+            
+            // 更新复选框的data-quantity属性
+            const checkbox = document.querySelector(`.item-checkbox[data-cart-id="${cartId}"]`);
+            if (checkbox) {
+                checkbox.dataset.quantity = newQuantity;
+            }
+            
+            // 更新选中商品的数据
+            if (selectedItems.has(cartId)) {
+                const item = selectedItemsData.get(cartId);
+                if (item) {
+                    item.quantity = newQuantity;
+                    item.subtotal = price * newQuantity;
+                    selectedItemsData.set(cartId, item);
+                }
+            }
+            
+            // 更新总结
+            updateSelectedSummary();
+            updateSummary();
+            
+            // 发送API请求
             const response = await fetch(UPDATE_CART_API, {
                 method: 'POST',
                 headers: {
@@ -1466,11 +1500,12 @@
 
             const data = await response.json();
             
-            if (data.success) {
-                showToast('Quantity updated successfully', 'success');
+            if (!data.success) {
+                showToast(data.error || 'Failed to update quantity', 'error');
+                // 如果API失败，重新加载购物车
                 await loadCart();
             } else {
-                showToast(data.error || 'Failed to update quantity', 'error');
+                showToast('Quantity updated successfully', 'success');
             }
         } catch (error) {
             console.error('Error updating quantity:', error);
@@ -1478,12 +1513,15 @@
         }
     }
 
+    // 确认删除单个商品
+    function confirmRemoveSingle(cartId, title) {
+        if (confirm(`Are you sure you want to remove "${title}" from your cart?`)) {
+            removeFromCart(cartId);
+        }
+    }
+
     // Remove from cart
     async function removeFromCart(cartId) {
-        if (!confirm('Are you sure you want to remove this item from your cart?')) {
-            return;
-        }
-
         try {
             const response = await fetch(UPDATE_CART_API, {
                 method: 'POST',
@@ -1513,59 +1551,61 @@
         }
     }
 
-    // Remove selected items
-    async function removeSelected() {
+    // 确认删除选中的商品
+    function confirmRemoveSelected() {
         if (selectedItems.size === 0) {
             showToast('Please select items to remove', 'warning');
             return;
         }
 
-        if (!confirm(`Are you sure you want to remove ${selectedItems.size} selected item(s) from your cart?`)) {
-            return;
+        const itemNames = Array.from(selectedItemsData.values())
+            .map(item => item.title)
+            .join(', ');
+        
+        const message = selectedItems.size === 1 
+            ? `Are you sure you want to remove "${itemNames}" from your cart?`
+            : `Are you sure you want to remove ${selectedItems.size} selected items from your cart?`;
+        
+        if (confirm(message)) {
+            removeSelected();
         }
+    }
 
+    // Remove selected items
+    async function removeSelected() {
         try {
             const cartIds = Array.from(selectedItems);
-            const response = await fetch(UPDATE_CART_API, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    cart_ids: cartIds,
-                    action: 'bulk_remove'
-                })
-            });
-
-            const data = await response.json();
             
-            if (data.success) {
+            // 逐个删除选中的商品
+            const promises = cartIds.map(cartId => 
+                fetch(UPDATE_CART_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        cart_id: cartId,
+                        action: 'remove'
+                    })
+                }).then(response => response.json())
+            );
+            
+            const results = await Promise.all(promises);
+            const allSuccess = results.every(result => result.success);
+            
+            if (allSuccess) {
                 showToast(`${selectedItems.size} item(s) removed from cart`, 'success');
                 selectedItems.clear();
                 selectedItemsData.clear();
                 await loadCart();
             } else {
-                showToast(data.error || 'Failed to remove selected items', 'error');
+                showToast('Some items failed to remove. Please try again.', 'error');
             }
         } catch (error) {
             console.error('Error removing selected items:', error);
             showToast('Error removing items. Please try again.', 'error');
         }
-    }
-
-    // Save for later
-    async function saveForLater() {
-        if (selectedItems.size === 0) {
-            showToast('Please select items to save for later', 'warning');
-            return;
-        }
-
-        showToast(`${selectedItems.size} item(s) saved for later`, 'success');
-        
-        // 在实际应用中，这里会将项目移动到"稍后购买"列表
-        // 现在先移除它们
-        await removeSelected();
     }
 
     // Clear entire cart
@@ -1605,122 +1645,10 @@
         }
     }
 
-    // Convert to pre-order
-    async function convertToPreorder(cartId) {
-        if (!confirm('This item is out of stock. Would you like to convert it to a pre-order?')) {
-            return;
-        }
-
-        try {
-            const response = await fetch(CONVERT_TO_PREORDER_API, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    cart_id: cartId,
-                    action: 'convert'
-                })
-            });
-
-            const data = await response.json();
-            
-            if (data.success) {
-                showToast('Item converted to pre-order', 'success');
-                await loadCart();
-            } else {
-                showToast(data.error || 'Failed to convert to pre-order', 'error');
-            }
-        } catch (error) {
-            console.error('Error converting to pre-order:', error);
-            showToast('Error converting to pre-order. Please try again.', 'error');
-        }
-    }
-
-    // Process available pre-order
-    async function processAvailablePreorder(cartId) {
-        if (!confirm('This pre-order is now available. Would you like to process it now?')) {
-            return;
-        }
-
-        try {
-            const response = await fetch(PROCESS_PREORDER_API, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    cart_id: cartId,
-                    action: 'process'
-                })
-            });
-
-            const data = await response.json();
-            
-            if (data.success) {
-                showToast('Pre-order processed successfully. Redirecting to checkout...', 'success');
-                setTimeout(() => {
-                    window.location.href = `checkout.php?preorder=${cartId}`;
-                }, 1500);
-            } else {
-                showToast(data.error || 'Failed to process pre-order', 'error');
-            }
-        } catch (error) {
-            console.error('Error processing pre-order:', error);
-            showToast('Error processing pre-order. Please try again.', 'error');
-        }
-    }
-
-    // Cancel pre-order
-    async function cancelPreorder(cartId) {
-        if (!confirm('Are you sure you want to cancel this pre-order?')) {
-            return;
-        }
-
-        try {
-            const response = await fetch(CONVERT_TO_PREORDER_API, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    cart_id: cartId,
-                    action: 'cancel'
-                })
-            });
-
-            const data = await response.json();
-            
-            if (data.success) {
-                showToast('Pre-order cancelled', 'success');
-                await loadCart();
-            } else {
-                showToast(data.error || 'Failed to cancel pre-order', 'error');
-            }
-        } catch (error) {
-            console.error('Error cancelling pre-order:', error);
-            showToast('Error cancelling pre-order. Please try again.', 'error');
-        }
-    }
-
     // Process checkout
     async function processCheckout() {
         if (selectedItems.size === 0) {
             showToast('Please select items to checkout', 'warning');
-            return;
-        }
-
-        // 检查是否有预购商品被选中
-        const hasPreOrderItems = Array.from(selectedItems).some(cartId => {
-            const item = document.querySelector(`[data-cart-id="${cartId}"]`);
-            return item && item.dataset.isPreorder === '1';
-        });
-
-        if (hasPreOrderItems) {
-            showToast('Pre-order items cannot be checked out with regular items. Please remove them or process them separately.', 'error');
             return;
         }
 
@@ -1789,81 +1717,79 @@
         confirmPaymentBtn.disabled = false;
     }
 
-    // 在 cart.html 中找到 confirmPayment 函数，修改第1887行附近的代码：
+    async function confirmPayment() {
+        if (!selectedPaymentMethod) {
+            showToast('Please select a payment method', 'error');
+            return;
+        }
 
-async function confirmPayment() {
-    if (!selectedPaymentMethod) {
-        showToast('Please select a payment method', 'error');
-        return;
-    }
-
-    try {
-        modalLoading.style.display = 'block';
-        paymentSelection.style.display = 'none';
-        
-        // 1. 创建订单（支付会自动完成）
-        const orderResponse = await fetch(CREATE_ORDER_API, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                cart_ids: Array.from(selectedItems),
-                customer_id: currentUser.user_id || currentUser.auto_id || 1,
-                payment_method: selectedPaymentMethod,
-                total_amount: parseFloat(totalElement.textContent.replace('RM ', '')),
-                shipping_address: getUserAddress(),
-                contact_phone: getUserPhone(),
-                contact_email: getUserEmail()
-            })
-        });
-
-        const orderText = await orderResponse.text();
-        console.log('Order Response:', orderText);
-        
-        let orderData;
         try {
-            orderData = JSON.parse(orderText);
-        } catch (parseError) {
-            console.error('JSON Parse Error:', parseError);
-            console.error('Response Text:', orderText);
-            throw new Error(`Invalid JSON response from server`);
+            modalLoading.style.display = 'block';
+            paymentSelection.style.display = 'none';
+            
+            // 1. 创建订单（支付会自动完成）
+            const orderResponse = await fetch(CREATE_ORDER_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cart_ids: Array.from(selectedItems),
+                    customer_id: currentUser.user_id || currentUser.auto_id || 1,
+                    payment_method: selectedPaymentMethod,
+                    total_amount: parseFloat(totalElement.textContent.replace('RM ', '')),
+                    shipping_address: getUserAddress(),
+                    contact_phone: getUserPhone(),
+                    contact_email: getUserEmail()
+                })
+            });
+
+            const orderText = await orderResponse.text();
+            console.log('Order Response:', orderText);
+            
+            let orderData;
+            try {
+                orderData = JSON.parse(orderText);
+            } catch (parseError) {
+                console.error('JSON Parse Error:', parseError);
+                console.error('Response Text:', orderText);
+                throw new Error(`Invalid JSON response from server`);
+            }
+            
+            if (!orderData.success) {
+                throw new Error(orderData.error || 'Failed to create order');
+            }
+
+            // 成功处理
+            currentOrderData = {
+                order_id: orderData.order_id,
+                payment_id: orderData.payment_id,
+                total_amount: orderData.total_amount,
+                transaction_id: orderData.transaction_id
+            };
+
+            modalLoading.style.display = 'none';
+            orderConfirmation.style.display = 'block';
+            
+            document.getElementById('confirmedOrderId').textContent = orderData.order_id;
+            document.getElementById('confirmedPaymentId').textContent = orderData.payment_id;
+            document.getElementById('confirmedAmount').textContent = 'RM ' + parseFloat(orderData.total_amount).toFixed(2);
+            document.getElementById('confirmationMessage').textContent = 
+                `Thank you for your order! Your payment has been processed successfully.` +
+                `\nTransaction ID: ${orderData.transaction_id}` +
+                `\nPayment Method: ${selectedPaymentMethod}`;
+
+            // 清空购物车
+            selectedItems.clear();
+            selectedItemsData.clear();
+            await loadCart();
+            
+        } catch (error) {
+            console.error('Payment Error:', error);
+            modalLoading.style.display = 'none';
+            paymentSelection.style.display = 'none';
+            paymentError.style.display = 'block';
+            document.getElementById('errorMessage').textContent = error.message;
         }
-        
-        if (!orderData.success) {
-            throw new Error(orderData.error || 'Failed to create order');
-        }
-
-        // 成功处理
-        currentOrderData = {
-            order_id: orderData.order_id,
-            payment_id: orderData.payment_id,
-            total_amount: orderData.total_amount,
-            transaction_id: orderData.transaction_id
-        };
-
-        modalLoading.style.display = 'none';
-        orderConfirmation.style.display = 'block';
-        
-        document.getElementById('confirmedOrderId').textContent = orderData.order_id;
-        document.getElementById('confirmedPaymentId').textContent = orderData.payment_id;
-        document.getElementById('confirmedAmount').textContent = 'RM ' + parseFloat(orderData.total_amount).toFixed(2);
-        document.getElementById('confirmationMessage').textContent = 
-            `Thank you for your order! Your payment has been processed successfully.` +
-            `\nTransaction ID: ${orderData.transaction_id}` +
-            `\nPayment Method: ${selectedPaymentMethod}`;
-
-        // 清空购物车
-        selectedItems.clear();
-        selectedItemsData.clear();
-        await loadCart();
-        
-    } catch (error) {
-        console.error('Payment Error:', error);
-        modalLoading.style.display = 'none';
-        paymentSelection.style.display = 'none';
-        paymentError.style.display = 'block';
-        document.getElementById('errorMessage').textContent = error.message;
     }
-}
 
     // Retry payment
     function retryPayment() {
@@ -1938,57 +1864,6 @@ async function confirmPayment() {
             toast.classList.remove('show');
         }, 3000);
     }
-
-    // 测试API是否存在的函数
-    async function testAPI(endpoint) {
-        try {
-            // 使用GET方法而不是HEAD，因为有些服务器不支持HEAD
-            const response = await fetch(endpoint, { 
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            return response.ok || response.status === 405; // 405也表示API存在
-        } catch (error) {
-            console.log(`API ${endpoint} 检查失败:`, error.message);
-            return false;
-        }
-    }
-
-    // 初始化时检查关键API
-    async function checkRequiredAPIs() {
-        const requiredAPIs = [
-            CREATE_ORDER_API,
-            GET_PAYMENT_API,
-            PROCESS_PAYMENT_API,
-            GET_CART_API,
-            UPDATE_CART_API
-        ];
-        
-        console.log('🔍 检查API可用性...');
-        
-        for (const api of requiredAPIs) {
-            try {
-                const exists = await testAPI(api);
-                if (exists) {
-                    console.log(`✅ ${api} 可用`);
-                } else {
-                    console.warn(`⚠️  ${api} 可能不可用`);
-                }
-            } catch (error) {
-                console.error(`❌ 检查 ${api} 时出错:`, error);
-            }
-        }
-    }
-
-    // 页面加载完成后检查API
-    document.addEventListener('DOMContentLoaded', function() {
-        // 延迟检查，避免影响主要功能
-        setTimeout(() => {
-            checkRequiredAPIs();
-        }, 1000);
-    });
     </script>
 </body>
 </html>
