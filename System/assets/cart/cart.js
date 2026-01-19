@@ -9,10 +9,19 @@ let savedItems = [];
 
 const TAX_RATE = 0.06;
 
+const SHIPPING_RULES = {
+  standard: { fee: 5.00, minDays: 2, maxDays: 3, label: "Standard (Peninsular)" },
+  express:  { fee: 12.00, minDays: 1, maxDays: 1, label: "Express (Peninsular)" },
+  sabah:    { fee: 18.00, minDays: 4, maxDays: 7, label: "Sabah Delivery" },
+  sarawak:  { fee: 16.00, minDays: 4, maxDays: 7, label: "Sarawak Delivery" }
+};
+
 // Shipping + Promo
 let shippingOption = localStorage.getItem("cart_shipping") || "standard";
 let promoCode = localStorage.getItem("cart_promo") || "";
 let discountValue = 0;
+let lastPaidReceipt = null; // will be filled only after successful payment
+
 
 // -------------------- Boot --------------------
 document.addEventListener("DOMContentLoaded", () => {
@@ -28,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnApplyPromo = document.getElementById("btnApplyPromo");
 
   if (shippingSelect) {
+    if (!SHIPPING_RULES[shippingOption]) shippingOption = "standard";
     shippingSelect.value = shippingOption;
     shippingSelect.addEventListener("change", () => {
       shippingOption = shippingSelect.value;
@@ -52,17 +62,14 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("togglePayment")?.addEventListener("click", togglePaymentPanel);
   document.getElementById("paymentMethod")?.addEventListener("change", syncPaymentFields);
 
-  // Bank transfer buttons
-  document.getElementById("btnGenBankRef")?.addEventListener("click", generateBankRef);
-  document.getElementById("btnCopyAcc")?.addEventListener("click", () => copyText("bankAcc"));
-  document.getElementById("btnCopyRef")?.addEventListener("click", () => copyText("bankRef"));
-
   // Card live validation
   document.getElementById("cardNumber")?.addEventListener("input", onCardNumberInput);
   document.getElementById("cardExpiry")?.addEventListener("input", onCardExpiryInput);
   document.getElementById("cardCvv")?.addEventListener("input", onCardCvvInput);
 
   syncPaymentFields();
+  setReceiptAvailability(false);
+  setReceiptAvailability(true);
 
   // Load cart
   loadCart();
@@ -74,6 +81,21 @@ function setMsg(text, isError = false) {
   if (!el) return;
   el.textContent = text || "";
   el.style.color = isError ? "#ef4444" : "#6b7280";
+}
+
+function setReceiptAvailability(isPaid) {
+  const viewBtn = document.getElementById("btnPreviewReceipt");
+  const printBtn = document.getElementById("btnPrintReceipt");
+  const hint = document.getElementById("receiptHint");
+
+  if (viewBtn) viewBtn.disabled = !isPaid;
+  if (printBtn) printBtn.disabled = !isPaid;
+
+  if (hint) {
+    hint.textContent = isPaid
+      ? "Receipt is available. You can view or print it now."
+      : "Receipt will be available after payment is completed.";
+  }
 }
 
 function showState(message) {
@@ -311,26 +333,22 @@ function updateDeliveryEstimate() {
   const el = document.getElementById("deliveryEstimate");
   if (!el) return;
 
+  const rule = SHIPPING_RULES[shippingOption] || SHIPPING_RULES.standard;
+
   const now = new Date();
-  let minDays = 2, maxDays = 3;
-
-  if (shippingOption === "express") {
-    minDays = 1;
-    maxDays = 1;
-  }
-
   const d1 = new Date(now);
-  d1.setDate(now.getDate() + minDays);
+  d1.setDate(now.getDate() + rule.minDays);
 
   const d2 = new Date(now);
-  d2.setDate(now.getDate() + maxDays);
+  d2.setDate(now.getDate() + rule.maxDays);
 
   const fmt = (d) => d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 
-  el.textContent = (minDays === maxDays)
-    ? `Estimated delivery: ${fmt(d1)} (Express)`
-    : `Estimated delivery: ${fmt(d1)} – ${fmt(d2)} (Standard)`;
+  el.textContent = (rule.minDays === rule.maxDays)
+    ? `Estimated delivery: ${fmt(d1)} • ${rule.label}`
+    : `Estimated delivery: ${fmt(d1)} – ${fmt(d2)} • ${rule.label}`;
 }
+
 
 function updateTotals() {
   const itemsCount = cartItems.reduce((acc, it) => acc + (Number(it.quantity) || 0), 0);
@@ -343,9 +361,11 @@ function updateTotals() {
 
   // shipping depends on option
   let shipping = 0;
-  if (cartItems.length > 0) {
-    shipping = (shippingOption === "express") ? 12.0 : 5.0;
-  }
+if (cartItems.length > 0) {
+  const rule = SHIPPING_RULES[shippingOption] || SHIPPING_RULES.standard;
+  shipping = rule.fee;
+}
+
 
   // discount rules
   const code = normalizeCode(promoCode);
@@ -495,23 +515,17 @@ function togglePaymentPanel() {
 }
 
 function syncPaymentFields() {
-  const method = document.getElementById("paymentMethod")?.value || "Card";
   const card = document.getElementById("cardFields");
   const bank = document.getElementById("bankFields");
   const cod = document.getElementById("codFields");
 
-  if (card) card.style.display = method === "Card" ? "block" : "none";
-  if (bank) bank.style.display = method === "BANK" ? "block" : "none";
-  if (cod) cod.style.display = method === "COD" ? "block" : "none";
-
-  if (method === "BANK") {
-    const ref = localStorage.getItem("cart_bank_ref") || "";
-    const el = document.getElementById("bankRef");
-    if (el) el.textContent = ref || "—";
-  }
+  if (card) card.style.display = "block";
+  if (bank) bank.style.display = "none";
+  if (cod) cod.style.display = "none";
 
   setPaymentError("");
 }
+
 
 function setPaymentError(msg, isError = true) {
   const el = document.getElementById("paymentError");
@@ -680,7 +694,7 @@ async function checkout() {
     return;
   }
 
-  const payment_method = document.getElementById("paymentMethod")?.value || "Card";
+  const payment_method = "Card";
   const address = document.getElementById("address")?.value?.trim() || "";
 
   if (address.length < 8) {
@@ -698,6 +712,17 @@ async function checkout() {
       setMsg(data.error || "Checkout failed.", true);
       return;
     }
+
+    // ✅ Mark as paid + enable receipt buttons
+lastPaidReceipt = {
+  order_id: data.order_id,
+  paid_at: new Date().toLocaleString(),
+  payment_method: "Card",
+  payment_ref: "CARD-" + Date.now(),
+  masked_card: getMaskedCardInfo()
+};
+
+setReceiptAvailability(true);
 
     alert(`Order placed successfully! Order ID: ${data.order_id}`);
     await loadCart();
@@ -733,7 +758,10 @@ function getTotalsForReceipt() {
   }, 0);
 
   let shipping = 0;
-  if (cartItems.length > 0) shipping = (shippingOption === "express") ? 12.0 : 5.0;
+if (cartItems.length > 0) {
+  const rule = SHIPPING_RULES[shippingOption] || SHIPPING_RULES.standard;
+  shipping = rule.fee;
+}
 
   const code = normalizeCode(promoCode);
   let discount = 0;
@@ -752,6 +780,9 @@ function getTotalsForReceipt() {
 }
 
 function buildReceiptHTML() {
+  if (!lastPaidReceipt) {
+  return `<div class="muted">Receipt not available yet. Please complete payment first.</div>`;
+}
   const now = new Date();
   const receiptId =
     `DRAFT-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}` +
@@ -796,7 +827,7 @@ function buildReceiptHTML() {
         </div>
         <div class="receipt-box">
           <div class="muted">Shipping Option</div>
-          <div><strong>${shippingOption === "express" ? "Express" : "Standard"}</strong></div>
+          <div><strong>${(SHIPPING_RULES[shippingOption] || SHIPPING_RULES.standard).label}</strong></div>
           <div class="muted">${escapeHtml(deliveryText)}</div>
         </div>
         <div class="receipt-box" style="grid-column: 1 / -1;">
@@ -841,6 +872,10 @@ function buildReceiptHTML() {
 }
 
 function printReceipt() {
+  if (!lastPaidReceipt) {
+  alert("Receipt is only available after payment is completed.");
+  return;
+}
   const html = buildReceiptHTML();
 
   const w = window.open("", "_blank");
