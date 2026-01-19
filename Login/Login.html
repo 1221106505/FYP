@@ -138,7 +138,7 @@
         }
         
         .hidden {
-            display: none;
+            display: none !important;
         }
         
         .message {
@@ -176,7 +176,6 @@
             text-decoration: underline;
         }
         
-        /* 新增样式 */
         .validation-message {
             margin-top: 5px;
             font-size: 13px;
@@ -301,6 +300,271 @@
             color: #dc3545;
         }
         
+        .resend-timer {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .resend-timer a {
+            color: #2575fc;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .resend-timer a:hover {
+            text-decoration: underline;
+        }
+        
+        .resend-timer .disabled {
+            color: #999;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e9ecef;
+            z-index: 1;
+        }
+        
+        .step {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .step.active .step-number {
+            background-color: #2575fc;
+            color: white;
+            border-color: #2575fc;
+        }
+        
+        .step.completed .step-number {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        
+        .step-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .step.active .step-label {
+            color: #2575fc;
+            font-weight: 600;
+        }
+        
+        .verification-inputs {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .verification-input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .verification-input:focus {
+            border-color: #2575fc;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(37, 117, 252, 0.1);
+        }
+        
+        .verification-input.filled {
+            border-color: #28a745;
+        }
+        
+        .verification-instruction {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .modal-header h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .modal-header .close-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .modal-header .close-btn:hover {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .verification-code-display {
+            background-color: #f8f9fa;
+            border: 2px dashed #2575fc;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .verification-code-display .code {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2575fc;
+            letter-spacing: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        
+        .modal-instruction {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-instruction code {
+            background-color: #f8f9fa;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #2575fc;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+        
+        .modal-btn.primary {
+            background-color: #2575fc;
+            color: white;
+        }
+        
+        .modal-btn.primary:hover {
+            background-color: #1c6ae4;
+        }
+        
+        .modal-btn.secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .modal-btn.secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .auto-verify-notice {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e8f4fd;
+            border: 1px solid #b6d4fe;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #084298;
+            text-align: center;
+            display: none;
+        }
+        
+        .auto-verify-notice.show {
+            display: block;
+        }
+        
         @media (max-width: 768px) {
             .form-container {
                 padding: 30px 20px;
@@ -312,6 +576,11 @@
             
             .container {
                 max-width: 100%;
+            }
+            
+            .modal-content {
+                padding: 20px;
+                width: 95%;
             }
         }
         
@@ -325,6 +594,59 @@
             .password-container .username-status {
                 right: 50px;
             }
+            
+            .verification-inputs {
+                gap: 5px;
+            }
+            
+            .verification-input {
+                width: 40px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .modal-btn {
+                width: 100%;
+            }
+            
+            .step-label {
+                font-size: 11px;
+            }
+        }
+        
+        .verification-success {
+            animation: successPulse 2s infinite;
+        }
+        
+        @keyframes successPulse {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+        
+        .code-copied-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .code-copied-message.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -355,7 +677,7 @@
                             <input type="checkbox" id="remember-me" name="remember_me">
                             <label for="remember-me">Remember me</label>
                         </div>
-                        <a href="#" class="forgot-password">Forgot Password?</a>
+                        <a href="#" class="forgot-password" id="show-forgot-password">Forgot Password?</a>
                     </div>
                     
                     <button type="submit" class="btn" id="login-btn">Login</button>
@@ -382,6 +704,15 @@
                         </div>
                         <div id="username-validation" class="validation-message"></div>
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="register-email">Email <span class="required">*</span></label>
+                        <input type="email" id="register-email" name="email" required 
+                               placeholder="Enter your email" autocomplete="email"
+                               oninput="checkEmailFormat()">
+                        <div id="email-validation" class="validation-message"></div>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="register-password">Password <span class="required">*</span></label>
                         <div class="password-container">
@@ -425,6 +756,170 @@
                 </div>
                 <a href="../System/Main.html" class="back-button">← Back to Main Page</a>
             </div>
+            
+            <!-- Forgot Password Form -->
+            <div id="forgot-password-form" class="hidden">
+                <h2>Reset Password</h2>
+                <div id="forgot-message" class="message hidden"></div>
+                
+                <!-- Step 1: Enter Email -->
+                <div id="step-1">
+                    <div class="step-indicator">
+                        <div class="step active">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Enter Email</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Verify Code</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-label">New Password</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="forgot-email">Email Address <span class="required">*</span></label>
+                        <input type="email" id="forgot-email" name="email" required 
+                               placeholder="Enter your registered email" autocomplete="email">
+                    </div>
+                    
+                    <button type="button" class="btn" id="send-code-btn" onclick="sendVerificationCode()">Send Verification Code</button>
+                    <div class="resend-timer hidden" id="resend-timer">
+                        Didn't receive the code? <a id="resend-code" class="disabled">Resend in <span id="countdown">60</span>s</a>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Verify Code -->
+                <div id="step-2" class="hidden">
+                    <div class="step-indicator">
+                        <div class="step completed">
+                            <div class="step-number">✓</div>
+                            <div class="step-label">Enter Email</div>
+                        </div>
+                        <div class="step active">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Verify Code</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-label">New Password</div>
+                        </div>
+                    </div>
+                    
+                    <div class="verification-instruction">
+                        Enter the 6-digit verification code sent to <span id="user-email" style="font-weight: bold; color: #2575fc;"></span>
+                    </div>
+                    
+                    <div class="verification-inputs">
+                        <input type="text" class="verification-input" maxlength="1" oninput="moveToNext(this, 1)" data-index="0" autocomplete="off">
+                        <input type="text" class="verification-input" maxlength="1" oninput="moveToNext(this, 2)" data-index="1" autocomplete="off">
+                        <input type="text" class="verification-input" maxlength="1" oninput="moveToNext(this, 3)" data-index="2" autocomplete="off">
+                        <input type="text" class="verification-input" maxlength="1" oninput="moveToNext(this, 4)" data-index="3" autocomplete="off">
+                        <input type="text" class="verification-input" maxlength="1" oninput="moveToNext(this, 5)" data-index="4" autocomplete="off">
+                        <input type="text" class="verification-input" maxlength="1" oninput="moveToNext(this, 6)" data-index="5" autocomplete="off">
+                    </div>
+                    
+                    <div id="auto-verify-notice" class="auto-verify-notice">
+                        <div id="auto-verify-timer">Auto-verifying in <span id="auto-verify-countdown">5</span>s</div>
+                        <div id="auto-verify-message" style="margin-top: 5px;"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="button" class="btn" id="verify-code-btn" onclick="verifyCode()" disabled>Verify Code</button>
+                    </div>
+                    
+                    <div class="resend-timer" id="verification-resend-timer">
+                        Didn't receive the code? <a id="resend-verification-code" onclick="resendVerificationCode()">Resend Code</a>
+                    </div>
+                </div>
+                
+                <!-- Step 3: New Password -->
+                <div id="step-3" class="hidden">
+                    <div class="step-indicator">
+                        <div class="step completed">
+                            <div class="step-number">✓</div>
+                            <div class="step-label">Enter Email</div>
+                        </div>
+                        <div class="step completed">
+                            <div class="step-number">✓</div>
+                            <div class="step-label">Verify Code</div>
+                        </div>
+                        <div class="step active">
+                            <div class="step-number">3</div>
+                            <div class="step-label">New Password</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="new-password">New Password <span class="required">*</span></label>
+                        <div class="password-container">
+                            <input type="password" id="new-password" name="new_password" required 
+                                   placeholder="Enter new password" autocomplete="new-password"
+                                   oninput="checkNewPasswordStrength()">
+                            <button type="button" class="toggle-password" id="toggle-new-password" onclick="togglePassword('new-password', this)">👁️</button>
+                        </div>
+                        <div class="password-strength">
+                            <div id="new-password-strength-meter" class="password-strength-meter"></div>
+                        </div>
+                        <div id="new-password-strength-text" class="password-strength-text"></div>
+                        <div id="new-password-validation" class="validation-message"></div>
+                        <ul id="new-password-rules" class="validation-list">
+                            <li id="new-rule-length" class="invalid">At least 8 characters</li>
+                            <li id="new-rule-uppercase" class="invalid">Contains uppercase letter</li>
+                            <li id="new-rule-lowercase" class="invalid">Contains lowercase letter</li>
+                            <li id="new-rule-number" class="invalid">Contains number</li>
+                            <li id="new-rule-special" class="invalid">Contains special character (@#$%&!)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm-new-password">Confirm New Password <span class="required">*</span></label>
+                        <div class="password-container">
+                            <input type="password" id="confirm-new-password" name="confirm_new_password" required 
+                                   placeholder="Confirm new password" autocomplete="new-password"
+                                   oninput="checkNewConfirmPassword()">
+                            <button type="button" class="toggle-password" id="toggle-confirm-new-password" onclick="togglePassword('confirm-new-password', this)">👁️</button>
+                        </div>
+                        <div id="new-confirm-validation" class="validation-message"></div>
+                    </div>
+                    
+                    <button type="button" class="btn" id="reset-password-btn" onclick="resetPassword()" disabled>Reset Password</button>
+                </div>
+                
+                <div class="switch-form">
+                    Remember your password? <a id="show-login-from-forgot">Login Now</a>
+                </div>
+                <a href="../System/Main.html" class="back-button">← Back to Main Page</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verification Code Modal -->
+    <div id="verification-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Email Verification Code</h3>
+                <button type="button" class="close-btn" onclick="closeVerificationModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="verification-code-display">
+                    <div>Verification code for:</div>
+                    <div style="font-weight: bold; margin: 10px 0; color: #2575fc;" id="modal-email"></div>
+                    <div class="code" id="verification-code-display">000000</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 10px;">Code expires in: <span id="code-expiry">15:00</span></div>
+                </div>
+                <div id="code-copied-message" class="code-copied-message"></div>
+                <div class="modal-instruction">
+                    Click <code>Copy Code</code> then paste it into the verification form.<br>
+                    The code will be auto-filled in 2 seconds after copying.
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="modal-btn primary" onclick="copyVerificationCode()">Copy Code</button>
+                <button type="button" class="modal-btn secondary" onclick="closeVerificationModal()">Close</button>
+            </div>
         </div>
     </div>
 
@@ -433,7 +928,20 @@
         let usernameAvailable = false;
         let passwordValid = false;
         let confirmPasswordValid = false;
+        let newPasswordValid = false;
+        let newConfirmPasswordValid = false;
+        let emailValid = false;
         let usernameCheckTimeout = null;
+        let resendTimer = null;
+        let codeExpiryTimer = null;
+        let autoVerifyTimer = null;
+        let countdown = 60;
+        let codeExpiry = 900; // 15 minutes in seconds
+        let userEmail = '';
+        let currentVerificationCode = '';
+        let resetToken = null;
+        let autoVerifyCountdown = 5;
+        let isAutoVerifying = false;
 
         // 处理登录表单提交
         function handleLoginSubmit(event) {
@@ -478,17 +986,18 @@
             event.preventDefault();
             
             // 验证所有字段
-            if (!usernameAvailable || !passwordValid || !confirmPasswordValid) {
+            if (!usernameAvailable || !emailValid || !passwordValid || !confirmPasswordValid) {
                 showMessage('register-message', 'Please fix the validation errors above', 'error');
                 return false;
             }
             
             const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
             const password = document.getElementById('register-password').value;
             const confirmPassword = document.getElementById('register-confirm-password').value;
             
             // 最终验证
-            if (!username || !password || !confirmPassword) {
+            if (!username || !email || !password || !confirmPassword) {
                 showMessage('register-message', 'Please fill in all fields', 'error');
                 return false;
             }
@@ -521,19 +1030,40 @@
             button.textContent = type === 'password' ? '👁️' : '🔒';
         }
         
-        // Switch between login and register forms
+        // Switch between forms
         document.getElementById('show-register').addEventListener('click', function() {
             document.getElementById('login-form').classList.add('hidden');
             document.getElementById('register-form').classList.remove('hidden');
+            document.getElementById('forgot-password-form').classList.add('hidden');
             clearMessages();
             resetValidation();
+            closeVerificationModal();
         });
         
         document.getElementById('show-login').addEventListener('click', function() {
             document.getElementById('register-form').classList.add('hidden');
             document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('forgot-password-form').classList.add('hidden');
             clearMessages();
             resetValidation();
+            closeVerificationModal();
+        });
+        
+        document.getElementById('show-forgot-password').addEventListener('click', function() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('forgot-password-form').classList.remove('hidden');
+            clearMessages();
+            resetForgotPassword();
+            closeVerificationModal();
+        });
+        
+        document.getElementById('show-login-from-forgot').addEventListener('click', function() {
+            document.getElementById('forgot-password-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+            clearMessages();
+            resetForgotPassword();
+            closeVerificationModal();
         });
         
         // 检查用户名可用性
@@ -643,6 +1173,72 @@
             }, 500); // 500ms防抖
         }
         
+        // 检查邮箱格式和注册状态
+        async function checkEmailFormat() {
+            const email = document.getElementById('register-email').value;
+            const validationElement = document.getElementById('email-validation');
+            const emailInput = document.getElementById('register-email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email.length === 0) {
+                validationElement.textContent = '';
+                validationElement.className = 'validation-message';
+                emailInput.classList.remove('valid-border', 'invalid-border');
+                emailValid = false;
+                updateRegisterButton();
+                return;
+            }
+            
+            if (!emailRegex.test(email)) {
+                validationElement.textContent = 'Invalid email format';
+                validationElement.className = 'validation-message invalid show';
+                emailInput.classList.remove('valid-border');
+                emailInput.classList.add('invalid-border');
+                emailValid = false;
+                updateRegisterButton();
+                return;
+            }
+            
+            // 显示检查状态
+            validationElement.textContent = 'Checking email...';
+            validationElement.className = 'validation-message show';
+            
+            try {
+                const response = await fetch('check_email.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `email=${encodeURIComponent(email)}`
+                });
+                
+                const data = await response.json();
+                
+                if (data.exists) {
+                    validationElement.textContent = 'Email already registered';
+                    validationElement.className = 'validation-message invalid show';
+                    emailInput.classList.remove('valid-border');
+                    emailInput.classList.add('invalid-border');
+                    emailValid = false;
+                } else {
+                    validationElement.textContent = 'Email is available';
+                    validationElement.className = 'validation-message valid show';
+                    emailInput.classList.remove('invalid-border');
+                    emailInput.classList.add('valid-border');
+                    emailValid = true;
+                }
+            } catch (error) {
+                console.error('Error checking email:', error);
+                validationElement.textContent = 'Error checking email';
+                validationElement.className = 'validation-message invalid show';
+                emailInput.classList.remove('valid-border');
+                emailInput.classList.add('invalid-border');
+                emailValid = false;
+            }
+            
+            updateRegisterButton();
+        }
+        
         // 检查密码强度
         function checkPasswordStrength() {
             const password = document.getElementById('register-password').value;
@@ -652,7 +1248,6 @@
             const passwordInput = document.getElementById('register-password');
             
             let score = 0;
-            const messages = [];
             
             // 检查密码规则
             const hasLength = password.length >= 8;
@@ -731,8 +1326,101 @@
             updateRegisterButton();
         }
         
+        // 检查新密码强度
+        function checkNewPasswordStrength() {
+            const password = document.getElementById('new-password').value;
+            const strengthMeter = document.getElementById('new-password-strength-meter');
+            const strengthText = document.getElementById('new-password-strength-text');
+            const validationElement = document.getElementById('new-password-validation');
+            const passwordInput = document.getElementById('new-password');
+            
+            let score = 0;
+            
+            // 检查密码规则
+            const hasLength = password.length >= 8;
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasLowercase = /[a-z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            const hasSpecial = /[@#$%&!]/.test(password);
+            
+            // 更新规则显示
+            updateNewRule('new-rule-length', hasLength);
+            updateNewRule('new-rule-uppercase', hasUppercase);
+            updateNewRule('new-rule-lowercase', hasLowercase);
+            updateNewRule('new-rule-number', hasNumber);
+            updateNewRule('new-rule-special', hasSpecial);
+            
+            // 计算分数
+            if (hasLength) score += 1;
+            if (hasUppercase) score += 1;
+            if (hasLowercase) score += 1;
+            if (hasNumber) score += 1;
+            if (hasSpecial) score += 1;
+            
+            // 确定强度等级
+            let strength = 'Very Weak';
+            let color = '#dc3545';
+            let width = '20%';
+            
+            if (score >= 4) {
+                strength = 'Strong';
+                color = '#28a745';
+                width = '80%';
+                newPasswordValid = true;
+            } else if (score >= 3) {
+                strength = 'Good';
+                color = '#17a2b8';
+                width = '60%';
+                newPasswordValid = true;
+            } else if (score >= 2) {
+                strength = 'Fair';
+                color = '#ffc107';
+                width = '40%';
+                newPasswordValid = false;
+            } else if (score >= 1) {
+                strength = 'Weak';
+                color = '#fd7e14';
+                width = '20%';
+                newPasswordValid = false;
+            } else {
+                newPasswordValid = false;
+            }
+            
+            // 更新UI
+            strengthMeter.style.width = width;
+            strengthMeter.style.backgroundColor = color;
+            strengthText.textContent = `Strength: ${strength}`;
+            strengthText.style.color = color;
+            
+            if (password.length === 0) {
+                validationElement.textContent = '';
+                validationElement.className = 'validation-message';
+                passwordInput.classList.remove('valid-border', 'invalid-border');
+            } else if (newPasswordValid) {
+                validationElement.textContent = 'Password strength is good';
+                validationElement.className = 'validation-message valid show';
+                passwordInput.classList.remove('invalid-border');
+                passwordInput.classList.add('valid-border');
+            } else {
+                validationElement.textContent = 'Password is too weak. Please follow the rules above.';
+                validationElement.className = 'validation-message invalid show';
+                passwordInput.classList.remove('valid-border');
+                passwordInput.classList.add('invalid-border');
+            }
+            
+            // 同时检查确认密码
+            checkNewConfirmPassword();
+            updateResetPasswordButton();
+        }
+        
         // 更新规则显示
         function updateRule(elementId, isValid) {
+            const element = document.getElementById(elementId);
+            element.className = isValid ? 'valid' : 'invalid';
+        }
+        
+        // 更新新密码规则显示
+        function updateNewRule(elementId, isValid) {
             const element = document.getElementById(elementId);
             element.className = isValid ? 'valid' : 'invalid';
         }
@@ -766,10 +1454,39 @@
             updateRegisterButton();
         }
         
+        // 检查新确认密码
+        function checkNewConfirmPassword() {
+            const password = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-new-password').value;
+            const validationElement = document.getElementById('new-confirm-validation');
+            const confirmInput = document.getElementById('confirm-new-password');
+            
+            if (confirmPassword.length === 0) {
+                validationElement.textContent = '';
+                validationElement.className = 'validation-message';
+                confirmInput.classList.remove('valid-border', 'invalid-border');
+                newConfirmPasswordValid = false;
+            } else if (password === confirmPassword) {
+                validationElement.textContent = 'Passwords match';
+                validationElement.className = 'validation-message valid show';
+                confirmInput.classList.remove('invalid-border');
+                confirmInput.classList.add('valid-border');
+                newConfirmPasswordValid = true;
+            } else {
+                validationElement.textContent = 'Passwords do not match';
+                validationElement.className = 'validation-message invalid show';
+                confirmInput.classList.remove('valid-border');
+                confirmInput.classList.add('invalid-border');
+                newConfirmPasswordValid = false;
+            }
+            
+            updateResetPasswordButton();
+        }
+        
         // 更新注册按钮状态
         function updateRegisterButton() {
             const registerBtn = document.getElementById('register-btn');
-            if (usernameAvailable && passwordValid && confirmPasswordValid) {
+            if (usernameAvailable && emailValid && passwordValid && confirmPasswordValid) {
                 registerBtn.disabled = false;
                 registerBtn.style.opacity = '1';
             } else {
@@ -778,13 +1495,27 @@
             }
         }
         
+        // 更新重置密码按钮状态
+        function updateResetPasswordButton() {
+            const resetBtn = document.getElementById('reset-password-btn');
+            if (newPasswordValid && newConfirmPasswordValid) {
+                resetBtn.disabled = false;
+                resetBtn.style.opacity = '1';
+            } else {
+                resetBtn.disabled = true;
+                resetBtn.style.opacity = '0.6';
+            }
+        }
+        
         // 重置验证状态
         function resetValidation() {
             usernameAvailable = false;
             passwordValid = false;
             confirmPasswordValid = false;
+            emailValid = false;
             
             document.getElementById('register-username').classList.remove('valid-border', 'invalid-border');
+            document.getElementById('register-email').classList.remove('valid-border', 'invalid-border');
             document.getElementById('register-password').classList.remove('valid-border', 'invalid-border');
             document.getElementById('register-confirm-password').classList.remove('valid-border', 'invalid-border');
             
@@ -802,6 +1533,714 @@
             });
             
             updateRegisterButton();
+        }
+        
+        // 重置忘记密码表单
+        function resetForgotPassword() {
+            // 重置步骤
+            document.getElementById('step-1').classList.remove('hidden');
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('step-3').classList.add('hidden');
+            
+            // 重置输入
+            document.getElementById('forgot-email').value = '';
+            document.querySelectorAll('.verification-input').forEach(input => {
+                input.value = '';
+                input.classList.remove('filled');
+            });
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-new-password').value = '';
+            
+            // 重置验证状态
+            newPasswordValid = false;
+            newConfirmPasswordValid = false;
+            
+            // 重置UI
+            document.getElementById('new-password-strength-meter').style.width = '0%';
+            document.getElementById('new-password-strength-text').textContent = '';
+            document.getElementById('new-password-validation').textContent = '';
+            document.getElementById('new-password-validation').className = 'validation-message';
+            document.getElementById('new-confirm-validation').textContent = '';
+            document.getElementById('new-confirm-validation').className = 'validation-message';
+            
+            document.querySelectorAll('#new-password-rules li').forEach(el => {
+                el.className = 'invalid';
+            });
+            
+            // 清除定时器
+            if (resendTimer) {
+                clearInterval(resendTimer);
+                resendTimer = null;
+            }
+            
+            // 清除验证码过期定时器
+            if (codeExpiryTimer) {
+                clearInterval(codeExpiryTimer);
+                codeExpiryTimer = null;
+            }
+            
+            // 清除自动验证定时器
+            if (autoVerifyTimer) {
+                clearInterval(autoVerifyTimer);
+                autoVerifyTimer = null;
+            }
+            
+            // 重置重发按钮
+            document.getElementById('resend-timer').classList.add('hidden');
+            document.getElementById('resend-code').classList.add('disabled');
+            document.getElementById('countdown').textContent = '60';
+            countdown = 60;
+            
+            // 重置验证按钮
+            document.getElementById('verify-code-btn').disabled = true;
+            
+            // 重置自动验证通知
+            document.getElementById('auto-verify-notice').classList.remove('show');
+            document.getElementById('auto-verify-countdown').textContent = '5';
+            autoVerifyCountdown = 5;
+            isAutoVerifying = false;
+            
+            // 重置全局变量
+            userEmail = '';
+            resetToken = null;
+            currentVerificationCode = '';
+        }
+        
+        // 发送验证码（完全修复版）
+        async function sendVerificationCode() {
+            const email = document.getElementById('forgot-email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!email || !emailRegex.test(email)) {
+                showMessage('forgot-message', 'Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // 显示加载状态
+            const sendBtn = document.getElementById('send-code-btn');
+            const originalText = sendBtn.innerHTML;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = 'Sending...';
+            
+            try {
+                // 调用后端API检查邮箱是否存在
+                const formData = new FormData();
+                formData.append('action', 'send_code');
+                formData.append('email', email);
+                
+                const response = await fetch('ForgotPassword.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 使用后端返回的验证码
+                    currentVerificationCode = result.code;
+                    userEmail = email;
+                    
+                    console.log('Verification code received from backend:', currentVerificationCode);
+                    
+                    // 显示弹窗显示验证码
+                    showVerificationModal();
+                    
+                    // 显示步骤2
+                    document.getElementById('step-1').classList.add('hidden');
+                    document.getElementById('step-2').classList.remove('hidden');
+                    document.getElementById('user-email').textContent = email;
+                    
+                    // 显示成功消息
+                    showMessage('forgot-message', result.message, 'success');
+                    
+                    // 启动重发计时器
+                    startResendTimer();
+                    
+                    // 启动验证码过期计时器
+                    startCodeExpiryTimer();
+                    
+                    // 设置增强的粘贴功能
+                    setupEnhancedPaste();
+                    
+                    // 启用验证按钮
+                    document.getElementById('verify-code-btn').disabled = false;
+                } else {
+                    showMessage('forgot-message', result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('forgot-message', 'Failed to send verification code', 'error');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = originalText;
+            }
+        }
+        
+        // 显示验证码弹窗
+        function showVerificationModal() {
+            document.getElementById('verification-code-display').textContent = currentVerificationCode;
+            document.getElementById('modal-email').textContent = userEmail;
+            document.getElementById('verification-modal').classList.remove('hidden');
+            
+            // 重置过期时间显示
+            codeExpiry = 900; // 15分钟
+            updateExpiryDisplay();
+            
+            // 隐藏复制成功消息
+            document.getElementById('code-copied-message').classList.remove('show');
+        }
+        
+        // 更新过期时间显示
+        function updateExpiryDisplay() {
+            const minutes = Math.floor(codeExpiry / 60);
+            const seconds = codeExpiry % 60;
+            document.getElementById('code-expiry').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // 启动验证码过期计时器
+        function startCodeExpiryTimer() {
+            if (codeExpiryTimer) {
+                clearInterval(codeExpiryTimer);
+            }
+            
+            codeExpiryTimer = setInterval(() => {
+                codeExpiry--;
+                updateExpiryDisplay();
+                
+                if (codeExpiry <= 0) {
+                    clearInterval(codeExpiryTimer);
+                    showMessage('forgot-message', 'Verification code has expired. Please request a new one.', 'error');
+                    // 清除当前验证码
+                    currentVerificationCode = '';
+                    // 禁用验证按钮
+                    document.getElementById('verify-code-btn').disabled = true;
+                }
+            }, 1000);
+        }
+        
+        // 关闭验证码弹窗
+        function closeVerificationModal() {
+            const modal = document.getElementById('verification-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+        
+        // 复制验证码并自动填充
+        async function copyVerificationCode() {
+            if (!currentVerificationCode) {
+                alert('No verification code available');
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(currentVerificationCode);
+                
+                // 显示复制成功消息
+                const copySuccess = document.getElementById('code-copied-message');
+                copySuccess.textContent = '✓ Code copied! Auto-filling in 2 seconds...';
+                copySuccess.classList.remove('error');
+                copySuccess.classList.add('success');
+                copySuccess.classList.add('show');
+                
+                // 2秒后自动填充验证码
+                setTimeout(() => {
+                    // 自动填充验证码输入框
+                    const inputs = document.querySelectorAll('.verification-input');
+                    const codeDigits = currentVerificationCode.split('');
+                    
+                    inputs.forEach((input, index) => {
+                        if (codeDigits[index]) {
+                            input.value = codeDigits[index];
+                            input.classList.add('filled');
+                            // 触发输入事件
+                            input.dispatchEvent(new Event('input'));
+                        }
+                    });
+                    
+                    // 关闭弹窗
+                    closeVerificationModal();
+                    
+                    // 启用验证按钮
+                    document.getElementById('verify-code-btn').disabled = false;
+                    
+                    // 显示自动验证通知
+                    const autoVerifyNotice = document.getElementById('auto-verify-notice');
+                    const autoVerifyMessage = document.getElementById('auto-verify-message');
+                    
+                    autoVerifyNotice.classList.add('show');
+                    autoVerifyNotice.style.display = 'block';
+                    autoVerifyMessage.textContent = 'Code auto-filled! Click "Verify Code" or wait 3 seconds for auto-verification...';
+                    autoVerifyMessage.style.color = '#084298';
+                    
+                    // 3秒后自动验证
+                    autoVerifyCountdown = 3;
+                    document.getElementById('auto-verify-countdown').textContent = autoVerifyCountdown;
+                    
+                    if (autoVerifyTimer) {
+                        clearInterval(autoVerifyTimer);
+                    }
+                    
+                    autoVerifyTimer = setInterval(() => {
+                        autoVerifyCountdown--;
+                        document.getElementById('auto-verify-countdown').textContent = autoVerifyCountdown;
+                        
+                        if (autoVerifyCountdown <= 0) {
+                            clearInterval(autoVerifyTimer);
+                            isAutoVerifying = true;
+                            verifyCode();
+                        }
+                    }, 1000);
+                    
+                }, 2000); // 等待2秒
+                
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                // 降级方案
+                const textArea = document.createElement('textarea');
+                textArea.value = currentVerificationCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // 显示成功消息
+                const copySuccess = document.getElementById('code-copied-message');
+                copySuccess.textContent = '✓ Code copied! Auto-filling now...';
+                copySuccess.classList.add('show');
+                
+                // 立即自动填充
+                setTimeout(() => {
+                    const inputs = document.querySelectorAll('.verification-input');
+                    const codeDigits = currentVerificationCode.split('');
+                    
+                    inputs.forEach((input, index) => {
+                        if (codeDigits[index]) {
+                            input.value = codeDigits[index];
+                            input.classList.add('filled');
+                            input.dispatchEvent(new Event('input'));
+                        }
+                    });
+                    
+                    closeVerificationModal();
+                    document.getElementById('verify-code-btn').disabled = false;
+                }, 500);
+            }
+        }
+        
+        // 启动重发计时器
+        function startResendTimer() {
+            countdown = 60;
+            document.getElementById('countdown').textContent = countdown;
+            document.getElementById('resend-timer').classList.remove('hidden');
+            document.getElementById('resend-code').classList.add('disabled');
+            
+            if (resendTimer) {
+                clearInterval(resendTimer);
+            }
+            
+            resendTimer = setInterval(() => {
+                countdown--;
+                document.getElementById('countdown').textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(resendTimer);
+                    document.getElementById('resend-code').classList.remove('disabled');
+                    document.getElementById('resend-code').textContent = 'Resend Now';
+                }
+            }, 1000);
+        }
+        
+        // 重新发送验证码（完全修复版）
+        async function resendVerificationCode() {
+            if (countdown > 0) {
+                showMessage('forgot-message', `Please wait ${countdown} seconds before resending`, 'error');
+                return;
+            }
+            
+            // 显示加载状态
+            const resendLink = document.getElementById('resend-verification-code');
+            const originalText = resendLink.innerHTML;
+            resendLink.innerHTML = 'Resending...';
+            
+            try {
+                // 调用后端API重新发送验证码
+                const formData = new FormData();
+                formData.append('action', 'send_code');
+                formData.append('email', userEmail);
+                
+                const response = await fetch('ForgotPassword.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 使用后端返回的新验证码
+                    currentVerificationCode = result.code;
+                    
+                    console.log('New verification code received from backend:', currentVerificationCode);
+                    
+                    // 更新弹窗显示
+                    document.getElementById('verification-code-display').textContent = currentVerificationCode;
+                    
+                    // 重置计时器
+                    startResendTimer();
+                    document.getElementById('resend-code').classList.add('disabled');
+                    
+                    // 重置验证码过期计时器
+                    if (codeExpiryTimer) {
+                        clearInterval(codeExpiryTimer);
+                    }
+                    codeExpiry = 900;
+                    startCodeExpiryTimer();
+                    
+                    // 清除验证码输入
+                    document.querySelectorAll('.verification-input').forEach(input => {
+                        input.value = '';
+                        input.classList.remove('filled');
+                    });
+                    
+                    // 禁用验证按钮（等待用户输入）
+                    document.getElementById('verify-code-btn').disabled = true;
+                    
+                    // 清除自动验证
+                    if (autoVerifyTimer) {
+                        clearInterval(autoVerifyTimer);
+                        autoVerifyTimer = null;
+                    }
+                    document.getElementById('auto-verify-notice').classList.remove('show');
+                    
+                    // 显示成功消息
+                    showMessage('forgot-message', 'New verification code sent!', 'success');
+                    
+                    // 重新显示弹窗
+                    showVerificationModal();
+                } else {
+                    showMessage('forgot-message', result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('forgot-message', 'Failed to resend verification code', 'error');
+            } finally {
+                resendLink.innerHTML = originalText;
+            }
+        }
+        
+        // 在验证码输入框之间移动焦点
+        function moveToNext(input, nextIndex) {
+            // 只允许数字
+            input.value = input.value.replace(/\D/g, '');
+            
+            // 如果输入了内容，添加filled类
+            if (input.value) {
+                input.classList.add('filled');
+            } else {
+                input.classList.remove('filled');
+            }
+            
+            // 自动跳转到下一个输入框
+            if (input.value && nextIndex <= 6) {
+                const nextInput = document.querySelector(`.verification-input[data-index="${nextIndex}"]`);
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
+            
+            // 处理退格键（自动跳转到上一个输入框）
+            if (input.value === '' && nextIndex > 1) {
+                const prevInput = document.querySelector(`.verification-input[data-index="${nextIndex - 2}"]`);
+                if (prevInput) {
+                    prevInput.focus();
+                }
+            }
+            
+            // 检查是否所有输入框都有值
+            checkVerificationCode();
+        }
+        
+        // 检查验证码
+        function checkVerificationCode() {
+            const inputs = document.querySelectorAll('.verification-input');
+            let code = '';
+            let allFilled = true;
+            
+            inputs.forEach(input => {
+                code += input.value;
+                if (!input.value) allFilled = false;
+            });
+            
+            // 如果所有输入框都有值，启用验证按钮
+            document.getElementById('verify-code-btn').disabled = !allFilled;
+            
+            // 如果填满了6位且不是自动验证中，开始自动验证倒计时
+            if (allFilled && code.length === 6 && !isAutoVerifying) {
+                startAutoVerifyCountdown();
+            }
+        }
+        
+        // 开始自动验证倒计时
+        function startAutoVerifyCountdown() {
+            // 清除自动验证通知
+            document.getElementById('auto-verify-notice').classList.remove('show');
+            
+            // 显示自动验证通知
+            const autoVerifyNotice = document.getElementById('auto-verify-notice');
+            const autoVerifyMessage = document.getElementById('auto-verify-message');
+            
+            autoVerifyNotice.classList.add('show');
+            autoVerifyNotice.style.display = 'block';
+            autoVerifyMessage.textContent = 'Code entered. Click "Verify Code" or wait 3 seconds for auto-verification...';
+            autoVerifyMessage.style.color = '#084298';
+            
+            autoVerifyCountdown = 3;
+            document.getElementById('auto-verify-countdown').textContent = autoVerifyCountdown;
+            
+            if (autoVerifyTimer) {
+                clearInterval(autoVerifyTimer);
+            }
+            
+            autoVerifyTimer = setInterval(() => {
+                autoVerifyCountdown--;
+                document.getElementById('auto-verify-countdown').textContent = autoVerifyCountdown;
+                
+                if (autoVerifyCountdown <= 0) {
+                    clearInterval(autoVerifyTimer);
+                    isAutoVerifying = true;
+                    verifyCode();
+                }
+            }, 1000);
+        }
+        
+        // 设置增强的粘贴功能
+        function setupEnhancedPaste() {
+            const verificationInputs = document.querySelectorAll('.verification-input');
+            
+            verificationInputs.forEach(input => {
+                // 清除旧的监听器
+                const newInput = input.cloneNode(true);
+                input.parentNode.replaceChild(newInput, input);
+                
+                // 重新绑定事件
+                newInput.addEventListener('paste', handlePaste);
+                newInput.addEventListener('input', function(e) {
+                    moveToNext(this, parseInt(this.dataset.index) + 2);
+                });
+            });
+            
+            function handlePaste(e) {
+                e.preventDefault();
+                const pasteData = e.clipboardData.getData('text');
+                const numbers = pasteData.replace(/\D/g, '');
+                
+                if (numbers.length === 6) {
+                    // 如果粘贴的是6位数字，自动填充
+                    const inputs = document.querySelectorAll('.verification-input');
+                    inputs.forEach((inputEl, index) => {
+                        if (numbers[index]) {
+                            inputEl.value = numbers[index];
+                            inputEl.classList.add('filled');
+                            // 触发输入事件以更新UI
+                            inputEl.dispatchEvent(new Event('input'));
+                        }
+                    });
+                    
+                    // 清除自动验证通知
+                    document.getElementById('auto-verify-notice').classList.remove('show');
+                    
+                    // 启用验证按钮
+                    document.getElementById('verify-code-btn').disabled = false;
+                    
+                    // 显示自动验证通知
+                    const autoVerifyNotice = document.getElementById('auto-verify-notice');
+                    const autoVerifyMessage = document.getElementById('auto-verify-message');
+                    
+                    autoVerifyNotice.classList.add('show');
+                    autoVerifyNotice.style.display = 'block';
+                    autoVerifyMessage.textContent = 'Code pasted! Click "Verify Code" or wait 3 seconds for auto-verification...';
+                    autoVerifyMessage.style.color = '#084298';
+                    
+                    // 3秒后自动验证
+                    autoVerifyCountdown = 3;
+                    document.getElementById('auto-verify-countdown').textContent = autoVerifyCountdown;
+                    
+                    if (autoVerifyTimer) {
+                        clearInterval(autoVerifyTimer);
+                    }
+                    
+                    autoVerifyTimer = setInterval(() => {
+                        autoVerifyCountdown--;
+                        document.getElementById('auto-verify-countdown').textContent = autoVerifyCountdown;
+                        
+                        if (autoVerifyCountdown <= 0) {
+                            clearInterval(autoVerifyTimer);
+                            isAutoVerifying = true;
+                            verifyCode();
+                        }
+                    }, 1000);
+                    
+                    // 聚焦到最后一个输入框
+                    inputs[5].focus();
+                } else if (numbers.length > 0 && numbers.length < 6) {
+                    // 如果粘贴的数字不足6位，只填充前几个
+                    const inputs = document.querySelectorAll('.verification-input');
+                    numbers.split('').forEach((num, index) => {
+                        if (inputs[index]) {
+                            inputs[index].value = num;
+                            inputs[index].classList.add('filled');
+                            inputs[index].dispatchEvent(new Event('input'));
+                        }
+                    });
+                    
+                    // 聚焦到下一个可用的输入框
+                    const nextIndex = Math.min(numbers.length, 5);
+                    inputs[nextIndex].focus();
+                }
+            }
+        }
+        
+        // 验证验证码（完全修复版 - 使用后端验证）
+        async function verifyCode() {
+            const inputs = document.querySelectorAll('.verification-input');
+            let enteredCode = '';
+            
+            inputs.forEach(input => {
+                enteredCode += input.value;
+            });
+            
+            // 检查验证码是否过期
+            if (codeExpiry <= 0) {
+                showMessage('forgot-message', 'Verification code has expired. Please request a new one.', 'error');
+                return;
+            }
+            
+            if (enteredCode.length !== 6) {
+                showMessage('forgot-message', 'Please enter all 6 digits', 'error');
+                return;
+            }
+            
+            // 显示加载状态
+            const verifyBtn = document.getElementById('verify-code-btn');
+            const originalText = verifyBtn.innerHTML;
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = 'Verifying...';
+            
+            try {
+                // 调用后端API验证验证码
+                const formData = new FormData();
+                formData.append('action', 'verify_code');
+                formData.append('email', userEmail);
+                formData.append('code', enteredCode);
+                
+                const response = await fetch('ForgotPassword.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 验证成功，显示步骤3
+                    document.getElementById('step-2').classList.add('hidden');
+                    document.getElementById('step-3').classList.remove('hidden');
+                    showMessage('forgot-message', result.message, 'success');
+                    
+                    // 存储重置令牌
+                    resetToken = result.token;
+                    
+                    // 清除验证码过期定时器
+                    if (codeExpiryTimer) {
+                        clearInterval(codeExpiryTimer);
+                        codeExpiryTimer = null;
+                    }
+                    
+                    // 清除自动验证定时器
+                    if (autoVerifyTimer) {
+                        clearInterval(autoVerifyTimer);
+                        autoVerifyTimer = null;
+                    }
+                    
+                    // 关闭弹窗
+                    closeVerificationModal();
+                    
+                    // 清除自动验证通知
+                    document.getElementById('auto-verify-notice').classList.remove('show');
+                } else {
+                    showMessage('forgot-message', result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('forgot-message', 'Failed to verify code. Please try again.', 'error');
+            } finally {
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = originalText;
+                isAutoVerifying = false;
+            }
+        }
+        
+        // 重置密码（完全修复版）
+        async function resetPassword() {
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-new-password').value;
+            
+            if (!newPasswordValid || !newConfirmPasswordValid) {
+                showMessage('forgot-message', 'Please fix the validation errors above', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showMessage('forgot-message', 'Passwords do not match', 'error');
+                return;
+            }
+            
+            if (!resetToken) {
+                showMessage('forgot-message', 'Reset session expired. Please start over.', 'error');
+                return;
+            }
+            
+            // 显示加载状态
+            const resetBtn = document.getElementById('reset-password-btn');
+            const originalText = resetBtn.innerHTML;
+            resetBtn.disabled = true;
+            resetBtn.innerHTML = 'Resetting...';
+            
+            try {
+                // 调用后端API重置密码
+                const formData = new FormData();
+                formData.append('action', 'reset_password');
+                formData.append('email', userEmail);
+                formData.append('token', resetToken);
+                formData.append('new_password', newPassword);
+                
+                const response = await fetch('ForgotPassword.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('forgot-message', 'Password reset successful! You can now login with your new password.', 'success');
+                    
+                    // 重置表单并显示登录表单
+                    setTimeout(() => {
+                        resetForgotPassword();
+                        document.getElementById('forgot-password-form').classList.add('hidden');
+                        document.getElementById('login-form').classList.remove('hidden');
+                        clearMessages();
+                    }, 3000);
+                } else {
+                    showMessage('forgot-message', result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('forgot-message', 'An error occurred. Please try again.', 'error');
+            } finally {
+                resetBtn.disabled = false;
+                resetBtn.innerHTML = originalText;
+            }
         }
         
         // Show message
@@ -823,6 +2262,7 @@
         function clearMessages() {
             document.getElementById('login-message').classList.add('hidden');
             document.getElementById('register-message').classList.add('hidden');
+            document.getElementById('forgot-message').classList.add('hidden');
         }
 
         // Check for URL parameters to show messages
@@ -840,25 +2280,30 @@
                 // 确保显示登录表单
                 document.getElementById('register-form').classList.add('hidden');
                 document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('forgot-password-form').classList.add('hidden');
+                closeVerificationModal();
             }
             if (registerError) {
                 // 显示注册表单并显示错误
                 document.getElementById('login-form').classList.add('hidden');
                 document.getElementById('register-form').classList.remove('hidden');
+                document.getElementById('forgot-password-form').classList.add('hidden');
                 showMessage('register-message', decodeURIComponent(registerError), 'error');
+                closeVerificationModal();
             }
             if (registerSuccess) {
                 // 显示登录表单并显示成功消息
                 document.getElementById('register-form').classList.add('hidden');
                 document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('forgot-password-form').classList.add('hidden');
                 showMessage('login-message', decodeURIComponent(registerSuccess), 'success');
+                closeVerificationModal();
             }
             
             // 检查是否有重定向参数
             const redirect = urlParams.get('redirect');
             if (redirect) {
                 console.log('Redirect parameter found:', redirect);
-                // 可以在页面上显示一些指示，告诉用户登录后会返回到该页面
             }
             
             // 检查是否有登录成功的参数（从其他页面重定向回来）
@@ -891,6 +2336,52 @@
                 registerBtn.disabled = true;
                 registerBtn.innerHTML = 'Create Account';
             }
+            
+            // 监听验证码输入框的键盘事件
+            const verificationInputs = document.querySelectorAll('.verification-input');
+            verificationInputs.forEach(input => {
+                input.addEventListener('keydown', function(e) {
+                    // 允许退格键、删除键、箭头键、Tab键
+                    if ([8, 9, 37, 38, 39, 40, 46].includes(e.keyCode)) {
+                        return;
+                    }
+                    
+                    // 只允许数字
+                    if (e.keyCode < 48 || e.keyCode > 57) {
+                        if (e.keyCode < 96 || e.keyCode > 105) {
+                            e.preventDefault();
+                        }
+                    }
+                });
+            });
+            
+            // 点击模态框外部关闭模态框
+            document.getElementById('verification-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeVerificationModal();
+                }
+            });
+            
+            // ESC键关闭模态框
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeVerificationModal();
+                }
+            });
+            
+            // 设置增强的粘贴功能
+            setupEnhancedPaste();
+            
+            // 为重新发送按钮添加事件监听
+            document.getElementById('resend-code').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (!this.classList.contains('disabled')) {
+                    resendVerificationCode();
+                }
+            });
+            
+            // 初始时确保弹窗关闭
+            closeVerificationModal();
         });
     </script>
 </body>
