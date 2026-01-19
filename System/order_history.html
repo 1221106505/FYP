@@ -156,6 +156,18 @@
             color: #383d41;
         }
 
+        /* Payment Method Badge */
+        .payment-method-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            background: #e9ecef;
+            color: #495057;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
         /* Orders List */
         .orders-container {
             background: white;
@@ -499,12 +511,12 @@
                 <div class="stat-label">Total Spent</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" id="pendingOrders">0</div>
-                <div class="stat-label">Pending Orders</div>
+                <div class="stat-value" id="completedPayments">0</div>
+                <div class="stat-label">Paid Orders</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" id="avgOrder">RM 0.00</div>
-                <div class="stat-label">Average Order</div>
+                <div class="stat-value" id="pendingPayments">0</div>
+                <div class="stat-label">Pending Payments</div>
             </div>
         </div>
 
@@ -555,7 +567,6 @@
         // API endpoints
         const API_ENDPOINTS = {
             orders: 'get_customer_orders.php',
-            payments: 'get_payment.php',
             checkLogin: 'check_login.php'
         };
 
@@ -647,12 +658,15 @@
                     console.log(`Found ${data.orders.length} orders`);
                     allOrders = data.orders;
                     
-                    // 为每个订单加载支付历史
-                    await loadPaymentsForOrders();
-                    
                     // 显示订单
                     filterOrders();
-                    updateStats();
+                    
+                    // 更新统计信息
+                    if (data.payment_stats) {
+                        updatePaymentStats(data);
+                    } else {
+                        updateStats();
+                    }
                 } else {
                     console.log('No orders found or API returned error');
                     showNoOrders();
@@ -660,32 +674,6 @@
             } catch (error) {
                 console.error('Error loading customer orders:', error);
                 showError('Error loading orders. Please try again later.');
-            }
-        }
-
-        // 为所有订单加载支付历史
-        async function loadPaymentsForOrders() {
-            for (let i = 0; i < allOrders.length; i++) {
-                try {
-                    const order = allOrders[i];
-                    const paymentResponse = await fetch(`${API_ENDPOINTS.payments}?order_id=${order.order_id}`, {
-                        credentials: 'include'
-                    });
-                    
-                    if (paymentResponse.ok) {
-                        const paymentData = await paymentResponse.json();
-                        if (paymentData.success) {
-                            allOrders[i].payments = paymentData.payments || [];
-                        } else {
-                            allOrders[i].payments = [];
-                        }
-                    } else {
-                        allOrders[i].payments = [];
-                    }
-                } catch (error) {
-                    console.error(`Error loading payments for order ${order.order_id}:`, error);
-                    allOrders[i].payments = [];
-                }
             }
         }
 
@@ -738,7 +726,6 @@
             ordersContainer.innerHTML = orders.map(order => {
                 const orderDate = new Date(order.order_date);
                 const orderItems = order.items || [];
-                const payments = order.payments || [];
                 
                 return `
                 <div class="order-card">
@@ -755,25 +742,32 @@
                     <div class="order-details">
                         <div>
                             <strong>Shipping Address:</strong><br>
-                            <small>${order.shipping_address || 'No address provided'}</small>
+                            <small>${escapeHtml(order.shipping_address || 'No address provided')}</small>
                         </div>
                         <div>
                             <strong>Contact:</strong><br>
-                            <small>${order.contact_phone || 'N/A'}</small>
+                            <small>${escapeHtml(order.contact_phone || 'N/A')}</small>
                         </div>
                         <div>
-                            <strong>Items:</strong><br>
-                            <small>${order.item_count || orderItems.length || 0} items</small>
+                            <strong>Payment:</strong><br>
+                            <small>
+                                ${escapeHtml(order.payment_method_display || getPaymentMethodText(order.payment_method) || 'Not Specified')}<br>
+                                <span class="payment-method-badge">${escapeHtml(order.payment_method || 'N/A')}</span>
+                            </small>
                         </div>
                         <div>
-                            <strong>Total:</strong><br>
+                            <strong>Payment Status:</strong><br>
+                            <span class="payment-status ${getPaymentStatusClass(order.payment_status)}">
+                                ${escapeHtml(order.payment_status_display || order.payment_status || 'Pending')}
+                            </span><br>
+                            <strong style="display: block; margin-top: 4px;">Total:</strong>
                             <strong>RM ${parseFloat(order.total_amount || 0).toFixed(2)}</strong>
                         </div>
                     </div>
                     
                     ${orderItems.length > 0 ? `
                         <div class="order-items">
-                            <strong>Order Items:</strong>
+                            <strong>Order Items (${orderItems.length}):</strong>
                             ${orderItems.map(item => {
                                 const bookTitle = item.book_title || item.title || 'Unknown Book';
                                 const author = item.author || 'Unknown Author';
@@ -796,44 +790,39 @@
                         </div>
                     ` : '<div class="order-items"><em>No items found for this order</em></div>'}
                     
-                    <!-- Payment History Section -->
+                    <!-- Payment Details Section -->
                     <div class="payment-history">
-                        <strong>Payment History:</strong>
-                        ${payments.length > 0 ? 
-                            payments.map(payment => {
-                                const paymentDate = payment.created_at ? new Date(payment.created_at) : new Date();
-                                const statusClass = getPaymentStatusClass(payment.payment_status);
-                                
-                                return `
-                                <div class="payment-item ${payment.payment_status}">
-                                    <div class="payment-header">
-                                        <div class="payment-method">
-                                            ${getPaymentMethodText(payment.payment_method)}
-                                        </div>
-                                        <div class="payment-status ${statusClass}">
-                                            ${payment.payment_status.toUpperCase()}
-                                        </div>
-                                    </div>
-                                    <div class="payment-details">
-                                        <div class="payment-amount">
-                                            RM ${parseFloat(payment.amount || 0).toFixed(2)}
-                                        </div>
-                                        <div class="payment-date">
-                                            ${paymentDate.toLocaleDateString()}
-                                        </div>
-                                    </div>
-                                    ${payment.transaction_id ? `
-                                    <div style="margin-top: 8px; font-size: 0.8rem;">
-                                        <strong>Transaction ID:</strong>
-                                        <div class="transaction-id">${payment.transaction_id}</div>
-                                    </div>
-                                    ` : ''}
+                        <strong>Payment Details:</strong>
+                        <div class="payment-item ${order.payment_status || 'pending'}">
+                            <div class="payment-header">
+                                <div class="payment-method">
+                                    ${escapeHtml(order.payment_method_display || getPaymentMethodText(order.payment_method) || 'Payment Method')}
                                 </div>
-                                `;
-                            }).join('') 
-                            : 
-                            '<div style="color: #666; font-style: italic; padding: 10px; background: #f8f9fa; border-radius: 6px;">No payment records found for this order</div>'
-                        }
+                                <div class="payment-status ${getPaymentStatusClass(order.payment_status)}">
+                                    ${escapeHtml(order.payment_status_display || order.payment_status || 'PENDING').toUpperCase()}
+                                </div>
+                            </div>
+                            <div class="payment-details">
+                                <div class="payment-amount">
+                                    RM ${parseFloat(order.payment_amount || order.total_amount || 0).toFixed(2)}
+                                </div>
+                                <div class="payment-date">
+                                    ${order.payment_date ? new Date(order.payment_date).toLocaleDateString() : 'Not Paid Yet'}
+                                </div>
+                            </div>
+                            ${order.transaction_id ? `
+                            <div style="margin-top: 8px; font-size: 0.8rem;">
+                                <strong>Transaction ID:</strong>
+                                <div class="transaction-id">${escapeHtml(order.transaction_id)}</div>
+                            </div>
+                            ` : ''}
+                            ${order.notes ? `
+                            <div style="margin-top: 8px; font-size: 0.8rem;">
+                                <strong>Notes:</strong>
+                                <div>${escapeHtml(order.notes)}</div>
+                            </div>
+                            ` : ''}
+                        </div>
                     </div>
                 </div>
                 `;
@@ -842,22 +831,47 @@
 
         // 更新统计信息
         function updateStats() {
-            if (allOrders.length === 0) return;
+            if (allOrders.length === 0) {
+                document.getElementById('totalOrders').textContent = '0';
+                document.getElementById('totalSpent').textContent = 'RM 0.00';
+                document.getElementById('completedPayments').textContent = '0';
+                document.getElementById('pendingPayments').textContent = '0';
+                return;
+            }
+            
+            // 计算统计
+            const totalSpent = allOrders.reduce((sum, order) => sum + parseFloat(order.total_amount || 0), 0);
+            const completedPayments = allOrders.filter(order => order.payment_status === 'completed').length;
+            const pendingPayments = allOrders.filter(order => order.payment_status === 'pending').length;
+            
+            // 更新显示
+            document.getElementById('totalOrders').textContent = allOrders.length;
+            document.getElementById('totalSpent').textContent = `RM ${totalSpent.toFixed(2)}`;
+            document.getElementById('completedPayments').textContent = completedPayments;
+            document.getElementById('pendingPayments').textContent = pendingPayments;
+        }
+
+        // 更新支付统计信息
+        function updatePaymentStats(data) {
+            const stats = data.payment_stats || {};
             
             // 总订单数
-            document.getElementById('totalOrders').textContent = allOrders.length;
+            document.getElementById('totalOrders').textContent = data.order_count || allOrders.length;
             
             // 总消费额
-            const totalSpent = allOrders.reduce((sum, order) => sum + parseFloat(order.total_amount || 0), 0);
+            const totalSpent = stats.total_spent || 
+                allOrders.reduce((sum, order) => sum + parseFloat(order.total_amount || 0), 0);
             document.getElementById('totalSpent').textContent = `RM ${totalSpent.toFixed(2)}`;
             
-            // 待处理订单
-            const pendingOrders = allOrders.filter(order => order.status === 'pending').length;
-            document.getElementById('pendingOrders').textContent = pendingOrders;
+            // 完成支付数
+            document.getElementById('completedPayments').textContent = 
+                stats.completed_payments || 
+                allOrders.filter(order => order.payment_status === 'completed').length;
             
-            // 平均订单金额
-            const avgOrder = totalSpent / allOrders.length;
-            document.getElementById('avgOrder').textContent = `RM ${avgOrder.toFixed(2)}`;
+            // 待支付数
+            document.getElementById('pendingPayments').textContent = 
+                stats.pending_payments || 
+                allOrders.filter(order => order.payment_status === 'pending').length;
         }
 
         // 显示无订单
@@ -880,7 +894,7 @@
             ordersContainer.innerHTML = `
                 <div class="error">
                     <h3>Error</h3>
-                    <p>${message}</p>
+                    <p>${escapeHtml(message)}</p>
                     <button class="btn btn-primary" onclick="loadOrderHistory()" style="margin-top: 15px;">
                         Retry
                     </button>
@@ -898,6 +912,9 @@
         // 刷新订单
         function refreshOrders() {
             const ordersContainer = document.getElementById('ordersContainer');
+            const statsCard = document.getElementById('orderStats');
+            
+            // 显示加载状态
             ordersContainer.innerHTML = `
                 <div class="loading">
                     <div class="loading-spinner"></div>
@@ -905,9 +922,15 @@
                 </div>
             `;
             
-            setTimeout(() => {
-                loadCustomerOrders();
-            }, 500);
+            // 显示统计加载状态
+            const statItems = statsCard.querySelectorAll('.stat-item');
+            statItems.forEach(item => {
+                item.classList.add('loading');
+                item.querySelector('.stat-value').textContent = '...';
+            });
+            
+            // 重新加载数据
+            loadCustomerOrders();
         }
 
         // 辅助函数
@@ -951,10 +974,11 @@
                 'bank_transfer': 'Bank Transfer',
                 'cash_on_delivery': 'Cash on Delivery'
             };
-            return methodMap[method] || method.replace('_', ' ').toUpperCase();
+            return methodMap[method] || (method ? method.replace('_', ' ').toUpperCase() : 'Not Specified');
         }
 
         function escapeHtml(text) {
+            if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
