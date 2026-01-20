@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btnRemoveSelected")?.addEventListener("click", removeSelected);
   document.getElementById("btnClearCart")?.addEventListener("click", clearCart);
   document.getElementById("btnCheckout")?.addEventListener("click", checkout);
+  document.getElementById("btnPayNow")?.addEventListener("click", payNow);
 
   // Shipping + Promo
   const shippingSelect = document.getElementById("shippingOption");
@@ -69,7 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   syncPaymentFields();
   setReceiptAvailability(false);
-  setReceiptAvailability(true);
 
   // Load cart
   loadCart();
@@ -685,6 +685,40 @@ async function copyText(id) {
   }
 }
 
+function setPayMsg(text, isError = false) {
+  const el = document.getElementById("payMsg");
+  if (!el) return;
+  el.textContent = text || "";
+  el.style.color = isError ? "#ef4444" : "#6b7280";
+}
+
+async function payNow() {
+  setPayMsg("");
+
+  if (cartItems.length === 0) {
+    setPayMsg("Your cart is empty.", true);
+    return;
+  }
+
+  // ✅ validate card input first
+  const pay = validatePaymentBeforeCheckout();
+  if (!pay.ok) return;
+
+  // ✅ simulate payment success (FYP)
+  setPayMsg("Processing payment...");
+
+  lastPaidReceipt = {
+    order_id: "PENDING",
+    paid_at: new Date().toLocaleString(),
+    payment_method: "Card",
+    payment_ref: pay.ref,
+    masked_card: pay.maskedCard
+  };
+
+  setReceiptAvailability(true);
+  setPayMsg("Payment successful ✅ You can now view/print receipt.");
+}
+
 // -------------------- Checkout --------------------
 async function checkout() {
   setMsg("");
@@ -693,6 +727,11 @@ async function checkout() {
     setMsg("Your cart is empty.", true);
     return;
   }
+
+  if (!lastPaidReceipt) {
+  setMsg("Please complete payment first (click Pay Now).", true);
+  return;
+}
 
   const payment_method = "Card";
   const address = document.getElementById("address")?.value?.trim() || "";
@@ -712,6 +751,8 @@ async function checkout() {
       setMsg(data.error || "Checkout failed.", true);
       return;
     }
+
+    lastPaidReceipt.order_id = data.order_id;
 
     // ✅ Mark as paid + enable receipt buttons
 lastPaidReceipt = {
