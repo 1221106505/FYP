@@ -79,9 +79,13 @@
 <label class="field">
   <span class="label">Shipping Option</span>
   <select id="shippingOption">
-    <option value="standard" selected>Standard (RM 5.00) • 2–3 days</option>
-    <option value="express">Express (RM 12.00) • Next day</option>
-  </select>
+  <option value="standard" selected>Standard (Peninsular) (RM 5.00) • 2–3 days</option>
+  <option value="express">Express (Peninsular) (RM 12.00) • Next day</option>
+
+  <option value="sabah">Sabah Delivery (RM 18.00) • 4–7 days</option>
+  <option value="sarawak">Sarawak Delivery (RM 16.00) • 4–7 days</option>
+</select>
+
 </label>
 
 <label class="field">
@@ -108,11 +112,10 @@
 
       <label class="field">
         <span class="label">Payment Method</span>
-        <select id="paymentMethod">
-  <option value="Card">Card</option>
-  <option value="BANK">Bank Transfer</option>
-  <option value="COD">Cash on Delivery</option>
-</select>      
+        <select id="paymentMethod" disabled>
+  <option value="card" selected>Card</option>
+</select>
+      
       </label>
 
       <!-- Secure Payment Details (Collapsible) -->
@@ -155,67 +158,6 @@
       </div>
     </div>
 
-   <!-- BANK TRANSFER (Manual) -->
-<div class="pay-section" id="bankFields" style="display:none;">
-  <div class="hint">
-    Transfer to our account using the details below. Include the <strong>Reference</strong> in the transfer remark.
-  </div>
-
-  <div class="bank-grid">
-    <div class="bank-card">
-      <div class="muted tiny">Bank</div>
-      <div><strong>Maybank</strong></div>
-    </div>
-
-    <div class="bank-card">
-      <div class="muted tiny">Account Name</div>
-      <div><strong>Visual BookStore Sdn Bhd</strong></div>
-    </div>
-
-    <div class="bank-card">
-      <div class="muted tiny">Account Number</div>
-      <div class="mono"><strong id="bankAcc">123456789012</strong></div>
-      <button class="btn" type="button" id="btnCopyAcc">Copy</button>
-    </div>
-
-    <div class="bank-card">
-      <div class="muted tiny">Reference</div>
-      <div class="mono"><strong id="bankRef">—</strong></div>
-      <button class="btn" type="button" id="btnCopyRef">Copy</button>
-    </div>
-  </div>
-
-  <div class="fpx-actions">
-    <button class="btn" type="button" id="btnGenBankRef">Generate Reference</button>
-    <span class="tiny muted" id="bankStatus"></span>
-  </div>
-
-  <div class="hint">
-    After you transfer, click checkout. Your order will be created with status <strong>Pending Payment Verification</strong>.
-  </div>
-</div>
-
-    <!-- COD -->
-    <div class="pay-section" id="codFields" style="display:none;">
-      <div class="hint">Cash on Delivery selected. You will pay when the book arrives.</div>
-    </div>
-
-    <p class="tiny muted" id="paymentError" style="margin:10px 0 0;"></p>
-  </div>
-</div>
-
-
-      <label class="field">
-        <span class="label">Delivery Address</span>
-        <textarea id="address" rows="3" placeholder="Enter delivery address..."></textarea>
-      </label>
-
-      <button class="btn primary" id="btnCheckout">Proceed to Checkout</button>
-      <div style="display:flex; gap:10px; margin-top:10px;">
-  <button class="btn" id="btnPreviewReceipt" type="button">Preview Receipt</button>
-  <button class="btn" id="btnPrintReceipt" type="button">Print / Save as PDF</button>
-</div>
-
 <!-- Receipt Modal -->
 <div class="modal" id="receiptModal" aria-hidden="true">
   <div class="modal-backdrop" id="receiptBackdrop"></div>
@@ -231,6 +173,11 @@
   </div>
 </div>
 
+<div style="display:flex; gap:10px; margin-top:10px;">
+  <button class="btn ghost" id="btnPreviewReceipt" type="button" disabled>View Receipt</button>
+  <button class="btn ghost" id="btnPrintReceipt" type="button" disabled>Print Receipt</button>
+</div>
+<span class="tiny muted" id="receiptHint">Receipt will be available after payment is completed.</span>
 
       <p class="tiny muted" id="msg"></p>
     </aside>
