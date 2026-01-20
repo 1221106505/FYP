@@ -156,6 +156,14 @@
       <div class="hint">
         We do <strong>not</strong> store CVV. Card number is saved as <strong>masked</strong> (e.g., **** **** **** 1234).
       </div>
+      <button class="btn" id="btnPayNow" type="button">Pay Now</button>
+<p class="tiny muted" id="payMsg"></p>
+
+<div style="display:flex; gap:10px; margin-top:10px;">
+  <button class="btn ghost" id="btnPreviewReceipt" type="button" disabled>View Receipt</button>
+  <button class="btn ghost" id="btnPrintReceipt" type="button" disabled>Print Receipt</button>
+</div>
+<span class="tiny muted" id="receiptHint">Receipt will be available after payment is completed.</span>
     </div>
 
 <!-- Receipt Modal -->
@@ -172,12 +180,6 @@
     </div>
   </div>
 </div>
-
-<div style="display:flex; gap:10px; margin-top:10px;">
-  <button class="btn ghost" id="btnPreviewReceipt" type="button" disabled>View Receipt</button>
-  <button class="btn ghost" id="btnPrintReceipt" type="button" disabled>Print Receipt</button>
-</div>
-<span class="tiny muted" id="receiptHint">Receipt will be available after payment is completed.</span>
 
       <p class="tiny muted" id="msg"></p>
     </aside>
