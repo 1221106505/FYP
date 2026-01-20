@@ -2,134 +2,216 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - Virtual BookStore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 保持你之前的所有CSS样式不变，只添加必要的修复 */
+        :root {
+            --primary: #6d28d9;
+            --primary-dark: #5b21b6;
+            --secondary: #f1f5f9;
+            --accent: #10b981;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #e74c3c;
+            --pre-order: #3b82f6;
+            --pre-order-dark: #1d4ed8;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #2D3748;
-            --primary-dark: #1A202C;
-            --secondary: #4C51BF;
-            --accent: #ED8936;
-            --success: #38A169;
-            --warning: #D69E2E;
-            --error: #E53E3E;
-            --light: #F7FAFC;
-            --light-gray: #E2E8F0;
-            --medium-gray: #A0AEC0;
-            --dark-gray: #4A5568;
-            --white: #FFFFFF;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: var(--text);
             line-height: 1.6;
-            color: var(--primary);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        .nav-container {
+        /* Header Styles - 修改为灵活响应式 */
+        .customer-header {
             display: flex;
+            flex-wrap: wrap; /* 允许换行 */
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
-            max-width: 1200px;
-            margin: 0 auto;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            gap: 15px; /* 添加间距 */
         }
 
-        .nav-logo h2 {
-            color: var(--white);
-            font-weight: 700;
-        }
-
-        .nav-user {
+        .logo {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            flex-shrink: 0; /* 防止logo被压缩 */
         }
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
+        .logo i {
+            font-size: clamp(1.5rem, 2.5vw, 2rem); /* 使用clamp响应式字体大小 */
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: clamp(1.2rem, 2vw, 1.8rem); /* 使用clamp响应式字体大小 */
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap; /* 防止文字换行 */
+        }
+
+        .customer-nav {
+            display: flex;
+            flex-wrap: wrap; /* 允许换行 */
+            gap: clamp(10px, 2vw, 25px); /* 响应式间距 */
+            justify-content: center;
+            flex-grow: 1; /* 占据可用空间 */
+            margin: 0 15px; /* 添加左右边距 */
+        }
+
+        .customer-nav a {
             text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s ease;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 8px 0;
+            position: relative;
+            font-size: clamp(0.9rem, 1vw, 1rem); /* 响应式字体大小 */
+            white-space: nowrap; /* 防止文字换行 */
         }
 
-        .btn-primary {
-            background: var(--secondary);
-            color: var(--white);
+        .customer-nav a:hover, .customer-nav a.active {
+            color: var(--primary);
         }
 
-        .btn-danger {
-            background: var(--error);
-            color: var(--white);
+        .customer-nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
         }
 
-        .btn-logout {
-            background: var(--accent);
-            color: var(--white);
+        .user-actions {
+            display: flex;
+            flex-wrap: wrap; /* 允许换行 */
+            gap: clamp(8px, 1.5vw, 15px); /* 响应式间距 */
+            align-items: center;
+            flex-shrink: 0; /* 防止被压缩 */
         }
 
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
+        .user-welcome {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: clamp(0.85rem, 1vw, 1rem); /* 响应式字体大小 */
         }
 
+        .username {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: clamp(1rem, 1.2vw, 1.2rem); /* 响应式图标大小 */
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            flex-shrink: 0; /* 防止被压缩 */
+        }
+
+        .cart-icon:hover {
+            background-color: var(--secondary);
+            color: var(--primary);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            padding: clamp(6px, 1vw, 8px) clamp(12px, 1.5vw, 16px); /* 响应式内边距 */
+            background-color: var(--secondary);
+            color: var(--text);
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: clamp(0.85rem, 1vw, 1rem); /* 响应式字体大小 */
+            white-space: nowrap; /* 防止文字换行 */
+        }
+
+        .logout-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Profile Container */
         .profile-container {
-            background: var(--white);
-            border-radius: 15px;
-            padding: 40px;
-            margin: 20px auto;
-            max-width: 900px;
-            box-shadow: var(--shadow-lg);
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
         }
 
         .profile-header {
             text-align: center;
             margin-bottom: 30px;
             padding-bottom: 20px;
-            border-bottom: 2px solid var(--light-gray);
+            border-bottom: 1px solid var(--border);
         }
 
         .avatar-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-bottom: 15px;
         }
 
         .avatar {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--secondary), var(--primary-dark));
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
-            color: var(--white);
-            border: 4px solid var(--white);
-            box-shadow: var(--shadow);
+            font-size: 40px;
+            color: white;
+            border: 3px solid white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
         }
@@ -146,99 +228,101 @@
         }
 
         .user-name {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 5px;
+            color: var(--text);
+            margin-bottom: 8px;
         }
 
         .user-type {
-            font-size: 16px;
-            color: var(--success);
-            background: var(--light);
-            padding: 4px 12px;
-            border-radius: 15px;
-            display: inline-block;
+            font-size: 14px;
+            color: var(--text-light);
             font-weight: 500;
         }
 
+        /* Profile Content */
         .profile-content {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 30px;
+            gap: 20px;
         }
 
         .section {
-            background: var(--light);
-            padding: 25px;
+            background: var(--card-bg);
+            padding: 20px;
             border-radius: 10px;
-            box-shadow: var(--shadow);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
         }
 
         .section-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 20px;
+            color: var(--text);
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap; /* 允许换行 */
+            gap: 10px; /* 添加间距 */
         }
 
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
         }
 
         .info-item {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .info-label {
             font-weight: 600;
-            color: var(--dark-gray);
+            color: var(--text-light);
             display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
+            margin-bottom: 6px;
+            font-size: 13px;
         }
 
         .info-value {
-            color: var(--primary);
+            color: var(--text);
             padding: 10px;
-            background: var(--white);
-            border-radius: 6px;
-            border: 1px solid var(--light-gray);
-            min-height: 40px;
+            background: var(--secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            min-height: 38px;
             display: flex;
             align-items: center;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .edit-input {
             width: 100%;
             padding: 10px;
-            border: 1px solid var(--light-gray);
-            border-radius: 6px;
-            font-size: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
             box-sizing: border-box;
+            transition: border-color 0.3s;
         }
 
         .edit-input:focus {
             outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
         }
 
         .edit-btn {
-            background: var(--secondary);
-            color: var(--white);
+            background: var(--primary);
+            color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
         }
 
         .edit-btn:hover {
@@ -246,15 +330,16 @@
         }
 
         .delete-btn {
-            background: var(--error);
-            color: var(--white);
+            background: var(--danger);
+            color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
-            margin-top: 20px;
-            transition: all 0.3s ease;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-top: 15px;
         }
 
         .delete-btn:hover {
@@ -262,44 +347,45 @@
         }
 
         .password-form {
-            background: var(--white);
-            padding: 20px;
+            background: var(--secondary);
+            padding: 15px;
             border-radius: 8px;
-            border: 1px solid var(--light-gray);
-            margin-top: 20px;
+            border: 1px solid var(--border);
+            margin-top: 15px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
-            color: var(--dark-gray);
+            color: var(--text-light);
+            font-size: 13px;
         }
 
         .form-group input {
             width: 100%;
             padding: 10px;
-            border: 1px solid var(--light-gray);
-            border-radius: 6px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
             font-size: 14px;
-            transition: border 0.3s ease;
+            transition: border-color 0.3s;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
         }
 
         .password-strength {
-            margin-top: 10px;
+            margin-top: 8px;
             height: 5px;
             border-radius: 3px;
-            background: var(--light-gray);
+            background: var(--border);
             overflow: hidden;
         }
 
@@ -317,13 +403,13 @@
 
         .password-rules {
             list-style: none;
-            margin-top: 10px;
-            font-size: 13px;
+            margin-top: 8px;
+            font-size: 12px;
         }
 
         .password-rules li {
-            margin-bottom: 5px;
-            color: var(--medium-gray);
+            margin-bottom: 4px;
+            color: var(--text-light);
         }
 
         .password-rules li.valid {
@@ -331,96 +417,150 @@
         }
 
         .password-rules li.invalid {
-            color: var(--error);
+            color: var(--danger);
         }
 
         .action-buttons {
             display: flex;
             gap: 10px;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .action-buttons button {
-            flex: 1;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-cancel {
+            background-color: var(--text-light);
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background-color: #475569;
         }
 
         .hidden {
             display: none !important;
         }
 
+        /* Modal Styles */
         .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
             z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
         }
 
         .modal-content {
-            background: var(--white);
-            padding: 30px;
-            border-radius: 10px;
-            max-width: 500px;
+            background-color: white;
+            border-radius: 12px;
             width: 90%;
-            box-shadow: var(--shadow-lg);
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
-        .modal-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--primary);
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+            color: var(--text);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .modal-body {
+            padding: 15px 20px;
         }
 
         .modal-message {
-            margin-bottom: 20px;
-            color: var(--dark-gray);
+            margin-bottom: 15px;
+            color: var(--text-light);
+            font-size: 14px;
         }
 
-        .modal-buttons {
+        .modal-actions {
             display: flex;
             gap: 10px;
             justify-content: flex-end;
         }
 
-        .modal-buttons button {
-            padding: 10px 20px;
-        }
-
-        .btn-cancel {
-            background: var(--medium-gray);
-            color: var(--white);
+        .modal-actions button {
+            padding: 8px 16px;
+            font-size: 13px;
         }
 
         .btn-confirm {
-            background: var(--success);
-            color: var(--white);
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background-color: #0da271;
         }
 
         .btn-delete {
-            background: var(--error);
-            color: var(--white);
+            background-color: var(--danger);
+            color: white;
         }
 
+        .btn-delete:hover {
+            background-color: #c53030;
+        }
+
+        /* Loading Styles */
         .loading {
             text-align: center;
-            padding: 40px;
+            padding: 30px;
+            color: var(--text-light);
         }
 
-        .loading-spinner {
-            border: 3px solid var(--light-gray);
-            border-top: 3px solid var(--secondary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
+        .loading i {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
         }
 
         @keyframes spin {
@@ -428,141 +568,216 @@
             100% { transform: rotate(360deg); }
         }
 
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 30px 0;
-        }
-
-        .quick-action-btn {
-            background: var(--white);
-            border: 1px solid var(--light-gray);
+        /* Toast Styles */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 16px;
             border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: var(--primary);
-            display: block;
-        }
-
-        .quick-action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow);
-            border-color: var(--secondary);
-        }
-
-        .quick-action-icon {
-            font-size: 24px;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .quick-action-text {
-            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.3s;
             font-size: 14px;
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-left: 10px;
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
         }
 
-        .status-admin {
-            background: var(--accent);
-            color: var(--white);
+        .toast.success {
+            background-color: var(--success);
         }
 
-        .status-customer {
-            background: var(--success);
-            color: var(--white);
+        .toast.error {
+            background-color: var(--danger);
         }
 
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: var(--white);
-            font-weight: 500;
-            box-shadow: var(--shadow-lg);
-            z-index: 1001;
-            animation: slideIn 0.3s ease;
+        .toast.warning {
+            background-color: var(--warning);
         }
 
-        .toast-success {
-            background: var(--success);
+        /* Login Prompt */
+        .login-prompt {
+            text-align: center;
+            padding: 40px 30px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-top: 10px;
         }
 
-        .toast-error {
-            background: var(--error);
-        }
-
-        .toast-warning {
-            background: var(--warning);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
+        /* 响应式设计 - 更灵活的断点 */
+        @media (max-width: 1200px) {
+            .customer-header {
+                justify-content: space-around; /* 更均匀的分布 */
             }
-            to {
-                transform: translateX(0);
-                opacity: 1;
+            
+            .customer-nav {
+                order: 3; /* 将导航移到第三行 */
+                width: 100%; /* 占据整行 */
+                margin-top: 10px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .info-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            
+            .customer-header {
+                flex-direction: column; /* 改为垂直布局 */
+                align-items: stretch; /* 拉伸子元素 */
+                gap: 20px;
+            }
+            
+            .logo {
+                justify-content: center;
+            }
+            
+            .user-actions {
+                justify-content: center;
             }
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
             .profile-container {
                 padding: 20px;
                 margin: 10px;
             }
-
+            
             .info-grid {
                 grid-template-columns: 1fr;
             }
-
-            .quick-actions {
-                grid-template-columns: 1fr;
-            }
-
+            
             .action-buttons {
                 flex-direction: column;
+            }
+            
+            .section-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .customer-nav {
+                flex-direction: column; /* 垂直排列导航链接 */
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .customer-nav a {
+                width: 100%;
+                text-align: center;
+                padding: 10px;
+                border-radius: 8px;
+            }
+            
+            .customer-nav a:hover {
+                background-color: var(--secondary);
+            }
+            
+            .user-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-content {
+                gap: 15px;
+            }
+
+            .section {
+                padding: 15px;
+            }
+            
+            .avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 32px;
+            }
+            
+            .user-name {
+                font-size: 20px;
+            }
+            
+            .logo h1 {
+                font-size: 1.4rem; /* 进一步减小logo字体 */
+            }
+            
+            .customer-nav a {
+                font-size: 0.95rem; /* 减小导航字体 */
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .logo {
+                flex-direction: column; /* 垂直排列logo和图标 */
+                text-align: center;
+                gap: 5px;
+            }
+            
+            .logo h1 {
+                font-size: 1.2rem; /* 进一步减小logo字体 */
+            }
+            
+            .user-welcome {
+                font-size: 0.8rem; /* 减小欢迎文本 */
             }
         }
     </style>
 </head>
 <body>
-    <!-- 导航栏 -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <h2>📚 Virtual BookStore</h2>
-            </div>
-            <div class="nav-user">
-                <a href="Main.html" class="btn btn-primary">← Back to Main</a>
-                <a href="logout.php" class="btn btn-logout">Logout</a>
-            </div>
+    <!-- Header (consistent with customer_view) -->
+    <header class="customer-header">
+        <div class="logo">
+            <i class="fas fa-book"></i>
+            <h1>Virtual BookStore</h1>
         </div>
-    </nav>
+        <div class="customer-nav">
+            <a href="Main.html">Home</a>
+            <a href="customer_view.html">Books</a>
+            <a href="cart/cart.html">Cart</a>
+            <a href="order_history.html">Order History</a>
+            <a href="user_profile.html" class="active">Profile</a>
+        </div>
+        <div class="user-actions">
+            <div class="user-welcome">
+                Welcome, <span class="username" id="username">Guest</span>
+            </div>
+            <div class="cart-icon" onclick="viewCart()">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+            </div>
+            <a href="../Login/Login.html" class="logout-btn">Logout</a>
+        </div>
+    </header>
 
     <div class="container">
+        <!-- Loading State -->
         <div id="loading" class="loading">
-            <div class="loading-spinner"></div>
+            <i class="fas fa-spinner"></i>
             <p>Loading your profile...</p>
         </div>
 
+        <!-- Profile Content -->
         <div id="profileContainer" class="hidden">
             <div class="profile-container">
-                <!-- 用户基本信息 -->
+                <!-- User Basic Info -->
                 <div class="profile-header">
                     <div class="avatar-container">
                         <div class="avatar" id="userAvatar">
@@ -570,37 +785,20 @@
                         </div>
                         <div class="user-basic-info">
                             <div class="user-name" id="profileUsername"></div>
-                            <div class="user-type">
-                                <span id="profileUserType"></span>
-                                <span class="status-badge" id="statusBadge"></span>
-                            </div>
+                            <div class="user-type" id="profileUserType"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 快速操作 -->
-                <div class="quick-actions">
-                    <a href="customer_view.html" class="quick-action-btn">
-                        <span class="quick-action-icon">🔍</span>
-                        <span class="quick-action-text">Browse Books</span>
-                    </a>
-                    <a href="cart/cart.html" class="quick-action-btn">
-                        <span class="quick-action-icon">🛒</span>
-                        <span class="quick-action-text">View Cart</span>
-                    </a>
-                    <a href="order_history.html" class="quick-action-btn">
-                        <span class="quick-action-icon">📦</span>
-                        <span class="quick-action-text">My Orders</span>
-                    </a>
-                </div>
-
-                <!-- 个人信息部分 -->
+                <!-- Profile Content Sections -->
                 <div class="profile-content">
-                    <!-- 个人信息 -->
+                    <!-- Personal Information -->
                     <div class="section">
                         <h3 class="section-title">
                             Personal Information
-                            <button class="edit-btn" onclick="enableEdit('personalInfo')">Edit</button>
+                            <button class="edit-btn" onclick="enableEdit('personalInfo')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
                         </h3>
                         <div class="info-grid" id="personalInfo">
                             <div class="info-item">
@@ -629,16 +827,22 @@
                             </div>
                         </div>
                         <div class="action-buttons hidden" id="personalInfoActions">
-                            <button class="btn btn-primary" onclick="saveChanges('personalInfo')">Save Changes</button>
-                            <button class="btn btn-cancel" onclick="cancelEdit('personalInfo')">Cancel</button>
+                            <button class="btn-primary" onclick="saveChanges('personalInfo')">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <button class="btn-cancel" onclick="cancelEdit('personalInfo')">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
                         </div>
                     </div>
 
-                    <!-- 地址信息 -->
+                    <!-- Address Information -->
                     <div class="section">
                         <h3 class="section-title">
                             Address Information
-                            <button class="edit-btn" onclick="enableEdit('addressInfo')">Edit</button>
+                            <button class="edit-btn" onclick="enableEdit('addressInfo')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
                         </h3>
                         <div class="info-grid" id="addressInfo">
                             <div class="info-item">
@@ -663,12 +867,16 @@
                             </div>
                         </div>
                         <div class="action-buttons hidden" id="addressInfoActions">
-                            <button class="btn btn-primary" onclick="saveChanges('addressInfo')">Save Changes</button>
-                            <button class="btn btn-cancel" onclick="cancelEdit('addressInfo')">Cancel</button>
+                            <button class="btn-primary" onclick="saveChanges('addressInfo')">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <button class="btn-cancel" onclick="cancelEdit('addressInfo')">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
                         </div>
                     </div>
 
-                    <!-- 密码管理 -->
+                    <!-- Password Management -->
                     <div class="section">
                         <h3 class="section-title">Change Password</h3>
                         <div class="password-form" id="passwordForm">
@@ -697,85 +905,119 @@
                                 <div id="passwordMatch" class="password-strength-text"></div>
                             </div>
                             <div class="action-buttons">
-                                <button class="btn btn-primary" onclick="changePassword()">Change Password</button>
+                                <button class="btn-primary" onclick="changePassword()">
+                                    <i class="fas fa-key"></i> Change Password
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 删除账户 -->
+                    <!-- Account Management -->
                     <div class="section">
                         <h3 class="section-title">Account Management</h3>
-                        <p style="color: var(--dark-gray); margin-bottom: 20px;">
+                        <p style="color: var(--text-light); margin-bottom: 15px; font-size: 14px;">
                             This action is irreversible. All your data will be permanently deleted.
                         </p>
                         <button class="delete-btn" onclick="showDeleteAccountModal()">
-                            Delete My Account
+                            <i class="fas fa-trash-alt"></i> Delete My Account
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="loginPrompt" class="profile-container hidden" style="text-align: center; padding: 60px 40px;">
-            <h2 style="margin-bottom: 20px; color: var(--primary);">Please Login</h2>
-            <p style="margin-bottom: 30px; color: var(--dark-gray);">You need to be logged in to view your profile.</p>
-            <a href="../Login/Login.html?redirect=/System/user_profile.html" class="btn btn-primary" style="padding: 12px 30px; font-size: 16px;">
-                Go to Login
+        <!-- Login Prompt -->
+        <div id="loginPrompt" class="login-prompt hidden">
+            <h2 style="margin-bottom: 15px; color: var(--text); font-size: 1.5rem;">Please Login</h2>
+            <p style="margin-bottom: 25px; color: var(--text-light);">You need to be logged in to view your profile.</p>
+            <a href="../Login/Login.html?redirect=/System/user_profile.html" class="btn-primary" style="padding: 10px 25px; font-size: 14px; text-decoration: none; display: inline-block;">
+                <i class="fas fa-sign-in-alt"></i> Go to Login
             </a>
         </div>
     </div>
 
-    <!-- 确认模态框 -->
-    <div id="confirmModal" class="modal hidden">
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
         <div class="modal-content">
-            <h3 class="modal-title" id="modalTitle"></h3>
-            <div class="modal-message" id="modalMessage"></div>
-            <div class="modal-buttons">
-                <button class="btn btn-cancel" onclick="cancelAction()">Cancel</button>
-                <button class="btn btn-confirm" onclick="confirmAction()" id="confirmBtn">Confirm</button>
+            <div class="modal-header">
+                <h3 id="modalTitle"></h3>
+                <button class="close-modal" onclick="hideConfirmModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-message" id="modalMessage"></div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="cancelAction()">Cancel</button>
+                    <button class="btn-confirm" onclick="confirmAction()" id="confirmBtn">Confirm</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 删除确认模态框 -->
-    <div id="deleteModal" class="modal hidden">
+    <!-- Delete Account Modal -->
+    <div id="deleteModal" class="modal">
         <div class="modal-content">
-            <h3 class="modal-title">⚠️ Delete Account</h3>
-            <div class="modal-message" id="deleteModalMessage">
-                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
-                <div class="form-group" style="margin-top: 20px;">
-                    <label for="deletePassword">Enter your password to confirm:</label>
-                    <input type="password" id="deletePassword" placeholder="Your password">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Delete Account</h3>
+                <button class="close-modal" onclick="hideDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-message" id="deleteModalMessage">
+                    <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label for="deletePassword">Enter your password to confirm:</label>
+                        <input type="password" id="deletePassword" placeholder="Your password">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="hideDeleteModal()">Cancel</button>
+                    <button class="btn-delete" onclick="confirmDeleteAccount()">Delete Account</button>
                 </div>
             </div>
-            <div class="modal-buttons">
-                <button class="btn btn-cancel" onclick="hideDeleteModal()">Cancel</button>
-                <button class="btn btn-delete" onclick="confirmDeleteAccount()">Delete Account</button>
-            </div>
         </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle" id="toast-icon"></i>
+        <span id="toast-message"></span>
     </div>
 
     <script>
-        // 全局变量
+        // API endpoints (from customer_view)
+        const CHECK_LOGIN_API = 'check_login.php';
+        const GET_CART_API = 'get_cart.php';
+        const GET_USER_DATA_API = 'get_user_data.php';
+        const UPDATE_USER_PROFILE_API = 'update_user_profile.php';
+        const DELETE_USER_ACCOUNT_API = 'delete_user_account.php';
+
+        // Global variables
         let userData = {};
         let originalData = {};
         let confirmCallback = null;
         let pendingChanges = {};
         let passwordValid = false;
         let passwordMatch = false;
+        let currentUser = null;
 
-        // 页面加载时检查登录状态并加载用户数据
+        // DOM Elements
+        const cartCount = document.querySelector('.cart-count');
+        const usernameElement = document.getElementById('username');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        const toastIcon = document.getElementById('toast-icon');
+
+        // Page load
         document.addEventListener('DOMContentLoaded', function() {
             console.log('User Profile page loaded');
             checkLoginStatus();
         });
 
-        // 检查登录状态
+        // Check login status (modified from customer_view)
         async function checkLoginStatus() {
             try {
                 console.log('Checking login status...');
                 
-                const response = await fetch('check_login.php', {
+                const response = await fetch(CHECK_LOGIN_API, {
                     credentials: 'include',
                     headers: {
                         'Cache-Control': 'no-cache'
@@ -792,10 +1034,14 @@
                 console.log('Login check response data:', data);
                 
                 if (data.logged_in) {
+                    currentUser = data;
+                    usernameElement.textContent = data.username;
                     console.log('User is logged in, loading profile...');
                     await loadUserProfile();
+                    await updateCartCount();
                 } else {
                     console.log('User is not logged in, showing login prompt');
+                    usernameElement.textContent = 'Guest';
                     showLoginPrompt();
                 }
             } catch (error) {
@@ -804,11 +1050,34 @@
             }
         }
 
-        // 加载用户资料
+        // Update cart count (from customer_view)
+        async function updateCartCount() {
+            if (!currentUser || !currentUser.logged_in) {
+                cartCount.textContent = '0';
+                return;
+            }
+            
+            try {
+                const response = await fetch(GET_CART_API, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        cartCount.textContent = data.total_items;
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating cart count:', error);
+            }
+        }
+
+        // Load user profile
         async function loadUserProfile() {
             try {
                 console.log('Loading user profile data...');
-                const response = await fetch('get_user_data.php', {
+                const response = await fetch(GET_USER_DATA_API, {
                     credentials: 'include',
                     headers: {
                         'Cache-Control': 'no-cache'
@@ -838,20 +1107,22 @@
             }
         }
 
-        // 显示用户资料
+        // Display user profile - 简化版本，只显示一个用户类型
         function displayUserProfile() {
             console.log('Displaying user profile:', userData);
             
-            // 基本信息
+            // Basic info
             document.getElementById('profileUsername').textContent = userData.username || 'Unknown';
-            document.getElementById('profileUserType').textContent = userData.user_type === 'admin' ? 'Administrator' : 'Customer';
             
-            // 状态徽章
-            const badge = document.getElementById('statusBadge');
-            badge.textContent = userData.user_type.toUpperCase();
-            badge.className = `status-badge status-${userData.user_type}`;
+            // 只显示用户类型文本，不显示徽章
+            const userTypeElement = document.getElementById('profileUserType');
+            if (userData.user_type === 'admin') {
+                userTypeElement.textContent = 'Administrator';
+            } else {
+                userTypeElement.textContent = 'Customer';
+            }
             
-            // 个人信息
+            // Personal info
             document.getElementById('fullName').textContent = 
                 (userData.first_name && userData.last_name && 
                  userData.first_name !== 'Not specified' && userData.last_name !== 'Not specified') 
@@ -864,45 +1135,45 @@
             document.getElementById('userGender').textContent = userData.gender || 'Not specified';
             document.getElementById('memberSince').textContent = userData.member_since || 'Not specified';
             
-            // 地址信息
+            // Address info
             document.getElementById('userAddress').textContent = userData.address || 'Not specified';
             document.getElementById('userCity').textContent = userData.city || 'Not specified';
             document.getElementById('userState').textContent = userData.state || 'Not specified';
             document.getElementById('userZip').textContent = userData.zip_code || 'Not specified';
             document.getElementById('userCountry').textContent = userData.country || 'Not specified';
             
-            // 显示资料容器
+            // Show profile container
             document.getElementById('profileContainer').classList.remove('hidden');
             document.getElementById('loginPrompt').classList.add('hidden');
         }
 
-        // 显示登录提示
+        // Show login prompt
         function showLoginPrompt() {
             hideLoading();
             document.getElementById('loginPrompt').classList.remove('hidden');
             document.getElementById('profileContainer').classList.add('hidden');
         }
 
-        // 隐藏加载动画
+        // Hide loading
         function hideLoading() {
             document.getElementById('loading').classList.add('hidden');
         }
 
-        // 启用编辑模式
+        // Enable edit mode
         function enableEdit(section) {
             const infoDiv = document.getElementById(section);
             const actionDiv = document.getElementById(section + 'Actions');
             
-            // 转换所有info-value为输入框
+            // Convert all info-values to input fields
             const infoItems = infoDiv.querySelectorAll('.info-value');
             infoItems.forEach(item => {
                 const fieldId = item.id.replace('user', '').replace('fullName', 'name').toLowerCase();
                 let currentValue = item.textContent;
                 
-                // 检查是否为可编辑字段
-                if (fieldId === 'membersince') return; // 会员日期不可编辑
+                // Check if field is editable
+                if (fieldId === 'membersince') return; // Member since not editable
                 
-                // 处理"Not specified"值
+                // Handle "Not specified" values
                 if (currentValue === 'Not specified') {
                     currentValue = '';
                 }
@@ -910,10 +1181,10 @@
                 let inputType = 'text';
                 let inputValue = currentValue;
                 
-                // 特殊处理不同字段
+                // Special handling for different fields
                 if (fieldId === 'dob') {
                     inputType = 'date';
-                    // 转换日期格式
+                    // Convert date format
                     if (currentValue && currentValue !== 'Not specified') {
                         const date = new Date(currentValue);
                         if (!isNaN(date)) {
@@ -929,7 +1200,7 @@
                 } else if (fieldId === 'phone') {
                     inputType = 'tel';
                 } else if (fieldId === 'gender') {
-                    // 性别使用选择框
+                    // Gender uses select
                     item.innerHTML = `
                         <select id="edit_gender" class="edit-input">
                             <option value="">Select gender</option>
@@ -940,28 +1211,28 @@
                     `;
                     return;
                 } else if (fieldId === 'name') {
-                    // 处理全名，分成姓和名
+                    // Handle full name, split into first and last
                     const names = currentValue.split(' ');
                     const firstName = (names[0] && names[0] !== 'Not') ? names[0] : '';
                     const lastName = (names.slice(1).join(' ') && names.slice(1).join(' ') !== 'specified') ? names.slice(1).join(' ') : '';
                     
                     item.innerHTML = `
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <input type="text" id="edit_first_name" value="${firstName}" placeholder="First Name" class="edit-input">
-                            <input type="text" id="edit_last_name" value="${lastName}" placeholder="Last Name" class="edit-input">
+                            <input type="text" id="edit_first_name" value="${escapeHtml(firstName)}" placeholder="First Name" class="edit-input">
+                            <input type="text" id="edit_last_name" value="${escapeHtml(lastName)}" placeholder="Last Name" class="edit-input">
                         </div>
                     `;
                     return;
                 }
                 
-                item.innerHTML = `<input type="${inputType}" id="edit_${fieldId}" value="${inputValue}" class="edit-input" placeholder="Enter ${fieldId.replace('_', ' ')}">`;
+                item.innerHTML = `<input type="${inputType}" id="edit_${fieldId}" value="${escapeHtml(inputValue)}" class="edit-input" placeholder="Enter ${fieldId.replace('_', ' ')}">`;
             });
             
-            // 显示操作按钮
+            // Show action buttons
             actionDiv.classList.remove('hidden');
         }
 
-        // 日期格式化函数
+        // Date formatting
         function formatDateForBackend(dateString) {
             if (!dateString) return null;
             const date = new Date(dateString);
@@ -969,16 +1240,16 @@
             return date.toISOString().split('T')[0];
         }
 
-        // 保存更改
+        // Save changes
         async function saveChanges(section) {
             const infoDiv = document.getElementById(section);
             const actionDiv = document.getElementById(section + 'Actions');
             
-            // 收集更改的数据
+            // Collect changed data
             const changes = {};
             
             if (section === 'personalInfo') {
-                // 处理姓名的更改
+                // Handle name changes
                 const firstNameInput = document.getElementById('edit_first_name');
                 const lastNameInput = document.getElementById('edit_last_name');
                 
@@ -996,7 +1267,7 @@
                     }
                 }
                 
-                // 处理其他字段
+                // Handle other fields
                 const fields = ['email', 'phone', 'dob', 'gender'];
                 fields.forEach(field => {
                     const input = document.getElementById('edit_' + field);
@@ -1010,9 +1281,9 @@
                         
                         const oldValue = userData[field] || '';
                         
-                        // 检查是否有实际更改
+                        // Check for actual changes
                         if (field === 'dob') {
-                            // 日期需要特殊处理
+                            // Date needs special handling
                             if (newValue) {
                                 const formattedDate = formatDateForBackend(newValue);
                                 if (formattedDate !== (userData.date_of_birth || '')) {
@@ -1027,7 +1298,7 @@
                     }
                 });
             } else if (section === 'addressInfo') {
-                // 处理地址信息的更改
+                // Handle address info changes
                 const fields = ['address', 'city', 'state', 'zip_code', 'country'];
                 fields.forEach(field => {
                     const input = document.getElementById('edit_' + field);
@@ -1042,7 +1313,7 @@
                 });
             }
             
-            // 验证数据
+            // Validate data
             if (changes.email && !isValidEmail(changes.email)) {
                 showError('Please enter a valid email address');
                 return;
@@ -1062,7 +1333,7 @@
             console.log('Changes to save:', changes);
             
             try {
-                const response = await fetch('update_user_profile.php', {
+                const response = await fetch(UPDATE_USER_PROFILE_API, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1075,10 +1346,10 @@
                 console.log('Update response:', result);
                 
                 if (result.success) {
-                    // 更新本地数据
+                    // Update local data
                     Object.assign(userData, changes);
                     
-                    // 重新格式化数据以显示
+                    // Reformat data for display
                     if (changes.date_of_birth) {
                         const date = new Date(changes.date_of_birth);
                         if (!isNaN(date)) {
@@ -1086,7 +1357,7 @@
                         }
                     }
                     
-                    // 重新显示数据
+                    // Redisplay data
                     displayUserProfile();
                     showToast('Profile updated successfully', 'success');
                 } else {
@@ -1100,19 +1371,19 @@
             }
         }
 
-        // 取消编辑
+        // Cancel edit
         function cancelEdit(section) {
             const infoDiv = document.getElementById(section);
             const actionDiv = document.getElementById(section + 'Actions');
             
-            // 恢复原始显示
+            // Restore original display
             displayUserProfile();
             
-            // 隐藏操作按钮
+            // Hide action buttons
             actionDiv.classList.add('hidden');
         }
 
-        // 检查密码强度
+        // Check password strength
         function checkPasswordStrength() {
             const password = document.getElementById('newPassword').value;
             const strengthMeter = document.getElementById('passwordStrengthMeter');
@@ -1120,28 +1391,28 @@
             
             let score = 0;
             
-            // 检查规则
+            // Check rules
             const hasLength = password.length >= 8;
             const hasUppercase = /[A-Z]/.test(password);
             const hasLowercase = /[a-z]/.test(password);
             const hasNumber = /[0-9]/.test(password);
             const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
             
-            // 更新规则显示
+            // Update rule display
             updateRule('ruleLength', hasLength);
             updateRule('ruleUpper', hasUppercase);
             updateRule('ruleLower', hasLowercase);
             updateRule('ruleNumber', hasNumber);
             updateRule('ruleSpecial', hasSpecial);
             
-            // 计算分数
+            // Calculate score
             if (hasLength) score += 1;
             if (hasUppercase) score += 1;
             if (hasLowercase) score += 1;
             if (hasNumber) score += 1;
             if (hasSpecial) score += 1;
             
-            // 确定强度等级
+            // Determine strength level
             let strength = 'Very Weak';
             let color = '#E53E3E';
             let width = '20%';
@@ -1170,14 +1441,14 @@
                 passwordValid = false;
             }
             
-            // 更新UI
+            // Update UI
             strengthMeter.style.width = width;
             strengthMeter.style.backgroundColor = color;
             strengthText.textContent = `Strength: ${strength}`;
             strengthText.style.color = color;
         }
 
-        // 检查密码匹配
+        // Check password match
         function checkPasswordMatch() {
             const password = document.getElementById('newPassword').value;
             const confirm = document.getElementById('confirmPassword').value;
@@ -1197,19 +1468,19 @@
             }
         }
 
-        // 更新规则显示
+        // Update rule display
         function updateRule(elementId, isValid) {
             const element = document.getElementById(elementId);
             element.className = isValid ? 'valid' : 'invalid';
         }
 
-        // 更改密码
+        // Change password
         async function changePassword() {
             const oldPassword = document.getElementById('oldPassword').value;
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             
-            // 验证输入
+            // Validate input
             if (!oldPassword) {
                 showError('Please enter your current password');
                 return;
@@ -1231,7 +1502,7 @@
             }
             
             try {
-                const response = await fetch('update_user_profile.php', {
+                const response = await fetch(UPDATE_USER_PROFILE_API, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1248,24 +1519,24 @@
                 console.log('Password change response:', result);
                 
                 if (result.success) {
-                    // 清除密码字段
+                    // Clear password fields
                     document.getElementById('oldPassword').value = '';
                     document.getElementById('newPassword').value = '';
                     document.getElementById('confirmPassword').value = '';
                     
-                    // 重置UI
+                    // Reset UI
                     document.getElementById('passwordStrengthMeter').style.width = '0%';
                     document.getElementById('passwordStrengthText').textContent = '';
                     document.getElementById('passwordMatch').textContent = '';
                     
-                    // 重置规则显示
+                    // Reset rule display
                     document.querySelectorAll('#passwordRules li').forEach(li => {
                         li.className = 'invalid';
                     });
                     
                     showToast('Password changed successfully', 'success');
                     
-                    // 重置验证标志
+                    // Reset validation flags
                     passwordValid = false;
                     passwordMatch = false;
                 } else {
@@ -1277,18 +1548,18 @@
             }
         }
 
-        // 显示删除账户模态框
+        // Show delete account modal
         function showDeleteAccountModal() {
-            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('show');
         }
 
-        // 隐藏删除账户模态框
+        // Hide delete account modal
         function hideDeleteModal() {
-            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('show');
             document.getElementById('deletePassword').value = '';
         }
 
-        // 确认删除账户
+        // Confirm delete account
         async function confirmDeleteAccount() {
             const password = document.getElementById('deletePassword').value;
             
@@ -1298,7 +1569,7 @@
             }
             
             try {
-                const response = await fetch('delete_user_account.php', {
+                const response = await fetch(DELETE_USER_ACCOUNT_API, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1329,21 +1600,21 @@
             }
         }
 
-        // 显示确认模态框
+        // Show confirmation modal
         function showConfirmModal(title, message, callback) {
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalMessage').textContent = message;
             confirmCallback = callback;
-            document.getElementById('confirmModal').classList.remove('hidden');
+            document.getElementById('confirmModal').classList.add('show');
         }
 
-        // 隐藏确认模态框
+        // Hide confirmation modal
         function hideConfirmModal() {
-            document.getElementById('confirmModal').classList.add('hidden');
+            document.getElementById('confirmModal').classList.remove('show');
             confirmCallback = null;
         }
 
-        // 确认操作
+        // Confirm action
         function confirmAction() {
             if (confirmCallback) {
                 confirmCallback();
@@ -1351,54 +1622,81 @@
             hideConfirmModal();
         }
 
-        // 取消操作
+        // Cancel action
         function cancelAction() {
             hideConfirmModal();
         }
 
-        // 显示Toast消息
+        // Show toast (from customer_view)
         function showToast(message, type = 'success') {
-            // 移除现有的toast
-            const existingToast = document.querySelector('.toast');
-            if (existingToast) {
-                existingToast.remove();
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            
+            // Set icon based on type
+            if (type === 'success') {
+                toastIcon.className = 'fas fa-check-circle';
+            } else if (type === 'error') {
+                toastIcon.className = 'fas fa-exclamation-circle';
+            } else if (type === 'warning') {
+                toastIcon.className = 'fas fa-exclamation-triangle';
             }
             
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.textContent = message;
+            toast.classList.add('show');
             
-            document.body.appendChild(toast);
-            
-            // 3秒后自动移除
             setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.style.animation = 'slideIn 0.3s ease reverse forwards';
-                    setTimeout(() => {
-                        if (toast.parentNode) {
-                            toast.remove();
-                        }
-                    }, 300);
-                }
+                toast.classList.remove('show');
             }, 3000);
         }
 
-        // 显示错误
+        // Show error
         function showError(message) {
             showToast(message, 'error');
         }
 
-        // 验证电子邮件
+        // Validate email
         function isValidEmail(email) {
             const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(String(email).toLowerCase());
         }
 
-        // 验证电话号码
+        // Validate phone
         function isValidPhone(phone) {
             const re = /^[\+]?[0-9\s\-\(\)]{10,}$/;
             return re.test(phone);
         }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // View cart (from customer_view)
+        function viewCart() {
+            if (!currentUser || !currentUser.logged_in) {
+                showToast('Please login to view cart', 'error');
+                setTimeout(() => {
+                    window.location.href = '../Login/Login.html?redirect=cart';
+                }, 2000);
+                return;
+            }
+            
+            window.location.href = 'cart/cart.html';
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const confirmModal = document.getElementById('confirmModal');
+            const deleteModal = document.getElementById('deleteModal');
+            
+            if (event.target === confirmModal) {
+                hideConfirmModal();
+            }
+            if (event.target === deleteModal) {
+                hideDeleteModal();
+            }
+        };
     </script>
 </body>
 </html>

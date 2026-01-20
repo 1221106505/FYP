@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookStore - Browse Books</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #6d28d9;
@@ -211,6 +211,43 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-light);
+        }
+
+        .search-type-toggle {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .search-type-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .search-type-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .search-type-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            background-color: white;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-type-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .search-type-btn:hover:not(.active) {
+            background-color: var(--secondary);
         }
 
         .filter-select {
@@ -813,6 +850,7 @@
                 <a href="Main.html">Home</a>
                 <a href="customer_view.html" class="active">Books</a>
                 <a href="../System/cart/cart.html">Cart</a>
+                <a href="order_history.html">Order History</a>
                 <a href="user_profile.html">Profile</a>
             </div>
             <div class="user-actions">
@@ -835,6 +873,14 @@
                     <div class="search-box">
                         <input type="text" id="searchInput" placeholder="Search by title, author, or category...">
                         <i class="fas fa-search search-icon"></i>
+                        <div class="search-type-toggle">
+                            <span class="search-type-label">Search in:</span>
+                            <div class="search-type-buttons">
+                                <button class="search-type-btn active" data-type="title">Title Only</button>
+                                <button class="search-type-btn" data-type="all">All Fields</button>
+                                <button class="search-type-btn" data-type="exact">Exact Match</button>
+                            </div>
+                        </div>
                     </div>
                     <select class="filter-select" id="categoryFilter">
                         <option value="all">All Categories</option>
@@ -911,6 +957,7 @@
         let filteredBooks = [];
         let categories = [];
         let currentUser = null;
+        let searchType = 'title'; // Default search type
 
         // DOM Elements
         const booksContainer = document.getElementById('booksContainer');
@@ -961,6 +1008,20 @@
             availabilityFilter.addEventListener('change', filterBooks);
             priceFilter.addEventListener('change', filterBooks);
             sortBy.addEventListener('change', sortBooks);
+            
+            // Add search type button listeners
+            document.querySelectorAll('.search-type-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.search-type-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    searchType = this.dataset.type;
+                    filterBooks(); // Re-filter with new search type
+                });
+            });
         }
 
         // Load categories
@@ -1146,20 +1207,60 @@
             return div.innerHTML;
         }
 
-        // Filter books
+        // Filter books - IMPROVED VERSION with search type options
         function filterBooks() {
-            const searchTerm = searchInput.value.toLowerCase();
+            const searchTerm = searchInput.value.trim().toLowerCase();
             const selectedCategory = categoryFilter.value;
             const selectedAvailability = availabilityFilter.value;
             const selectedPrice = priceFilter.value;
             
             filteredBooks = allBooks.filter(book => {
-                // Search filter
-                const matchesSearch = 
-                    book.title.toLowerCase().includes(searchTerm) ||
-                    (book.author && book.author.toLowerCase().includes(searchTerm)) ||
-                    (book.category_name && book.category_name.toLowerCase().includes(searchTerm)) ||
-                    (book.description && book.description.toLowerCase().includes(searchTerm));
+                // Search filter - improved with different search types
+                let matchesSearch = false;
+                
+                if (searchTerm === '') {
+                    matchesSearch = true; // 空搜索显示所有书籍
+                } else {
+                    // 根据搜索类型进行不同的匹配
+                    const title = String(book.title || '').toLowerCase();
+                    const author = String(book.author || '').toLowerCase();
+                    const categoryName = String(book.category_name || '').toLowerCase();
+                    const description = String(book.description || '').toLowerCase();
+                    const isbn = String(book.isbn || '').toLowerCase();
+                    
+                    switch(searchType) {
+                        case 'title':
+                            // 只在标题中搜索
+                            matchesSearch = title.includes(searchTerm);
+                            break;
+                        case 'all':
+                            // 在所有字段中搜索
+                            matchesSearch = 
+                                title.includes(searchTerm) ||
+                                author.includes(searchTerm) ||
+                                categoryName.includes(searchTerm) ||
+                                description.includes(searchTerm) ||
+                                isbn.includes(searchTerm);
+                            break;
+                        case 'exact':
+                            // 精确匹配 - 使用空格分割关键词
+                            const searchWords = searchTerm.split(/\s+/).filter(word => word.length > 0);
+                            if (searchWords.length === 0) {
+                                matchesSearch = true;
+                            } else {
+                                // 所有关键词都必须出现在标题中
+                                const allWordsMatch = searchWords.every(word => 
+                                    title.includes(word) ||
+                                    author.includes(word) ||
+                                    categoryName.includes(word)
+                                );
+                                matchesSearch = allWordsMatch;
+                            }
+                            break;
+                        default:
+                            matchesSearch = true;
+                    }
+                }
                 
                 if (!matchesSearch) return false;
                 
@@ -1182,7 +1283,7 @@
                 
                 // Price filter
                 if (selectedPrice !== 'all') {
-                    const price = parseFloat(book.price);
+                    const price = parseFloat(book.price || 0);
                     if (selectedPrice === '0-20' && price > 20) return false;
                     if (selectedPrice === '20-50' && (price < 20 || price > 50)) return false;
                     if (selectedPrice === '50-100' && (price < 50 || price > 100)) return false;
@@ -1202,11 +1303,11 @@
             filteredBooks.sort((a, b) => {
                 switch (sortValue) {
                     case 'title':
-                        return a.title.localeCompare(b.title);
+                        return (a.title || '').localeCompare(b.title || '');
                     case 'price_low':
-                        return parseFloat(a.price) - parseFloat(b.price);
+                        return parseFloat(a.price || 0) - parseFloat(b.price || 0);
                     case 'price_high':
-                        return parseFloat(b.price) - parseFloat(a.price);
+                        return parseFloat(b.price || 0) - parseFloat(a.price || 0);
                     case 'newest':
                         return new Date(b.publish_date || 0) - new Date(a.publish_date || 0);
                     default:
