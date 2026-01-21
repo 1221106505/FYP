@@ -11,12 +11,15 @@
 <header class="topbar">
   <div class="brand">
     <span class="logo">📚</span>
-    <span class="name">BookStore</span>
+    <span class="name">Virtual BookStore</span>
   </div>
   <nav class="nav">
-    <a href="Main.html">Browse Books</a>
-    <a class="active" href="cart.html">Cart</a>
-  </nav>
+  <a href="../Main.html">Home</a>
+  <a href="../customer_view.html">Books</a>
+  <a class="active" href="cart.html">Cart</a>
+  <a href="../order_history.html">Order History</a>
+  <a href="../profile.html">Profile</a>
+</nav>
 </header>
 
 <main class="container">
@@ -100,6 +103,13 @@
 
 <p class="tiny muted" id="deliveryEstimate"></p>
 
+<label class="field">
+  <span class="label">Delivery Address</span>
+  <textarea id="address" rows="3"
+    placeholder="Full address (Street, Area, City, State, Postcode)"
+    style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:14px; resize:vertical;"></textarea>
+  <span class="tiny muted" id="addressMsg"></span>
+</label>
 
       <div class="divider"></div>
 
@@ -159,27 +169,6 @@
       <button class="btn" id="btnPayNow" type="button">Pay Now</button>
 <p class="tiny muted" id="payMsg"></p>
 
-<div style="display:flex; gap:10px; margin-top:10px;">
-  <button class="btn ghost" id="btnPreviewReceipt" type="button" disabled>View Receipt</button>
-  <button class="btn ghost" id="btnPrintReceipt" type="button" disabled>Print Receipt</button>
-</div>
-<span class="tiny muted" id="receiptHint">Receipt will be available after payment is completed.</span>
-    </div>
-
-<!-- Receipt Modal -->
-<div class="modal" id="receiptModal" aria-hidden="true">
-  <div class="modal-backdrop" id="receiptBackdrop"></div>
-  <div class="modal-card" role="dialog" aria-modal="true">
-    <div class="modal-head">
-      <h3 style="margin:0;">Receipt Preview</h3>
-      <button class="btn" id="btnCloseReceipt" type="button">Close</button>
-    </div>
-
-    <div class="modal-body" id="receiptContent">
-      <!-- JS will inject receipt HTML here -->
-    </div>
-  </div>
-</div>
 
       <p class="tiny muted" id="msg"></p>
     </aside>
