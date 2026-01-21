@@ -1580,42 +1580,36 @@
 
     // 根据权限控制导航菜单显示
     function updateNavigationBasedOnPermissions() {
-        console.log('Updating navigation based on permissions');
-        console.log('Accessible sections:', accessibleSections);
-        console.log('Current permissions:', currentAdminPermissions);
+    console.log('Updating navigation for:', {
+        sections: accessibleSections,
+        isSuperAdmin: isSuperAdmin
+    });
+    
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        const section = link.getAttribute('data-section');
+        const parentLi = link.parentElement;
         
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            const section = link.getAttribute('data-section');
-            const parentLi = link.parentElement;
-            
-            // 仪表板默认显示
-            if (section === 'dashboard') {
-                parentLi.style.display = 'list-item';
-                return;
-            }
-            
-            // 管理员管理只对超级管理员显示
-            if (section === 'admin-management') {
-                parentLi.style.display = isSuperAdmin ? 'list-item' : 'none';
-                return;
-            }
-            
-            // 根据权限控制显示
-            const sectionPermissions = {
-                'book-inventory': ['view_books', 'manage_books'],
-                'orders': ['manage_orders'],
-                'categories': ['manage_categories'],
-                'analytics': ['view_analytics']
-            };
-            
-            if (sectionPermissions[section]) {
-                parentLi.style.display = hasAnyPermission(sectionPermissions[section]) ? 'list-item' : 'none';
-            } else {
-                parentLi.style.display = 'list-item';
-            }
-        });
-    }
+        // 仪表板默认显示给所有人
+        if (section === 'dashboard') {
+            parentLi.style.display = 'list-item';
+            return;
+        }
+        
+        // 管理员管理只对超级管理员显示
+        if (section === 'admin-management') {
+            parentLi.style.display = isSuperAdmin ? 'list-item' : 'none';
+            return;
+        }
+        
+        // 其他页面根据可访问页面数组决定
+        if (accessibleSections.includes(section)) {
+            parentLi.style.display = 'list-item';
+        } else {
+            parentLi.style.display = 'none';
+        }
+    });
+}
 
     // 根据权限控制仪表板快速操作按钮
     function updateDashboardQuickActions() {
@@ -1817,44 +1811,116 @@
                 break;
         }
     }
-
-    // 初始化权限系统
-    async function initializePermissionSystem() {
-        try {
-            const response = await fetch(API_ENDPOINTS.getCurrentAdmin);
-            const data = await response.json();
-            
-            if (data.success) {
-                currentAdminPermissions = data.permissions || [];
-                accessibleSections = data.accessible_sections || [];
-                
-                console.log('Permissions initialized:', {
-                    permissions: currentAdminPermissions,
-                    accessibleSections: accessibleSections,
-                    isSuperAdmin: isSuperAdmin
-                });
-                
-                // 更新界面
-                updateNavigationBasedOnPermissions();
-                updateDashboardQuickActions();
-                
-                // 监听页面切换
-                document.querySelectorAll('.nav-link').forEach(link => {
-                    link.addEventListener('click', function() {
-                        setTimeout(() => {
-                            const sectionId = this.getAttribute('data-section');
-                            applySectionPermissions(sectionId);
-                        }, 100);
-                    });
-                });
-                
-                // 初始加载
-                applySectionPermissions('dashboard');
-            }
-        } catch (error) {
-            console.error('Error initializing permission system:', error);
-        }
+function hasPermission(permissionKey) {
+    console.log('Checking permission:', permissionKey, {
+        isSuperAdmin: isSuperAdmin,
+        currentPermissions: currentAdminPermissions
+    });
+    
+    // 超级管理员拥有所有权限
+    if (isSuperAdmin) {
+        console.log('Super admin has all permissions');
+        return true;
     }
+    
+    // 如果权限数据为空，使用fallback
+    if (!currentAdminPermissions || currentAdminPermissions.length === 0) {
+        console.warn('No permissions loaded, using fallback');
+        return hasFallbackPermission(permissionKey);
+    }
+    
+    // 检查权限列表
+    const hasPerm = currentAdminPermissions.some(perm => {
+        const match = perm.permission_key === permissionKey;
+        if (match) console.log('Permission found:', perm);
+        return match;
+    });
+    
+    console.log('Permission result:', hasPerm);
+    return hasPerm;
+}
+
+// 添加fallback权限检查（当权限数据加载失败时使用）
+function hasFallbackPermission(permissionKey) {
+    // 默认所有管理员都有这些基本权限
+    const basicPermissions = ['view_dashboard', 'view_books', 'view_orders', 'view_analytics'];
+    return basicPermissions.includes(permissionKey);
+}
+
+// 初始化权限系统
+// 修复权限系统初始化
+async function initializePermissionSystem() {
+    try {
+        const response = await fetch(API_ENDPOINTS.getCurrentAdmin);
+        const data = await response.json();
+        
+        if (data.success) {
+            currentAdminInfo = data;
+            isSuperAdmin = data.role === 'superadmin';
+            
+            console.log('Admin info loaded:', {
+                username: data.username,
+                role: data.role,
+                isSuperAdmin: isSuperAdmin
+            });
+            
+            updateAdminDisplay();
+            
+            // 加载权限数据（非超级管理员才需要）
+            if (!isSuperAdmin) {
+                await loadAdminPermissions();
+            } else {
+                currentAdminPermissions = [];
+                accessibleSections = ['dashboard', 'book-inventory', 'orders', 'categories', 'analytics', 'admin-management'];
+            }
+            
+            // 更新界面
+            updateNavigationBasedOnPermissions();
+            updateDashboardQuickActions();
+            
+            // 应用当前页面的权限控制
+            const activeSection = document.querySelector('.content-section.active');
+            if (activeSection) {
+                const sectionId = activeSection.id;
+                applySectionPermissions(sectionId);
+            }
+            
+        } else {
+            console.error('Failed to load admin info:', data.error);
+            fallbackToDefault('Failed to load admin info');
+        }
+    } catch (error) {
+        console.error('Error initializing permission system:', error);
+        fallbackToDefault('Network error: ' + error.message);
+    }
+}
+
+// 添加权限加载函数
+async function loadAdminPermissions() {
+    try {
+        // 假设你有获取权限的API，或者修改 get_current_admin.php 返回权限
+        const response = await fetch('get_admin_permissions.php');
+        const data = await response.json();
+        
+        if (data.success) {
+            currentAdminPermissions = data.permissions || [];
+            accessibleSections = data.accessible_sections || [];
+            
+            console.log('Admin permissions loaded:', {
+                permissions: currentAdminPermissions,
+                accessibleSections: accessibleSections
+            });
+        } else {
+            console.warn('Could not load permissions:', data.error);
+            currentAdminPermissions = [];
+            accessibleSections = ['dashboard']; // 默认只有仪表板
+        }
+    } catch (error) {
+        console.error('Error loading permissions:', error);
+        currentAdminPermissions = [];
+        accessibleSections = ['dashboard'];
+    }
+}
 
     // ============ INITIALIZATION ============
     
