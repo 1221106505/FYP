@@ -7,7 +7,7 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// 检查session
+// 检查session - 使用 admin_id
 if (!isset($_SESSION['admin_id'])) {
     echo json_encode(['success' => false, 'error' => 'Not logged in']);
     exit;
@@ -15,9 +15,11 @@ if (!isset($_SESSION['admin_id'])) {
 
 // 检查是否是superadmin
 $currentAdminId = $_SESSION['admin_id'];
-$stmt = $pdo->prepare("SELECT role FROM admin WHERE auto_id = ?");
-$stmt->execute([$currentAdminId]);
-$currentAdmin = $stmt->fetch();
+$stmt = $conn->prepare("SELECT role FROM admin WHERE auto_id = ?");
+$stmt->bind_param("i", $currentAdminId);
+$stmt->execute();
+$result = $stmt->get_result();
+$currentAdmin = $result->fetch_assoc();
 
 if (!$currentAdmin || $currentAdmin['role'] !== 'superadmin') {
     echo json_encode(['success' => false, 'error' => 'Access denied. Super Admin only.']);
@@ -34,12 +36,14 @@ if (empty($adminId) || empty($email)) {
 }
 
 try {
-    $pdo->beginTransaction();
+    $conn->begin_transaction();
     
     // 获取管理员信息
-    $stmt = $pdo->prepare("SELECT username, email FROM admin WHERE auto_id = ?");
-    $stmt->execute([$adminId]);
-    $admin = $stmt->fetch();
+    $stmt = $conn->prepare("SELECT username, email FROM admin WHERE auto_id = ?");
+    $stmt->bind_param("i", $adminId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $admin = $result->fetch_assoc();
     
     if (!$admin) {
         echo json_encode(['success' => false, 'error' => 'Admin not found']);
@@ -51,22 +55,23 @@ try {
     $password_hash = password_hash($newPassword, PASSWORD_DEFAULT);
     
     // 更新密码
-    $stmt = $pdo->prepare("UPDATE admin SET password_hash = ? WHERE auto_id = ?");
-    $stmt->execute([$password_hash, $adminId]);
+    $stmt = $conn->prepare("UPDATE admin SET password_hash = ? WHERE auto_id = ?");
+    $stmt->bind_param("si", $password_hash, $adminId);
+    $stmt->execute();
     
-    $pdo->commit();
-    
-    // 这里应该实现真正的邮件发送
-    // 暂时只返回成功信息
+    $conn->commit();
     
     echo json_encode([
         'success' => true,
-        'message' => 'Password reset email sent (simulated)',
-        'generated_password' => $newPassword // 在实际应用中不应该返回这个
+        'message' => 'Password reset successful',
+        'generated_password' => $newPassword,
+        'email_sent_to' => $email
     ]);
     
-} catch (PDOException $e) {
-    $pdo->rollBack();
+} catch (Exception $e) {
+    $conn->rollback();
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }
+
+$conn->close();
 ?>

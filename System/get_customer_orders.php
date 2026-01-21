@@ -52,6 +52,7 @@ try {
     // 修改：获取订单信息，使用正确的字段名
     $orders_sql = "SELECT 
                     o.order_id,
+                    o.username,
                     o.order_date,
                     o.total_amount,
                     o.status,  -- 直接使用 status，而不是 order_status

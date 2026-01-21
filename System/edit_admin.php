@@ -1,5 +1,5 @@
 <?php
-// save_admin.php
+// edit_admin.php - 专门处理编辑管理员
 session_start();
 require_once '../include/database.php';
 
@@ -29,12 +29,18 @@ if (!$currentAdmin || $currentAdmin['role'] !== 'superadmin') {
 
 $data = json_decode(file_get_contents('php://input'), true);
 
+$admin_id = $data['admin_id'] ?? null;
 $username = $data['username'] ?? '';
 $email = $data['email'] ?? '';
 $role = $data['role'] ?? 'admin';
 $permissions = $data['permissions'] ?? [];
 
-error_log("Creating admin: username=$username, role=$role, permissions=" . json_encode($permissions));
+error_log("Editing admin $admin_id: username=$username, role=$role, permissions=" . json_encode($permissions));
+
+if (empty($admin_id)) {
+    echo json_encode(['success' => false, 'error' => 'Admin ID is required for editing']);
+    exit;
+}
 
 if (empty($username)) {
     echo json_encode(['success' => false, 'error' => 'Username is required']);
@@ -44,9 +50,21 @@ if (empty($username)) {
 try {
     $conn->begin_transaction();
     
-    // 检查用户名是否已存在
-    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM admin WHERE username = ?");
-    $stmt->bind_param("s", $username);
+    // 检查要编辑的管理员是否存在
+    $stmt = $conn->prepare("SELECT username, role FROM admin WHERE auto_id = ?");
+    $stmt->bind_param("i", $admin_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $existingAdmin = $result->fetch_assoc();
+    
+    if (!$existingAdmin) {
+        echo json_encode(['success' => false, 'error' => 'Admin not found']);
+        exit;
+    }
+    
+    // 检查用户名是否已存在（排除当前编辑的管理员）
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM admin WHERE username = ? AND auto_id != ?");
+    $stmt->bind_param("si", $username, $admin_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
@@ -55,10 +73,10 @@ try {
         exit;
     }
     
-    // 检查邮箱是否已存在（只检查非空邮箱）
+    // 检查邮箱是否已存在（排除当前编辑的管理员）- 允许空邮箱
     if (!empty($email)) {
-        $stmt = $conn->prepare("SELECT COUNT(*) as count FROM admin WHERE email = ? AND email != ''");
-        $stmt->bind_param("s", $email);
+        $stmt = $conn->prepare("SELECT COUNT(*) as count FROM admin WHERE email = ? AND email != '' AND auto_id != ?");
+        $stmt->bind_param("si", $email, $admin_id);
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
@@ -68,41 +86,25 @@ try {
         }
     }
     
-    // 生成随机密码
-    $randomPassword = bin2hex(random_bytes(8));
-    $passwordHash = password_hash($randomPassword, PASSWORD_DEFAULT);
-    
-    // 正确插入所有必需字段
+    // 更新管理员信息
     $stmt = $conn->prepare("
-        INSERT INTO admin (
-            username, 
-            password_hash, 
-            identity, 
-            role, 
-            email, 
-            email_verified, 
-            verification_code, 
-            verification_code_expiry, 
-            reset_token, 
-            reset_token_expiry, 
-            created_at, 
-            updated_at
-        ) VALUES (?, ?, 'admin', ?, ?, 0, NULL, NULL, NULL, NULL, NOW(), NOW())
+        UPDATE admin 
+        SET username = ?, email = ?, role = ?, updated_at = NOW()
+        WHERE auto_id = ?
     ");
-    
-    if (!$stmt) {
-        throw new Exception("Prepare failed: " . $conn->error);
-    }
-    
-    $stmt->bind_param("ssss", $username, $passwordHash, $role, $email);
+    $stmt->bind_param("sssi", $username, $email, $role, $admin_id);
     
     if (!$stmt->execute()) {
-        throw new Exception("Failed to insert admin: " . $stmt->error);
+        throw new Exception("Failed to update admin: " . $stmt->error);
     }
     
-    $adminId = $conn->insert_id;
+    // 先删除所有现有权限
+    $stmt = $conn->prepare("DELETE FROM admin_permissions WHERE admin_id = ?");
+    $stmt->bind_param("i", $admin_id);
+    $stmt->execute();
     
     // 处理权限
+    $permissionsCount = 0;
     if ($role === 'superadmin') {
         // 如果是superadmin，赋予所有权限
         $stmt = $conn->query("SELECT permission_id FROM permission_definitions");
@@ -111,13 +113,13 @@ try {
                 INSERT INTO admin_permissions (admin_id, permission_id, permission_value, granted_by, granted_at) 
                 VALUES (?, ?, 1, ?, NOW())
             ");
-            $insertStmt->bind_param("iii", $adminId, $row['permission_id'], $currentAdminId);
+            $insertStmt->bind_param("iii", $admin_id, $row['permission_id'], $currentAdminId);
             $insertStmt->execute();
+            $permissionsCount++;
         }
         $permissionsCount = 'All';
     } else if ($role === 'admin' && !empty($permissions)) {
         // 如果是普通admin，设置选中的权限
-        $permissionsCount = 0;
         foreach ($permissions as $permission) {
             // 处理权限数据格式
             if (is_array($permission) && isset($permission['permission_key'])) {
@@ -141,7 +143,7 @@ try {
                     INSERT INTO admin_permissions (admin_id, permission_id, permission_value, granted_by, granted_at) 
                     VALUES (?, ?, 1, ?, NOW())
                 ");
-                $insertStmt->bind_param("iii", $adminId, $permRow['permission_id'], $currentAdminId);
+                $insertStmt->bind_param("iii", $admin_id, $permRow['permission_id'], $currentAdminId);
                 
                 if (!$insertStmt->execute()) {
                     error_log("Failed to insert permission $permissionKey: " . $insertStmt->error);
@@ -152,25 +154,21 @@ try {
                 error_log("Permission not found: $permissionKey");
             }
         }
-    } else {
-        // 没有权限的普通管理员
-        $permissionsCount = 0;
     }
     
     $conn->commit();
     
     echo json_encode([
         'success' => true,
-        'message' => 'Admin created successfully',
-        'admin_id' => $adminId,
-        'generated_password' => $randomPassword,
+        'message' => 'Admin updated successfully',
+        'admin_id' => $admin_id,
         'role' => $role,
         'permissions_count' => $permissionsCount
     ]);
     
 } catch (Exception $e) {
     $conn->rollback();
-    error_log("Error creating admin: " . $e->getMessage());
+    error_log("Error updating admin: " . $e->getMessage());
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }
 
