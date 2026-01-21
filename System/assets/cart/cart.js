@@ -20,7 +20,6 @@ const SHIPPING_RULES = {
 let shippingOption = localStorage.getItem("cart_shipping") || "standard";
 let promoCode = localStorage.getItem("cart_promo") || "";
 let discountValue = 0;
-let lastPaidReceipt = null; // will be filled only after successful payment
 
 
 // -------------------- Boot --------------------
@@ -53,12 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   updateDeliveryEstimate();
 
-  // Receipt modal
-  document.getElementById("btnPreviewReceipt")?.addEventListener("click", openReceiptModal);
-  document.getElementById("btnPrintReceipt")?.addEventListener("click", printReceipt);
-  document.getElementById("btnCloseReceipt")?.addEventListener("click", closeReceiptModal);
-  document.getElementById("receiptBackdrop")?.addEventListener("click", closeReceiptModal);
-
   // Secure payment panel
   document.getElementById("togglePayment")?.addEventListener("click", togglePaymentPanel);
   document.getElementById("paymentMethod")?.addEventListener("change", syncPaymentFields);
@@ -69,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("cardCvv")?.addEventListener("input", onCardCvvInput);
 
   syncPaymentFields();
-  setReceiptAvailability(false);
+ 
 
   // Load cart
   loadCart();
@@ -81,21 +74,6 @@ function setMsg(text, isError = false) {
   if (!el) return;
   el.textContent = text || "";
   el.style.color = isError ? "#ef4444" : "#6b7280";
-}
-
-function setReceiptAvailability(isPaid) {
-  const viewBtn = document.getElementById("btnPreviewReceipt");
-  const printBtn = document.getElementById("btnPrintReceipt");
-  const hint = document.getElementById("receiptHint");
-
-  if (viewBtn) viewBtn.disabled = !isPaid;
-  if (printBtn) printBtn.disabled = !isPaid;
-
-  if (hint) {
-    hint.textContent = isPaid
-      ? "Receipt is available. You can view or print it now."
-      : "Receipt will be available after payment is completed.";
-  }
 }
 
 function showState(message) {
@@ -270,10 +248,17 @@ function renderList(containerId, items, isSaved) {
   // Only cart list has selection checkboxes
   if (!isSaved) {
     el.querySelectorAll(".rowCheck").forEach(cb => cb.addEventListener("change", () => {
-      updateSelectAllState();
-      updateRemoveSelectedButton();
-    }));
+  updateSelectAllState();
+  updateRemoveSelectedButton();
+  updateTotals(); // ✅ add this
+}));
   }
+}
+
+function getSelectedCartItems() {
+  const selectedIds = getSelectedIds();
+  if (selectedIds.length === 0) return [];
+  return cartItems.filter(it => selectedIds.includes(Number(it.cart_id)));
 }
 
 // -------------------- Selection --------------------
@@ -282,6 +267,7 @@ function onSelectAll(e) {
   document.querySelectorAll(".rowCheck").forEach(cb => (cb.checked = checked));
   updateRemoveSelectedButton();
   updateSelectAllState();
+  updateTotals(); // ✅ add this
 }
 
 function updateSelectAllState() {
@@ -351,21 +337,24 @@ function updateDeliveryEstimate() {
 
 
 function updateTotals() {
-  const itemsCount = cartItems.reduce((acc, it) => acc + (Number(it.quantity) || 0), 0);
+  const selectedItems = getSelectedCartItems();
+  const itemsToSum = selectedItems.length > 0 ? selectedItems : [];
 
-  const subtotal = cartItems.reduce((acc, it) => {
+  // ✅ count + subtotal based on selected only
+  const itemsCount = itemsToSum.reduce((acc, it) => acc + (Number(it.quantity) || 0), 0);
+
+  const subtotal = itemsToSum.reduce((acc, it) => {
     const price = Number(it.price) || 0;
     const qty = Number(it.quantity) || 0;
     return acc + price * qty;
   }, 0);
 
-  // shipping depends on option
+  // ✅ shipping is 0 if nothing selected
   let shipping = 0;
-if (cartItems.length > 0) {
-  const rule = SHIPPING_RULES[shippingOption] || SHIPPING_RULES.standard;
-  shipping = rule.fee;
-}
-
+  if (itemsToSum.length > 0) {
+    const rule = SHIPPING_RULES[shippingOption] || SHIPPING_RULES.standard;
+    shipping = rule.fee;
+  }
 
   // discount rules
   const code = normalizeCode(promoCode);
@@ -692,10 +681,29 @@ function setPayMsg(text, isError = false) {
   el.style.color = isError ? "#ef4444" : "#6b7280";
 }
 
+function getAddressValue() {
+  return (document.getElementById("address")?.value || "").trim();
+}
+
+function setAddressMsg(msg, isError = false) {
+  const el = document.getElementById("addressMsg");
+  if (!el) return;
+  el.textContent = msg || "";
+  el.style.color = isError ? "#ef4444" : "#6b7280";
+}
+
+
 async function payNow() {
   setPayMsg("");
 
   if (cartItems.length === 0) {
+    const address = getAddressValue();
+if (address.length < 8) {
+  setAddressMsg("Please enter a valid delivery address.", true);
+  setPayMsg("Delivery address is required.", true);
+  return;
+}
+setAddressMsg("");
     setPayMsg("Your cart is empty.", true);
     return;
   }
@@ -704,19 +712,35 @@ async function payNow() {
   const pay = validatePaymentBeforeCheckout();
   if (!pay.ok) return;
 
-  // ✅ simulate payment success (FYP)
   setPayMsg("Processing payment...");
 
-  lastPaidReceipt = {
-    order_id: "PENDING",
-    paid_at: new Date().toLocaleString(),
-    payment_method: "Card",
-    payment_ref: pay.ref,
-    masked_card: pay.maskedCard
-  };
+  try {
+    // Your HTML currently has no address field, so use a default
+    const payment_method = "Card";
+const address = getAddressValue();
 
-  setReceiptAvailability(true);
-  setPayMsg("Payment successful ✅ You can now view/print receipt.");
+    // ✅ Place order in backend (should clear cart server-side)
+    const data = await apiPost("cart_checkout.php", { payment_method, address });
+
+    if (!data || !data.success) {
+      setPayMsg((data && data.error) ? data.error : "Checkout failed.", true);
+      return;
+    }
+
+    // ✅ IMPORTANT: Clear cart UI + reload from server
+    await loadCart(); // if backend cleared, UI becomes empty
+
+    // ✅ EXTRA SAFETY: If backend didn’t clear, clear it manually
+    if (cartItems.length > 0) {
+      await apiPost("cart_clear.php", {});
+      await loadCart();
+    }
+
+    setPayMsg(`Payment successful ✅ Order ID: ${data.order_id}. Cart cleared.`);
+  } catch (err) {
+    console.error(err);
+    setPayMsg("Payment success but clearing failed. Check Console (F12).", true);
+  }
 }
 
 // -------------------- Checkout --------------------
@@ -728,10 +752,6 @@ async function checkout() {
     return;
   }
 
-  if (!lastPaidReceipt) {
-  setMsg("Please complete payment first (click Pay Now).", true);
-  return;
-}
 
   const payment_method = "Card";
   const address = document.getElementById("address")?.value?.trim() || "";
@@ -752,19 +772,6 @@ async function checkout() {
       return;
     }
 
-    lastPaidReceipt.order_id = data.order_id;
-
-    // ✅ Mark as paid + enable receipt buttons
-lastPaidReceipt = {
-  order_id: data.order_id,
-  paid_at: new Date().toLocaleString(),
-  payment_method: "Card",
-  payment_ref: "CARD-" + Date.now(),
-  masked_card: getMaskedCardInfo()
-};
-
-setReceiptAvailability(true);
-
     alert(`Order placed successfully! Order ID: ${data.order_id}`);
     await loadCart();
   } catch (err) {
@@ -773,183 +780,6 @@ setReceiptAvailability(true);
   }
 }
 
-// -------------------- Receipt --------------------
-function openReceiptModal() {
-  const modal = document.getElementById("receiptModal");
-  const content = document.getElementById("receiptContent");
-  if (!modal || !content) return;
-
-  content.innerHTML = buildReceiptHTML();
-  modal.classList.add("show");
-  modal.setAttribute("aria-hidden", "false");
-}
-
-function closeReceiptModal() {
-  const modal = document.getElementById("receiptModal");
-  if (!modal) return;
-  modal.classList.remove("show");
-  modal.setAttribute("aria-hidden", "true");
-}
-
-function getTotalsForReceipt() {
-  const subtotal = cartItems.reduce((acc, it) => {
-    const price = Number(it.price) || 0;
-    const qty = Number(it.quantity) || 0;
-    return acc + price * qty;
-  }, 0);
-
-  let shipping = 0;
-if (cartItems.length > 0) {
-  const rule = SHIPPING_RULES[shippingOption] || SHIPPING_RULES.standard;
-  shipping = rule.fee;
-}
-
-  const code = normalizeCode(promoCode);
-  let discount = 0;
-
-  if (code === "SAVE10") discount = subtotal * 0.10;
-  else if (code === "SAVE20") discount = subtotal * 0.20;
-  else if (code === "FREESHIP") discount = shipping;
-
-  if (discount > (subtotal + shipping)) discount = (subtotal + shipping);
-
-  const taxableBase = Math.max(0, subtotal - discount);
-  const tax = taxableBase * TAX_RATE;
-  const total = Math.max(0, taxableBase + shipping + tax);
-
-  return { subtotal, shipping, discount, tax, total, code };
-}
-
-function buildReceiptHTML() {
-  if (!lastPaidReceipt) {
-  return `<div class="muted">Receipt not available yet. Please complete payment first.</div>`;
-}
-  const now = new Date();
-  const receiptId =
-    `DRAFT-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}` +
-    `-${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}`;
-
-  const payment = document.getElementById("paymentMethod")?.value || "Card";
-  const bankRef = localStorage.getItem("cart_bank_ref") || "";
-
-  const address = document.getElementById("address")?.value?.trim() || "(Not provided yet)";
-  const deliveryText = document.getElementById("deliveryEstimate")?.textContent || "";
-
-  const t = getTotalsForReceipt();
-
-  const itemsRows = cartItems.length
-    ? cartItems.map(it => {
-      const title = escapeHtml(it.title);
-      const price = Number(it.price) || 0;
-      const qty = Number(it.quantity) || 0;
-      const line = price * qty;
-      return `
-        <tr>
-          <td><strong>${title}</strong><div class="muted">Book ID: ${it.book_id}</div></td>
-          <td>${qty}</td>
-          <td>RM ${price.toFixed(2)}</td>
-          <td><strong>RM ${line.toFixed(2)}</strong></td>
-        </tr>
-      `;
-    }).join("")
-    : `<tr><td colspan="4" class="muted">No items in cart yet.</td></tr>`;
-
-  return `
-    <div class="receipt">
-      <h2>BookStore Receipt</h2>
-      <div class="muted">Receipt ID: <strong>${receiptId}</strong></div>
-      <div class="muted">Generated: ${now.toLocaleString()}</div>
-
-      <div class="receipt-grid">
-        <div class="receipt-box">
-          <div class="muted">Payment Method</div>
-          <div><strong>${escapeHtml(payment)}</strong></div>
-          ${payment === "BANK" ? `<div class="muted">Reference: <strong>${escapeHtml(bankRef || "—")}</strong></div>` : ""}
-        </div>
-        <div class="receipt-box">
-          <div class="muted">Shipping Option</div>
-          <div><strong>${(SHIPPING_RULES[shippingOption] || SHIPPING_RULES.standard).label}</strong></div>
-          <div class="muted">${escapeHtml(deliveryText)}</div>
-        </div>
-        <div class="receipt-box" style="grid-column: 1 / -1;">
-          <div class="muted">Delivery Address</div>
-          <div><strong>${escapeHtml(address)}</strong></div>
-        </div>
-      </div>
-
-      <table class="receipt-table">
-        <thead>
-          <tr>
-            <th style="width:55%;">Item</th>
-            <th style="width:10%;">Qty</th>
-            <th style="width:15%;">Unit</th>
-            <th style="width:20%;">Total</th>
-          </tr>
-        </thead>
-        <tbody>${itemsRows}</tbody>
-      </table>
-
-      <div class="receipt-grid">
-        <div class="receipt-box">
-          <div class="muted">Promo Code</div>
-          <div><strong>${t.code ? escapeHtml(t.code) : "—"}</strong></div>
-        </div>
-
-        <div class="receipt-box">
-          <div class="muted">Summary</div>
-          <div>Subtotal: <strong>RM ${t.subtotal.toFixed(2)}</strong></div>
-          <div>Shipping: <strong>RM ${t.shipping.toFixed(2)}</strong></div>
-          <div>Discount: <strong>- RM ${t.discount.toFixed(2)}</strong></div>
-          <div>Tax (6%): <strong>RM ${t.tax.toFixed(2)}</strong></div>
-          <div style="margin-top:6px; font-size:16px;">Grand Total: <strong>RM ${t.total.toFixed(2)}</strong></div>
-        </div>
-      </div>
-
-      <div class="muted" style="margin-top:10px;">
-        Note: This preview is generated client-side.
-      </div>
-    </div>
-  `;
-}
-
-function printReceipt() {
-  if (!lastPaidReceipt) {
-  alert("Receipt is only available after payment is completed.");
-  return;
-}
-  const html = buildReceiptHTML();
-
-  const w = window.open("", "_blank");
-  if (!w) {
-    alert("Popup blocked. Please allow popups to print/save PDF.");
-    return;
-  }
-
-  w.document.open();
-  w.document.write(`
-    <html>
-      <head>
-        <title>Receipt</title>
-        <style>
-          body{font-family:Arial, sans-serif; margin:20px; color:#111827;}
-          .muted{color:#6b7280;}
-          .receipt{border:1px solid #e5e7eb; border-radius:14px; padding:16px;}
-          table{width:100%; border-collapse:collapse; margin-top:12px;}
-          th, td{border-bottom:1px solid #e5e7eb; padding:10px 8px; text-align:left; vertical-align:top;}
-          th{background:#fafafa;}
-          .receipt-grid{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;}
-          .receipt-box{border:1px solid #e5e7eb; border-radius:12px; padding:10px 12px;}
-          @media print { button{display:none;} }
-        </style>
-      </head>
-      <body>
-        ${html}
-        <script>window.onload = () => window.print();</script>
-      </body>
-    </html>
-  `);
-  w.document.close();
-}
 
 // -------------------- Expose for inline onclick --------------------
 window.setQty = setQty;
