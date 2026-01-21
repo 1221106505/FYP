@@ -20,6 +20,10 @@
             --danger: #e74c3c;
             --pre-order: #3b82f6;
             --pre-order-dark: #1d4ed8;
+            --superadmin: #e74c3c;
+            --superadmin-dark: #c0392b;
+            --admin: #3498db;
+            --admin-dark: #2980b9;
         }
 
         * {
@@ -128,6 +132,30 @@
             font-weight: 600;
         }
 
+        .user-role-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .user-role-badge.superadmin {
+            background: linear-gradient(135deg, var(--superadmin), var(--superadmin-dark));
+            color: white;
+        }
+
+        .user-role-badge.admin {
+            background: linear-gradient(135deg, var(--admin), var(--admin-dark));
+            color: white;
+        }
+
+        .user-role-badge.customer {
+            background: linear-gradient(135deg, var(--success), #0da271);
+            color: white;
+        }
+
         .cart-icon {
             position: relative;
             font-size: clamp(1rem, 1.2vw, 1.2rem); /* 响应式图标大小 */
@@ -216,6 +244,18 @@
             overflow: hidden;
         }
 
+        .avatar.superadmin {
+            background: linear-gradient(135deg, var(--superadmin), var(--superadmin-dark));
+        }
+
+        .avatar.admin {
+            background: linear-gradient(135deg, var(--admin), var(--admin-dark));
+        }
+
+        .avatar.customer {
+            background: linear-gradient(135deg, var(--success), #0da271);
+        }
+
         .avatar-img {
             width: 100%;
             height: 100%;
@@ -238,6 +278,32 @@
             font-size: 14px;
             color: var(--text-light);
             font-weight: 500;
+        }
+
+        .user-type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-type-badge.superadmin {
+            background: linear-gradient(135deg, var(--superadmin), var(--superadmin-dark));
+            color: white;
+        }
+
+        .user-type-badge.admin {
+            background: linear-gradient(135deg, var(--admin), var(--admin-dark));
+            color: white;
+        }
+
+        .user-type-badge.customer {
+            background: linear-gradient(135deg, var(--success), #0da271);
+            color: white;
         }
 
         /* Profile Content */
@@ -758,6 +824,7 @@
         <div class="user-actions">
             <div class="user-welcome">
                 Welcome, <span class="username" id="username">Guest</span>
+                <span id="userRoleBadge" class="user-role-badge hidden"></span>
             </div>
             <div class="cart-icon" onclick="viewCart()">
                 <i class="fas fa-shopping-cart"></i>
@@ -786,6 +853,7 @@
                         <div class="user-basic-info">
                             <div class="user-name" id="profileUsername"></div>
                             <div class="user-type" id="profileUserType"></div>
+                            <div id="profileUserBadge" class="user-type-badge hidden"></div>
                         </div>
                     </div>
                 </div>
@@ -796,7 +864,7 @@
                     <div class="section">
                         <h3 class="section-title">
                             Personal Information
-                            <button class="edit-btn" onclick="enableEdit('personalInfo')">
+                            <button class="edit-btn" id="personalInfoEditBtn" onclick="enableEdit('personalInfo')">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                         </h3>
@@ -837,10 +905,10 @@
                     </div>
 
                     <!-- Address Information -->
-                    <div class="section">
+                    <div class="section" id="addressSection">
                         <h3 class="section-title">
                             Address Information
-                            <button class="edit-btn" onclick="enableEdit('addressInfo')">
+                            <button class="edit-btn" id="addressInfoEditBtn" onclick="enableEdit('addressInfo')">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                         </h3>
@@ -1002,6 +1070,7 @@
         // DOM Elements
         const cartCount = document.querySelector('.cart-count');
         const usernameElement = document.getElementById('username');
+        const userRoleBadgeElement = document.getElementById('userRoleBadge');
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toast-message');
         const toastIcon = document.getElementById('toast-icon');
@@ -1034,8 +1103,13 @@
                 console.log('Login check response data:', data);
                 
                 if (data.logged_in) {
-                    currentUser = data;
-                    usernameElement.textContent = data.username;
+                    currentUser = {
+                        ...data,
+                        user_type: data.user_type || 'customer',
+                        user_role: data.role || 'customer'
+                    };
+                    
+                    updateHeaderUserInfo();
                     console.log('User is logged in, loading profile...');
                     await loadUserProfile();
                     await updateCartCount();
@@ -1047,6 +1121,35 @@
             } catch (error) {
                 console.error('Error checking login status:', error);
                 showLoginPrompt();
+            }
+        }
+
+        // 更新头部用户信息显示
+        function updateHeaderUserInfo() {
+            if (!currentUser) return;
+            
+            let badgeText = '';
+            let badgeClass = '';
+            
+            if (currentUser.user_type === 'admin') {
+                if (currentUser.user_role === 'superadmin') {
+                    badgeText = 'Super Admin';
+                    badgeClass = 'superadmin';
+                } else {
+                    badgeText = 'Admin';
+                    badgeClass = 'admin';
+                }
+            } else {
+                badgeText = 'Customer';
+                badgeClass = 'customer';
+            }
+            
+            usernameElement.textContent = currentUser.username;
+            
+            if (userRoleBadgeElement) {
+                userRoleBadgeElement.textContent = badgeText;
+                userRoleBadgeElement.className = `user-role-badge ${badgeClass}`;
+                userRoleBadgeElement.classList.remove('hidden');
             }
         }
 
@@ -1107,40 +1210,119 @@
             }
         }
 
-        // Display user profile - 简化版本，只显示一个用户类型
+        // Display user profile - 完整支持 superadmin
         function displayUserProfile() {
             console.log('Displaying user profile:', userData);
             
             // Basic info
             document.getElementById('profileUsername').textContent = userData.username || 'Unknown';
             
-            // 只显示用户类型文本，不显示徽章
+            // 根据用户类型显示不同内容和样式
             const userTypeElement = document.getElementById('profileUserType');
+            const userBadgeElement = document.getElementById('profileUserBadge');
+            const avatarElement = document.getElementById('userAvatar');
+            
+            // 移除所有可能的类
+            avatarElement.className = 'avatar';
+            userBadgeElement.className = 'user-type-badge hidden';
+            
             if (userData.user_type === 'admin') {
-                userTypeElement.textContent = 'Administrator';
+                // 检查是否是 superadmin
+                if (userData.user_role === 'superadmin') {
+                    userTypeElement.textContent = 'Super Administrator';
+                    userTypeElement.style.color = 'var(--superadmin)';
+                    userTypeElement.style.fontWeight = 'bold';
+                    
+                    userBadgeElement.textContent = 'SUPER ADMIN';
+                    userBadgeElement.classList.add('superadmin');
+                    userBadgeElement.classList.remove('hidden');
+                    
+                    avatarElement.classList.add('superadmin');
+                } else {
+                    userTypeElement.textContent = 'Administrator';
+                    userTypeElement.style.color = 'var(--admin)';
+                    
+                    userBadgeElement.textContent = 'ADMIN';
+                    userBadgeElement.classList.add('admin');
+                    userBadgeElement.classList.remove('hidden');
+                    
+                    avatarElement.classList.add('admin');
+                }
             } else {
                 userTypeElement.textContent = 'Customer';
+                userTypeElement.style.color = 'var(--success)';
+                
+                userBadgeElement.textContent = 'CUSTOMER';
+                userBadgeElement.classList.add('customer');
+                userBadgeElement.classList.remove('hidden');
+                
+                avatarElement.classList.add('customer');
             }
             
-            // Personal info
-            document.getElementById('fullName').textContent = 
-                (userData.first_name && userData.last_name && 
-                 userData.first_name !== 'Not specified' && userData.last_name !== 'Not specified') 
-                ? `${userData.first_name} ${userData.last_name}`
-                : 'Not specified';
+            // 如果是管理员，隐藏地址信息部分
+            const addressSection = document.getElementById('addressSection');
+            const addressEditBtn = document.getElementById('addressInfoEditBtn');
+            const personalInfoEditBtn = document.getElementById('personalInfoEditBtn');
             
+            if (userData.user_type === 'admin') {
+                // 管理员没有地址信息
+                if (addressSection) addressSection.style.display = 'none';
+                
+                // 管理员只能编辑邮箱
+                if (personalInfoEditBtn) personalInfoEditBtn.style.display = 'none';
+                if (addressEditBtn) addressEditBtn.style.display = 'none';
+                
+                // 管理员信息特殊处理
+                document.getElementById('fullName').textContent = 'Not applicable for admin';
+                document.getElementById('userPhone').textContent = 'Not applicable for admin';
+                document.getElementById('userDOB').textContent = 'Not applicable for admin';
+                document.getElementById('userGender').textContent = 'Not applicable for admin';
+                
+                document.getElementById('userAddress').textContent = 'Not applicable for admin';
+                document.getElementById('userCity').textContent = 'Not applicable for admin';
+                document.getElementById('userState').textContent = 'Not applicable for admin';
+                document.getElementById('userZip').textContent = 'Not applicable for admin';
+                document.getElementById('userCountry').textContent = 'Not applicable for admin';
+            } else {
+                // 普通用户显示所有信息
+                if (addressSection) addressSection.style.display = 'block';
+                if (personalInfoEditBtn) personalInfoEditBtn.style.display = 'block';
+                if (addressEditBtn) addressEditBtn.style.display = 'block';
+                
+                // Personal info
+                document.getElementById('fullName').textContent = 
+                    (userData.first_name && userData.last_name && 
+                     userData.first_name !== 'Not specified' && userData.last_name !== 'Not specified') 
+                    ? `${userData.first_name} ${userData.last_name}`
+                    : 'Not specified';
+                
+                document.getElementById('userPhone').textContent = userData.phone || 'Not specified';
+                document.getElementById('userDOB').textContent = userData.date_of_birth || 'Not specified';
+                document.getElementById('userGender').textContent = userData.gender || 'Not specified';
+                
+                // Address info
+                document.getElementById('userAddress').textContent = userData.address || 'Not specified';
+                document.getElementById('userCity').textContent = userData.city || 'Not specified';
+                document.getElementById('userState').textContent = userData.state || 'Not specified';
+                document.getElementById('userZip').textContent = userData.zip_code || 'Not specified';
+                document.getElementById('userCountry').textContent = userData.country || 'Not specified';
+            }
+            
+            // 所有用户都有的信息
             document.getElementById('userEmail').textContent = userData.email || 'Not specified';
-            document.getElementById('userPhone').textContent = userData.phone || 'Not specified';
-            document.getElementById('userDOB').textContent = userData.date_of_birth || 'Not specified';
-            document.getElementById('userGender').textContent = userData.gender || 'Not specified';
             document.getElementById('memberSince').textContent = userData.member_since || 'Not specified';
             
-            // Address info
-            document.getElementById('userAddress').textContent = userData.address || 'Not specified';
-            document.getElementById('userCity').textContent = userData.city || 'Not specified';
-            document.getElementById('userState').textContent = userData.state || 'Not specified';
-            document.getElementById('userZip').textContent = userData.zip_code || 'Not specified';
-            document.getElementById('userCountry').textContent = userData.country || 'Not specified';
+            // 管理员头像显示不同的图标
+            const avatarContent = document.getElementById('avatarContent');
+            if (userData.user_type === 'admin') {
+                if (userData.user_role === 'superadmin') {
+                    avatarContent.textContent = '👑'; // 皇冠图标
+                } else {
+                    avatarContent.textContent = '🛡️'; // 盾牌图标
+                }
+            } else {
+                avatarContent.textContent = '👤'; // 默认用户图标
+            }
             
             // Show profile container
             document.getElementById('profileContainer').classList.remove('hidden');
@@ -1161,6 +1343,12 @@
 
         // Enable edit mode
         function enableEdit(section) {
+            // 如果是管理员，只能编辑邮箱
+            if (userData.user_type === 'admin' && section !== 'personalInfo') {
+                showToast('Only email can be edited for admin accounts', 'warning');
+                return;
+            }
+            
             const infoDiv = document.getElementById(section);
             const actionDiv = document.getElementById(section + 'Actions');
             
@@ -1173,9 +1361,21 @@
                 // Check if field is editable
                 if (fieldId === 'membersince') return; // Member since not editable
                 
+                // 管理员只能编辑邮箱
+                if (userData.user_type === 'admin' && fieldId !== 'email') {
+                    return; // 管理员只能编辑邮箱
+                }
+                
                 // Handle "Not specified" values
                 if (currentValue === 'Not specified') {
                     currentValue = '';
+                }
+                
+                // 管理员不需要编辑的字段
+                if (userData.user_type === 'admin' && 
+                    ['name', 'phone', 'dob', 'gender'].includes(fieldId)) {
+                    // 保留显示为不可编辑状态
+                    return;
                 }
                 
                 let inputType = 'text';
@@ -1249,56 +1449,70 @@
             const changes = {};
             
             if (section === 'personalInfo') {
-                // Handle name changes
-                const firstNameInput = document.getElementById('edit_first_name');
-                const lastNameInput = document.getElementById('edit_last_name');
-                
-                if (firstNameInput && lastNameInput) {
-                    const newFirstName = firstNameInput.value.trim();
-                    const newLastName = lastNameInput.value.trim();
-                    const oldFirstName = userData.first_name || '';
-                    const oldLastName = userData.last_name || '';
+                // 如果是管理员，只处理邮箱
+                if (userData.user_type === 'admin') {
+                    const emailInput = document.getElementById('edit_email');
+                    if (emailInput) {
+                        const newEmail = emailInput.value.trim();
+                        const oldEmail = userData.email || '';
+                        
+                        if (newEmail !== oldEmail) {
+                            changes.email = newEmail || null;
+                        }
+                    }
+                } else {
+                    // 普通用户处理所有个人信息
+                    // Handle name changes
+                    const firstNameInput = document.getElementById('edit_first_name');
+                    const lastNameInput = document.getElementById('edit_last_name');
                     
-                    if (newFirstName !== oldFirstName) {
-                        changes.first_name = newFirstName || null;
-                    }
-                    if (newLastName !== oldLastName) {
-                        changes.last_name = newLastName || null;
-                    }
-                }
-                
-                // Handle other fields
-                const fields = ['email', 'phone', 'dob', 'gender'];
-                fields.forEach(field => {
-                    const input = document.getElementById('edit_' + field);
-                    if (input) {
-                        let newValue;
-                        if (field === 'gender') {
-                            newValue = input.value;
-                        } else {
-                            newValue = input.value.trim();
+                    if (firstNameInput && lastNameInput) {
+                        const newFirstName = firstNameInput.value.trim();
+                        const newLastName = lastNameInput.value.trim();
+                        const oldFirstName = userData.first_name || '';
+                        const oldLastName = userData.last_name || '';
+                        
+                        if (newFirstName !== oldFirstName) {
+                            changes.first_name = newFirstName || null;
                         }
-                        
-                        const oldValue = userData[field] || '';
-                        
-                        // Check for actual changes
-                        if (field === 'dob') {
-                            // Date needs special handling
-                            if (newValue) {
-                                const formattedDate = formatDateForBackend(newValue);
-                                if (formattedDate !== (userData.date_of_birth || '')) {
-                                    changes[field] = formattedDate;
-                                }
-                            } else if (newValue === '' && userData[field]) {
-                                changes[field] = null;
+                        if (newLastName !== oldLastName) {
+                            changes.last_name = newLastName || null;
+                        }
+                    }
+                    
+                    // Handle other fields
+                    const fields = ['email', 'phone', 'dob', 'gender'];
+                    fields.forEach(field => {
+                        const input = document.getElementById('edit_' + field);
+                        if (input) {
+                            let newValue;
+                            if (field === 'gender') {
+                                newValue = input.value;
+                            } else {
+                                newValue = input.value.trim();
                             }
-                        } else if (newValue !== oldValue) {
-                            changes[field] = newValue || null;
+                            
+                            const oldValue = userData[field] || '';
+                            
+                            // Check for actual changes
+                            if (field === 'dob') {
+                                // Date needs special handling
+                                if (newValue) {
+                                    const formattedDate = formatDateForBackend(newValue);
+                                    if (formattedDate !== (userData.date_of_birth || '')) {
+                                        changes[field] = formattedDate;
+                                    }
+                                } else if (newValue === '' && userData[field]) {
+                                    changes[field] = null;
+                                }
+                            } else if (newValue !== oldValue) {
+                                changes[field] = newValue || null;
+                            }
                         }
-                    }
-                });
-            } else if (section === 'addressInfo') {
-                // Handle address info changes
+                    });
+                }
+            } else if (section === 'addressInfo' && userData.user_type !== 'admin') {
+                // Handle address info changes (only for customers)
                 const fields = ['address', 'city', 'state', 'zip_code', 'country'];
                 fields.forEach(field => {
                     const input = document.getElementById('edit_' + field);

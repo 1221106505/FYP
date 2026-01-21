@@ -23,9 +23,9 @@ try {
     // 根据用户类型查询不同的表
     if ($user_type === 'admin') {
         $query = "SELECT 
-                    auto_id as id,
-                    username,
-                    email,
+                    a.auto_id as id,
+                    a.username,
+                    a.email,
                     NULL as first_name,
                     NULL as last_name,
                     NULL as phone,
@@ -36,10 +36,11 @@ try {
                     NULL as country,
                     NULL as date_of_birth,
                     NULL as gender,
+                    a.role as user_role,
                     'admin' as user_type,
-                    DATE_FORMAT(created_at, '%M %e, %Y') as member_since
-                  FROM admin 
-                  WHERE auto_id = ?";
+                    DATE_FORMAT(a.created_at, '%M %e, %Y') as member_since
+                  FROM admin a
+                  WHERE a.auto_id = ?";
     } else {
         $query = "SELECT 
                     auto_id as id,
@@ -55,6 +56,7 @@ try {
                     country,
                     date_of_birth,
                     gender,
+                    'customer' as user_role,
                     'customer' as user_type,
                     DATE_FORMAT(created_at, '%M %e, %Y') as member_since
                   FROM customer 

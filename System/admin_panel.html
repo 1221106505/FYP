@@ -153,6 +153,41 @@
             transform: translateY(-2px);
         }
 
+        /* 角色徽章样式 */
+        .role-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .superadmin-badge {
+            background: #1565c0;
+            color: white;
+            border: 1px solid #0d47a1;
+        }
+
+        .admin-badge {
+            background: #7b1fa2;
+            color: white;
+            border: 1px solid #6a1b9a;
+        }
+
+        .time-info {
+            color: #666;
+            font-size: 0.9em;
+            margin-left: 8px;
+        }
+
+        /* 确保欢迎消息正确显示 */
+        #adminWelcome {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
         /* Content Sections */
         .content-section {
             display: none;
@@ -593,6 +628,42 @@
             color: #721c24;
         }
 
+        /* Admin Status Styles */
+        .admin-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .admin-role {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .role-superadmin {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .role-admin {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
         /* 新添加的样式 */
         .spinner {
             display: inline-block;
@@ -702,6 +773,44 @@
             vertical-align: middle;
         }
 
+        /* Permissions Checkbox Grid */
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            background: #f8f9fa;
+        }
+
+        .permission-category {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .permission-category h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 0;
+        }
+
+        .permission-item label {
+            font-size: 0.9em;
+            color: #495057;
+            cursor: pointer;
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .admin-container {
@@ -749,6 +858,20 @@
             .isbn-generator {
                 flex-direction: column;
             }
+            
+            #adminWelcome {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .role-badge {
+                margin-left: 0;
+            }
+            
+            .time-info {
+                margin-left: 0;
+            }
         }
     </style>
 </head>
@@ -766,6 +889,7 @@
                 <li><a href="#" class="nav-link" data-section="orders"><i>📦</i> Order Management</a></li>
                 <li><a href="#" class="nav-link" data-section="categories"><i>🏷️</i> Categories</a></li>
                 <li><a href="#" class="nav-link" data-section="analytics"><i>📈</i> Sales Report</a></li>
+                <li id="adminManagementLink" style="display: none;"><a href="#" class="nav-link" data-section="admin-management"><i>👥</i> Admin Management</a></li>
             </ul>
         </nav>
 
@@ -833,6 +957,9 @@
                     <button class="btn btn-primary" onclick="loadSectionData('analytics')">
                         <i>📈</i> View Sales Report 
                     </button>
+                    <button id="adminManagementBtn" class="btn btn-warning" style="display: none;" onclick="loadSectionData('admin-management')">
+                        <i>👥</i> Manage Admins
+                    </button>
                 </div>
             </section>
 
@@ -890,7 +1017,6 @@
                     <button class="btn btn-danger" onclick="showOutOfStockBooks()">
                         <i>❌</i> Out of Stock
                     </button>
-                    
                 </div>
 
                 <!-- Books Table -->
@@ -924,7 +1050,6 @@
                     <div style="display: flex; gap: 10px;">
                         <select id="orderStatusFilter" class="form-control" style="width: 200px;" onchange="filterOrders()">
                             <option value="all">All Status</option>
-                            <option value="pending">Pending</option>
                             <option value="confirmed">Confirmed</option>
                             <option value="shipped">Shipped</option>
                             <option value="delivered">Delivered</option>
@@ -937,10 +1062,6 @@
                 </div>
 
                 <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-                    <div class="stat-card" style="border-top-color: var(--warning);">
-                        <div class="stat-number" id="pendingOrders">0</div>
-                        <div class="stat-label">Pending</div>
-                    </div>
                     <div class="stat-card" style="border-top-color: var(--accent);">
                         <div class="stat-number" id="confirmedOrders">0</div>
                         <div class="stat-label">Confirmed</div>
@@ -952,6 +1073,10 @@
                     <div class="stat-card" style="border-top-color: var(--success);">
                         <div class="stat-number" id="deliveredOrders">0</div>
                         <div class="stat-label">Delivered</div>
+                    </div>
+                    <div class="stat-card" style="border-top-color: var(--danger);">
+                        <div class="stat-number" id="cancelledOrders">0</div>
+                        <div class="stat-label">Cancelled</div>
                     </div>
                 </div>
 
@@ -1049,6 +1174,72 @@
                 </div>
             </section>
 
+            <!-- Admin Management Section -->
+            <section id="admin-management" class="content-section">
+                <div class="section-header">
+                    <h2>👥 Admin Management</h2>
+                    <button id="addAdminBtn" class="btn btn-primary" style="display: none;" onclick="openAddAdminModal()">
+                        <i>➕</i> Add Admin
+                    </button>
+                </div>
+
+                <!-- Admin Stats -->
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 25px;" id="adminStats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalAdmins">0</div>
+                        <div class="stat-label">Total Admins</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="superadminCount">0</div>
+                        <div class="stat-label">Super Admins</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="adminCount">0</div>
+                        <div class="stat-label">Regular Admins</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeAdmins">0</div>
+                        <div class="stat-label">Active Admins</div>
+                    </div>
+                </div>
+
+                <!-- Search Box -->
+                <div class="search-box">
+                    <input type="text" id="adminSearch" class="search-input" placeholder="🔍 Search admins by username or email..." onkeyup="searchAdmins()">
+                    <select id="adminRoleFilter" class="form-control" style="width: 200px;" onchange="filterAdmins()">
+                        <option value="all">All Roles</option>
+                        <option value="superadmin">Super Admin</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <select id="adminStatusFilter" class="form-control" style="width: 200px;" onchange="filterAdmins()">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <!-- Admins Table -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminsTable">
+                            <tr><td colspan="8" class="loading">Loading admin data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <!-- Settings Section -->
             <section id="settings" class="content-section">
                 <div class="section-header">
@@ -1076,6 +1267,7 @@
         </main>
     </div>
 
+    <!-- 所有模态窗口 -->
     <!-- Add/Edit Book Modal -->
     <div class="modal" id="bookModal">
         <div class="modal-content">
@@ -1200,6 +1392,107 @@
         </div>
     </div>
 
+    <!-- Add/Edit Admin Modal -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 id="adminModalTitle">Add New Admin</h3>
+                <button class="close" onclick="closeAdminModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="adminForm">
+                    <input type="hidden" id="adminId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adminUsername">👤 Username *</label>
+                            <input type="text" id="adminUsername" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="adminEmail">📧 Email</label>
+                            <input type="email" id="adminEmail" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adminRole">👑 Role *</label>
+                            <select id="adminRole" class="form-control" required onchange="togglePermissions()">
+                                <option value="admin">Admin</option>
+                                <option value="superadmin">Super Admin</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="adminStatus">🔒 Status</label>
+                            <select id="adminStatus" class="form-control">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Permissions Section (only for admin role) -->
+                    <div id="permissionsSection" style="display: block;">
+                        <h4 style="margin-bottom: 15px; color: var(--primary);">🔑 Permissions</h4>
+                        <div class="permissions-grid" id="permissionsGrid">
+                            Loading permissions...
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAdminModal()">❌ Cancel</button>
+                <button class="btn btn-primary" onclick="saveAdmin()">💾 Save Admin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Details Modal -->
+    <div class="modal" id="adminDetailsModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 id="adminDetailsTitle">Admin Details</h3>
+                <button class="close" onclick="closeAdminDetailsModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="adminDetailsBody">
+                <!-- Dynamic content -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAdminDetailsModal()">Close</button>
+                <button class="btn btn-warning" id="editAdminBtn" onclick="editAdmin()">✏️ Edit</button>
+                <button class="btn btn-danger" id="deleteAdminBtn" onclick="deleteAdmin()">🗑️ Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send Password Modal -->
+    <div class="modal" id="sendPasswordModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>📧 Send Password Email</h3>
+                <button class="close" onclick="closeSendPasswordModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="sendPasswordForm">
+                    <input type="hidden" id="passwordAdminId">
+                    <div class="form-group">
+                        <label for="passwordAdminName">Admin Username</label>
+                        <input type="text" id="passwordAdminName" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordEmail">📧 Email Address *</label>
+                        <input type="email" id="passwordEmail" class="form-control" required>
+                    </div>
+                    <div class="alert alert-warning" style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 6px; margin-top: 15px;">
+                        <strong>⚠️ Note:</strong> This will generate a new random password and send it to the specified email address.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeSendPasswordModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="sendPasswordEmail()">📧 Send Password</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // API endpoints
         const API_ENDPOINTS = {
@@ -1211,7 +1504,7 @@
             deleteBook: 'delete_book.php',
             updateStock: 'update_book_stock.php',
             searchBook: 'search_book.php',
-            checkDuplicate: 'check_duplicate_book.php', // 新增：检查重复书名的API
+            checkDuplicate: 'check_duplicate_book.php',
             orders: 'getorder.php',
             orderDetail: 'get_single_order.php',
             updateOrder: 'update_order.php',
@@ -1219,135 +1512,238 @@
             salesAnalytics: 'sales_analytics.php',
             addCategory: 'add_category.php',
             updateCategory: 'update_category.php',
-            deleteCategory: 'delete_category.php'
+            deleteCategory: 'delete_category.php',
+            // New Admin Management APIs
+            getCurrentAdmin: 'get_current_admin.php',
+            getAdmins: 'get_admins.php',
+            getAdminDetail: 'get_admin_detail.php',
+            saveAdmin: 'save_admin.php',
+            sendPasswordEmail: 'send_password_email.php',
+            getPermissions: 'get_permissions.php'
         };
 
         // Current state
         let currentBooks = [];
         let currentCategories = [];
         let currentOrders = [];
+        let currentAdmins = [];
+        let currentPermissions = [];
         let currentInventoryFilter = 'all';
         let currentOrderId = null;
         let currentGeneratedISBN = '';
         let lastSearchTimeout = null;
+        let currentAdminInfo = null;
+        let isSuperAdmin = false;
 
         // Order status mapping
         const ORDER_STATUS_MAP = {
-            'pending': { text: '⏳ Pending', class: 'status-pending' },
             'confirmed': { text: '✅ Confirmed', class: 'status-confirmed' },
             'shipped': { text: '🚚 Shipped', class: 'status-shipped' },
             'delivered': { text: '📦 Delivered', class: 'status-delivered' },
             'cancelled': { text: '❌ Cancelled', class: 'status-cancelled' }
         };
 
-        // ============ ISBN FUNCTIONS ============
+        // Admin role mapping
+        const ADMIN_ROLE_MAP = {
+            'superadmin': { text: '👑 Super Admin', class: 'role-superadmin' },
+            'admin': { text: '👤 Admin', class: 'role-admin' }
+        };
+
+        // Admin status mapping
+        const ADMIN_STATUS_MAP = {
+            'active': { text: '✅ Active', class: 'status-active' },
+            'inactive': { text: '❌ Inactive', class: 'status-inactive' }
+        };
+
+        // ============ INITIALIZATION ============
         
-        function generateRandomISBN() {
-            const prefix = "978";
-            let middleDigits = "";
-            for (let i = 0; i < 10; i++) {
-                middleDigits += Math.floor(Math.random() * 10);
-            }
-            return `${prefix}-${middleDigits}`;
-        }
-
-        function isValidISBN(isbn) {
-            if (!isbn || typeof isbn !== 'string') return false;
-            const isbnPattern = /^978-\d{10}$/;
-            return isbnPattern.test(isbn);
-        }
-
-        function regenerateISBN() {
-            const newISBN = generateRandomISBN();
-            setGeneratedISBN(newISBN);
-            showNotification(`New ISBN generated: ${newISBN}`, 'info');
-        }
-
-        function setGeneratedISBN(isbn) {
-            let cleanISBN = String(isbn || '').trim();
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Admin panel initialized');
             
-            if (!isValidISBN(cleanISBN)) {
-                console.warn('ISBN format invalid, regenerating:', cleanISBN);
-                const newISBN = generateRandomISBN();
-                setGeneratedISBN(newISBN);
+            // Check current admin role
+            await checkAdminRole();
+            
+            // Load initial data
+            loadDashboardData();
+            loadSalesOverview();
+            
+            // Update clock
+            updateClock();
+            setInterval(updateClock, 60000);
+            
+            // Set up navigation
+            setupNavigation();
+        });
+
+        async function checkAdminRole() {
+            try {
+                const response = await fetch(API_ENDPOINTS.getCurrentAdmin);
+                const data = await response.json();
+                
+                console.log('Admin API response:', data);
+                
+                if (data.success) {
+                    currentAdminInfo = data;
+                    isSuperAdmin = data.role === 'superadmin';
+                    
+                    console.log('isSuperAdmin:', isSuperAdmin, 'Role:', data.role);
+                    
+                    // 更新欢迎消息和UI
+                    updateAdminDisplay();
+                    
+                } else {
+                    console.error('Error getting admin info:', data.error);
+                    currentAdminInfo = { username: 'Admin', role: 'admin' };
+                    isSuperAdmin = false;
+                    updateAdminDisplay();
+                }
+            } catch (error) {
+                console.error('Error checking admin role:', error);
+                currentAdminInfo = { username: 'Admin', role: 'admin' };
+                isSuperAdmin = false;
+                updateAdminDisplay();
+            }
+        }
+
+        function updateAdminDisplay() {
+            // 更新欢迎消息
+            updateWelcomeMessage();
+            
+            // 控制管理员管理功能的显示
+            toggleAdminManagement();
+            
+            // 更新导航链接
+            updateNavLinks();
+        }
+
+        function updateWelcomeMessage() {
+            const welcomeElement = document.getElementById('adminWelcome');
+            
+            if (!currentAdminInfo) {
+                welcomeElement.innerHTML = 'Welcome, <strong>Admin</strong>';
                 return;
             }
             
-            currentGeneratedISBN = cleanISBN;
-            const isbnInput = document.getElementById('bookISBN');
-            isbnInput.value = cleanISBN;
-            isbnInput.classList.add('isbn-generated');
-            
-            const statusLabel = document.getElementById('isbnStatusLabel');
-            if (statusLabel) {
-                statusLabel.textContent = 'Auto-generated';
-                statusLabel.style.background = '#3498db';
-            }
-        }
-
-        function formatISBN(rawISBN) {
-            if (isValidISBN(rawISBN)) {
-                return rawISBN;
+            // 根据角色创建徽章
+            let roleBadge = '';
+            if (currentAdminInfo.role === 'superadmin') {
+                roleBadge = '<span class="role-badge superadmin-badge">👑 Super Admin</span>';
+            } else {
+                roleBadge = '<span class="role-badge admin-badge">👤 Admin</span>';
             }
             
-            const cleanDigits = rawISBN.replace(/\D/g, '');
-            
-            if (cleanDigits.length !== 13) {
-                return rawISBN;
-            }
-            
-            return `${cleanDigits.substring(0, 3)}-${cleanDigits.substring(3, 13)}`;
-        }
-
-        // ============ NOTIFICATION FUNCTIONS ============
-        
-        function showNotification(message, type = 'info') {
-            const existingNotification = document.querySelector('.custom-notification');
-            if (existingNotification) existingNotification.remove();
-            
-            const notification = document.createElement('div');
-            notification.className = `custom-notification ${type}`;
-            notification.innerHTML = `
-                <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
-                <span>${message}</span>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease-out';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        // ============ NAVIGATION FUNCTIONS ============
-        
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-                
-                const sectionId = this.getAttribute('data-section');
-                document.querySelectorAll('.content-section').forEach(section => {
-                    section.classList.remove('active');
-                });
-                document.getElementById(sectionId).classList.add('active');
-                
-                const sectionTitles = {
-                    'dashboard': 'Dashboard',
-                    'book-inventory': 'Book & Inventory Management',
-                    'orders': 'Order Management',
-                    'categories': 'Category Management',
-                    'analytics': 'Sales Report Section',
-                    'settings': 'System Settings'
-                };
-                document.getElementById('sectionTitle').textContent = sectionTitles[sectionId];
-                
-                loadSectionData(sectionId);
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit'
             });
-        });
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            welcomeElement.innerHTML = `
+                Welcome, <strong>${currentAdminInfo.username}</strong>
+                ${roleBadge}
+                <span class="time-info">• ${dateString} ${timeString}</span>
+            `;
+        }
+
+        function toggleAdminManagement() {
+            const superAdminElements = [
+                'adminManagementLink',
+                'adminManagementBtn',
+                'addAdminBtn'
+            ];
+            
+            superAdminElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (isSuperAdmin) {
+                        element.style.display = 'inline-flex';
+                    } else {
+                        element.style.display = 'none';
+                    }
+                }
+            });
+            
+            // 特别处理导航链接的显示方式
+            const adminManagementLink = document.getElementById('adminManagementLink');
+            if (adminManagementLink) {
+                adminManagementLink.style.display = isSuperAdmin ? 'list-item' : 'none';
+            }
+        }
+
+        function updateNavLinks() {
+            // 如果有其他需要根据角色更新的导航项，可以在这里添加
+        }
+
+        function updateClock() {
+            if (!currentAdminInfo) return;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            const welcomeElement = document.getElementById('adminWelcome');
+            
+            let roleBadge = '';
+            if (currentAdminInfo.role === 'superadmin') {
+                roleBadge = '<span class="role-badge superadmin-badge">👑 Super Admin</span>';
+            } else {
+                roleBadge = '<span class="role-badge admin-badge">👤 Admin</span>';
+            }
+            
+            welcomeElement.innerHTML = `
+                Welcome, <strong>${currentAdminInfo.username}</strong>
+                ${roleBadge}
+                <span class="time-info">• ${dateString} ${timeString}</span>
+            `;
+        }
+
+        function setupNavigation() {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 如果点击的是管理员管理，但不是超级管理员，阻止访问
+                    if (this.getAttribute('data-section') === 'admin-management' && !isSuperAdmin) {
+                        showNotification('Access denied. Super Admin only.', 'error');
+                        return;
+                    }
+                    
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const sectionId = this.getAttribute('data-section');
+                    document.querySelectorAll('.content-section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    document.getElementById(sectionId).classList.add('active');
+                    
+                    const sectionTitles = {
+                        'dashboard': 'Dashboard',
+                        'book-inventory': 'Book & Inventory Management',
+                        'orders': 'Order Management',
+                        'categories': 'Category Management',
+                        'analytics': 'Sales Report Section',
+                        'admin-management': 'Admin Management',
+                        'settings': 'System Settings'
+                    };
+                    document.getElementById('sectionTitle').textContent = sectionTitles[sectionId];
+                    
+                    loadSectionData(sectionId);
+                });
+            });
+        }
 
         function loadSectionData(sectionId) {
             switch(sectionId) {
@@ -1367,7 +1763,14 @@
                 case 'categories':
                     loadCategoriesData();
                     break;
-                
+                case 'admin-management':
+                    if (isSuperAdmin) {
+                        loadAdminManagementData();
+                    } else {
+                        showNotification('Access denied. Super Admin only.', 'error');
+                        document.querySelector('.nav-link[data-section="dashboard"]').click();
+                    }
+                    break;
             }
         }
 
@@ -1418,130 +1821,1056 @@
             }
         }
 
-        async function loadSalesOverview() {
+        // ============ ORDER FUNCTIONS ============
+        
+        async function loadOrdersData() {
             try {
-                const response = await fetch(API_ENDPOINTS.salesOverview);
+                const response = await fetch(API_ENDPOINTS.orders);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.success) {
-                    displaySalesOverview(data.data);
+                    currentOrders = data.orders || data.data || [];
+                    updateOrderStats(currentOrders);
+                    displayOrders(currentOrders);
                 } else {
-                    console.error('Error loading sales overview:', data.error);
+                    console.error('Error loading orders:', data.error);
+                    document.getElementById('ordersTable').innerHTML = 
+                        '<tr><td colspan="7" class="error">Error loading orders: ' + (data.error || 'Unknown error') + '</td></tr>';
                 }
             } catch (error) {
-                console.error('Error loading sales overview:', error);
+                console.error('Error loading orders:', error);
+                document.getElementById('ordersTable').innerHTML = 
+                    '<tr><td colspan="7" class="error">Error loading orders. Please check the console.</td></tr>';
             }
         }
 
-        function displaySalesOverview(data) {
-            document.getElementById('todayRevenue').textContent = `RM ${data.today.revenue.toFixed(2)}`;
+        function updateOrderStats(orders) {
+            const confirmed = orders.filter(order => order.status === 'confirmed').length;
+            const shipped = orders.filter(order => order.status === 'shipped').length;
+            const delivered = orders.filter(order => order.status === 'delivered').length;
+            const cancelled = orders.filter(order => order.status === 'cancelled').length;
             
-            const dashboardStats = document.getElementById('dashboardStats');
-            if (dashboardStats) {
-                const statsHTML = `
-                    <div class="stat-card">
-                        <div class="stat-number">${data.inventory.total_books}</div>
-                        <div class="stat-label">Total Books</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${data.today.orders}</div>
-                        <div class="stat-label">Today's Orders</div>
-                        <div style="font-size: 0.8em; color: ${data.growth_rates.orders_growth >= 0 ? 'var(--success)' : 'var(--danger)'}; margin-top: 5px;">
-                            ${data.growth_rates.orders_growth >= 0 ? '↑' : '↓'} ${Math.abs(data.growth_rates.orders_growth).toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">RM ${data.today.revenue.toFixed(2)}</div>
-                        <div class="stat-label">Today's Revenue</div>
-                        <div style="font-size: 0.8em; color: ${data.growth_rates.revenue_growth >= 0 ? 'var(--success)' : 'var(--danger)'}; margin-top: 5px;">
-                            ${data.growth_rates.revenue_growth >= 0 ? '↑' : '↓'} ${Math.abs(data.growth_rates.revenue_growth).toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${data.inventory.low_stock + data.inventory.out_of_stock}</div>
-                        <div class="stat-label">Stock Alerts</div>
-                        <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
-                            ${data.inventory.out_of_stock} out, ${data.inventory.low_stock} low
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${data.pending_orders.count}</div>
-                        <div class="stat-label">Pending Orders</div>
-                        <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
-                            RM ${data.pending_orders.amount.toFixed(2)}
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${data.active_customers.today}</div>
-                        <div class="stat-label">Active Today</div>
-                        <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
-                            ${data.active_customers.total} total
-                        </div>
-                    </div>
-                `;
-                
-                dashboardStats.innerHTML = statsHTML;
-            }
-            
-            updateSalesOverviewChart(data);
+            document.getElementById('confirmedOrders').textContent = confirmed;
+            document.getElementById('shippedOrders').textContent = shipped;
+            document.getElementById('deliveredOrders').textContent = delivered;
+            document.getElementById('cancelledOrders').textContent = cancelled;
         }
 
-        function updateSalesOverviewChart(data) {
-            const chartContainer = document.getElementById('salesOverviewChart');
+        function displayOrders(orders) {
+            const ordersTable = document.getElementById('ordersTable');
             
-            if (!chartContainer) return;
-            
-            let hourlyChartHTML = '';
-            if (data.recent_sales && data.recent_sales.length > 0) {
-                const maxRevenue = Math.max(...data.recent_sales.map(s => s.hourly_revenue));
+            if (!orders || orders.length === 0) {
+                ordersTable.innerHTML = '<tr><td colspan="7" class="loading">No orders found</td></tr>';
+                return;
+            }
+
+            ordersTable.innerHTML = orders.map(order => {
+                let status = order.status;
+                if (status === 'pending') {
+                    status = 'confirmed';
+                }
                 
-                hourlyChartHTML = `
-                    <div style="padding: 20px; height: 100%; display: flex; flex-direction: column;">
-                        <h4 style="margin-bottom: 15px; color: var(--primary);">Today's Sales by Hour</h4>
-                        <div style="display: flex; align-items: flex-end; height: 150px; gap: 5px; border-bottom: 1px solid #e9ecef; padding-bottom: 15px;">
-                            ${data.recent_sales.map(sale => {
-                                const height = maxRevenue > 0 ? (sale.hourly_revenue / maxRevenue * 100) : 0;
-                                const hour = sale.hour < 10 ? `0${sale.hour}:00` : `${sale.hour}:00`;
-                                
-                                return `
-                                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                                        <div style="width: 80%; background: linear-gradient(to top, var(--accent), #3498db); 
-                                                   height: ${height}%; border-radius: 3px 3px 0 0;" 
-                                                   title="RM ${sale.hourly_revenue.toFixed(2)} - ${sale.hourly_orders} orders">
-                                        </div>
-                                        <div style="font-size: 0.7rem; margin-top: 5px; color: #666;">${hour}</div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
-                            <div style="text-align: center;">
-                                <div style="font-size: 1.2rem; font-weight: bold; color: var(--success);">
-                                    RM ${data.today.revenue.toFixed(2)}
-                                </div>
-                                <div style="font-size: 0.8rem; color: #666;">Today</div>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="font-size: 1.2rem; font-weight: bold; color: var(--warning);">
-                                    RM ${data.week.revenue.toFixed(2)}
-                                </div>
-                                <div style="font-size: 0.8rem; color: #666;">This Week</div>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="font-size: 1.2rem; font-weight: bold; color: var(--info);">
-                                    RM ${data.month.revenue.toFixed(2)}
-                                </div>
-                                <div style="font-size: 0.8rem; color: #666;">This Month</div>
-                            </div>
+                const statusInfo = ORDER_STATUS_MAP[status] || { text: status, class: 'status-confirmed' };
+                const customerName = order.customer_name || order.customer_name || `Customer ${order.customer_id || 'N/A'}`;
+                const contactEmail = order.contact_email || order.email || 'No email';
+                
+                return `
+                <tr>
+                    <td><strong>#${order.order_id || order.id || 'N/A'}</strong></td>
+                    <td>
+                        <div><strong>${customerName}</strong></div>
+                        <div style="font-size: 0.8em; color: #666;">${contactEmail}</div>
+                    </td>
+                    <td>${order.order_date ? new Date(order.order_date).toLocaleDateString() : 'N/A'}</td>
+                    <td>
+                        <div>${order.item_count || order.total_items || 0} items</div>
+                        <div style="font-size: 0.8em; color: #666;">${order.total_quantity || 0} total</div>
+                    </td>
+                    <td><strong>RM ${parseFloat(order.total_amount || order.total_price || 0).toFixed(2)}</strong></td>
+                    <td>
+                        <span class="order-status ${statusInfo.class}">
+                            ${statusInfo.text}
+                        </span>
+                    </td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-primary" onclick="viewOrderDetails(${order.order_id || order.id})">
+                            👁️ View
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="openUpdateOrderStatusModal(${order.order_id || order.id}, '${status}')">
+                            ✏️ Update
+                        </button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function filterOrders() {
+            const statusFilter = document.getElementById('orderStatusFilter').value;
+            
+            let filteredOrders = currentOrders || [];
+            
+            if (statusFilter !== 'all') {
+                filteredOrders = filteredOrders.filter(order => {
+                    let status = order.status;
+                    if (status === 'pending') {
+                        status = 'confirmed';
+                    }
+                    return status === statusFilter;
+                });
+            }
+            
+            displayOrders(filteredOrders);
+        }
+
+        function searchOrders() {
+            if (lastSearchTimeout) {
+                clearTimeout(lastSearchTimeout);
+            }
+            
+            lastSearchTimeout = setTimeout(function() {
+                const searchTerm = document.getElementById('orderSearch').value.toLowerCase();
+                
+                if (searchTerm.length < 2) {
+                    displayOrders(currentOrders);
+                    return;
+                }
+                
+                const filteredOrders = (currentOrders || []).filter(order => {
+                    const orderId = (order.order_id || order.id || '').toString();
+                    const customerName = (order.customer_name || order.customer_name || '').toLowerCase();
+                    const contactEmail = (order.contact_email || order.email || '').toLowerCase();
+                    
+                    return orderId.includes(searchTerm) ||
+                           customerName.includes(searchTerm) ||
+                           contactEmail.includes(searchTerm);
+                });
+                
+                displayOrders(filteredOrders);
+            }, 300);
+        }
+
+        function refreshOrders() {
+            loadOrdersData();
+        }
+
+        async function viewOrderDetails(orderId) {
+            try {
+                const response = await fetch(`${API_ENDPOINTS.orderDetail}?order_id=${orderId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showOrderDetailsModal(data.order || data.data);
+                } else {
+                    showNotification('Error loading order details: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error loading order details:', error);
+                showNotification('Error loading order details', 'error');
+            }
+        }
+
+        function showOrderDetailsModal(order) {
+            if (!order) {
+                showNotification('No order data available', 'error');
+                return;
+            }
+            
+            currentOrderId = order.order_id || order.id;
+            
+            document.getElementById('orderModalTitle').textContent = `Order #${currentOrderId} Details`;
+            
+            const itemsHtml = order.items && order.items.length > 0 ? order.items.map(item => `
+                <div class="order-item" style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 8px;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">${item.title || item.name || 'Unknown Book'}</div>
+                    <div style="display: flex; gap: 15px; font-size: 0.9em; color: #666;">
+                        <span>Qty: ${item.quantity || 0}</span>
+                        <span>Price: RM ${parseFloat(item.unit_price || item.price || 0).toFixed(2)}</span>
+                        <span>Subtotal: RM ${parseFloat(item.subtotal || (item.quantity * (item.unit_price || item.price) || 0)).toFixed(2)}</span>
+                    </div>
+                </div>
+            `).join('') : '<div style="color: #666; font-style: italic;">No items found</div>';
+            
+            let displayStatus = order.status;
+            if (displayStatus === 'pending') {
+                displayStatus = 'confirmed';
+            }
+            
+            document.getElementById('orderModalBody').innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">Customer Information</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
+                            <div style="margin-bottom: 8px;"><strong>Customer ID:</strong> ${order.customer_id || 'N/A'}</div>
+                            <div style="margin-bottom: 8px;"><strong>Name:</strong> ${order.customer_name || order.customer_name || 'N/A'}</div>
+                            <div style="margin-bottom: 8px;"><strong>Email:</strong> ${order.contact_email || order.email || 'N/A'}</div>
+                            <div style="margin-bottom: 8px;"><strong>Phone:</strong> ${order.contact_phone || order.phone || 'N/A'}</div>
                         </div>
                     </div>
+                    
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">Order Information</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
+                            <div style="margin-bottom: 8px;"><strong>Order Date:</strong> ${order.order_date ? new Date(order.order_date).toLocaleString() : 'N/A'}</div>
+                            <div style="margin-bottom: 8px;">
+                                <strong>Status:</strong> 
+                                <span class="order-status ${ORDER_STATUS_MAP[displayStatus]?.class || 'status-confirmed'}">
+                                    ${ORDER_STATUS_MAP[displayStatus]?.text || displayStatus || 'Confirmed'}
+                                </span>
+                            </div>
+                            <div style="margin-bottom: 8px;"><strong>Total Amount:</strong> RM ${parseFloat(order.total_amount || order.total_price || 0).toFixed(2)}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="grid-column: 1 / -1;">
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">Shipping Address</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; white-space: pre-line;">
+                            ${order.shipping_address || order.address || 'No shipping address provided'}
+                        </div>
+                    </div>
+                    
+                    <div style="grid-column: 1 / -1;">
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">Order Items (${order.items ? order.items.length : 0})</h4>
+                        <div style="max-height: 200px; overflow-y: auto;">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('orderModalFooter').innerHTML = `
+                <button class="btn" onclick="closeOrderDetailsModal()">Close</button>
+                <button class="btn btn-warning" onclick="openUpdateOrderStatusModal(${currentOrderId}, '${displayStatus}')">Update Status</button>
+            `;
+            
+            document.getElementById('orderDetailsModal').style.display = 'flex';
+        }
+
+        function closeOrderDetailsModal() {
+            document.getElementById('orderDetailsModal').style.display = 'none';
+            currentOrderId = null;
+        }
+
+        function openUpdateOrderStatusModal(orderId, currentStatus) {
+            currentOrderId = orderId;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'updateStatusModal';
+            modal.style.display = 'flex';
+            
+            let displayStatus = currentStatus;
+            if (displayStatus === 'pending') {
+                displayStatus = 'confirmed';
+            }
+            
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h3>Update Order Status</h3>
+                        <button class="close" onclick="closeUpdateStatusModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="newOrderStatus">Select New Status:</label>
+                            <select id="newOrderStatus" class="form-control">
+                                <option value="confirmed" ${displayStatus === 'confirmed' ? 'selected' : ''}>✅ Confirmed</option>
+                                <option value="shipped" ${displayStatus === 'shipped' ? 'selected' : ''}>🚚 Shipped</option>
+                                <option value="delivered" ${displayStatus === 'delivered' ? 'selected' : ''}>📦 Delivered</option>
+                                <option value="cancelled" ${displayStatus === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" onclick="closeUpdateStatusModal()">Cancel</button>
+                        <button class="btn btn-primary" onclick="updateOrderStatus()">Update Status</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function closeUpdateStatusModal() {
+            const modal = document.getElementById('updateStatusModal');
+            if (modal) modal.remove();
+            currentOrderId = null;
+        }
+
+        async function updateOrderStatus() {
+            if (!currentOrderId) return;
+            
+            const newStatus = document.getElementById('newOrderStatus').value;
+            
+            if (!newStatus) {
+                showNotification('Please select a status', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_ENDPOINTS.updateOrder, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_id: currentOrderId,
+                        status: newStatus
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('Order status updated successfully!', 'success');
+                    closeUpdateStatusModal();
+                    closeOrderDetailsModal();
+                    loadOrdersData();
+                } else {
+                    showNotification('Error updating order status: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error updating order status:', error);
+                showNotification('Error updating order status', 'error');
+            }
+        }
+
+        // ============ ADMIN MANAGEMENT FUNCTIONS ============
+        
+        async function loadAdminManagementData() {
+            if (!isSuperAdmin) {
+                showNotification('Access denied. Super Admin only.', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_ENDPOINTS.getAdmins);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentAdmins = data.admins || [];
+                    updateAdminStats(currentAdmins);
+                    displayAdmins(currentAdmins);
+                } else {
+                    document.getElementById('adminsTable').innerHTML = '<tr><td colspan="8" class="error">Error loading admin data: ' + (data.error || 'Unknown error') + '</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+                document.getElementById('adminsTable').innerHTML = '<tr><td colspan="8" class="error">Error loading admin data</td></tr>';
+            }
+        }
+
+        function updateAdminStats(admins) {
+            const totalAdmins = admins.length;
+            const superadminCount = admins.filter(admin => admin.role === 'superadmin').length;
+            const adminCount = admins.filter(admin => admin.role === 'admin').length;
+            const activeAdmins = admins.filter(admin => admin.status === 'active').length;
+            
+            document.getElementById('totalAdmins').textContent = totalAdmins;
+            document.getElementById('superadminCount').textContent = superadminCount;
+            document.getElementById('adminCount').textContent = adminCount;
+            document.getElementById('activeAdmins').textContent = activeAdmins;
+        }
+
+        function displayAdmins(admins) {
+            const adminsTable = document.getElementById('adminsTable');
+            
+            if (admins.length === 0) {
+                adminsTable.innerHTML = '<tr><td colspan="8" class="loading">No admins found. Add your first admin!</td></tr>';
+                return;
+            }
+
+            adminsTable.innerHTML = admins.map(admin => {
+                const roleInfo = ADMIN_ROLE_MAP[admin.role] || { text: admin.role, class: 'role-admin' };
+                const statusInfo = ADMIN_STATUS_MAP[admin.status] || { text: admin.status, class: 'status-active' };
+                
+                return `
+                <tr>
+                    <td>${admin.auto_id || admin.id}</td>
+                    <td><strong>${admin.username}</strong></td>
+                    <td>${admin.email || 'N/A'}</td>
+                    <td>
+                        <span class="admin-role ${roleInfo.class}">
+                            ${roleInfo.text}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="admin-status ${statusInfo.class}">
+                            ${statusInfo.text}
+                        </span>
+                    </td>
+                    <td>${admin.created_at ? new Date(admin.created_at).toLocaleDateString() : 'N/A'}</td>
+                    <td>${admin.last_login ? new Date(admin.last_login).toLocaleString() : 'Never'}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-primary" onclick="viewAdminDetails(${admin.auto_id || admin.id})">
+                            👁️ View
+                        </button>
+                        <button class="btn btn-sm btn-info" onclick="openSendPasswordModal(${admin.auto_id || admin.id}, '${admin.username.replace(/'/g, "\\'")}', '${(admin.email || '').replace(/'/g, "\\'")}')">
+                            📧 Send Password
+                        </button>
+                    </td>
+                </tr>
                 `;
+            }).join('');
+        }
+
+        function searchAdmins() {
+            if (lastSearchTimeout) {
+                clearTimeout(lastSearchTimeout);
+            }
+            
+            lastSearchTimeout = setTimeout(function() {
+                const searchTerm = document.getElementById('adminSearch').value.toLowerCase();
+                
+                if (searchTerm.length < 2) {
+                    displayAdmins(currentAdmins);
+                    return;
+                }
+                
+                const filteredAdmins = currentAdmins.filter(admin => 
+                    admin.username.toLowerCase().includes(searchTerm) ||
+                    (admin.email && admin.email.toLowerCase().includes(searchTerm))
+                );
+                
+                displayAdmins(filteredAdmins);
+            }, 300);
+        }
+
+        function filterAdmins() {
+            const roleFilter = document.getElementById('adminRoleFilter').value;
+            const statusFilter = document.getElementById('adminStatusFilter').value;
+            
+            let filteredAdmins = currentAdmins;
+            
+            if (roleFilter !== 'all') {
+                filteredAdmins = filteredAdmins.filter(admin => admin.role === roleFilter);
+            }
+            
+            if (statusFilter !== 'all') {
+                filteredAdmins = filteredAdmins.filter(admin => admin.status === statusFilter);
+            }
+            
+            displayAdmins(filteredAdmins);
+        }
+
+        // ============ BOOK FUNCTIONS ============
+        
+        async function loadBookInventoryData() {
+            try {
+                const [booksResponse, categoriesResponse] = await Promise.all([
+                    fetch(API_ENDPOINTS.books),
+                    fetch(API_ENDPOINTS.categories)
+                ]);
+
+                const booksData = await booksResponse.json();
+                const categoriesData = await categoriesResponse.json();
+
+                if (booksData.success) {
+                    currentBooks = booksData.books || booksData.data || [];
+                    updateBookInventoryStats(currentBooks);
+                    displayBookInventory(currentBooks);
+                    document.getElementById('totalBookCount').textContent = currentBooks.length;
+                }
+
+                if (categoriesData.success) {
+                    currentCategories = categoriesData.categories || categoriesData.data || [];
+                    loadCategoryFilter();
+                }
+            } catch (error) {
+                console.error('Error loading book inventory:', error);
+                document.getElementById('booksInventoryTable').innerHTML = '<tr><td colspan="10" class="error">Error loading data</td></tr>';
+            }
+        }
+
+        function updateBookInventoryStats(books) {
+            const inStockCount = books.filter(book => {
+                const stock = parseInt(book.stock_quantity);
+                return stock > 10;
+            }).length;
+            
+            const lowStockCount = books.filter(book => {
+                const stock = parseInt(book.stock_quantity);
+                return stock >= 1 && stock <= 10;
+            }).length;
+            
+            const outOfStockCount = books.filter(book => {
+                const stock = parseInt(book.stock_quantity);
+                return stock === 0;
+            }).length;
+            
+            document.getElementById('inStockCount').textContent = inStockCount;
+            document.getElementById('inventoryLowStock').textContent = lowStockCount;
+            document.getElementById('inventoryOutOfStock').textContent = outOfStockCount;
+        }
+
+        function displayBookInventory(books) {
+            const tableBody = document.getElementById('booksInventoryTable');
+            
+            if (books.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="10" class="loading">No books found</td></tr>';
+                return;
+            }
+
+            tableBody.innerHTML = books.map(book => {
+                const stockStatusClass = getStockStatusClass(book.stock_quantity);
+                const stockStatusText = getStockStatusText(book.stock_quantity);
+                
+                return `
+                <tr>
+                    <td>${book.book_id}</td>
+                    <td><strong>${book.title}</strong></td>
+                    <td>${book.author}</td>
+                    <td>${book.category_name || 'N/A'}</td>
+                    <td>RM ${parseFloat(book.price).toFixed(2)}</td>
+                    <td>${book.stock_quantity}</td>
+                    <td style="font-family: 'Courier New', monospace;">
+                        ${book.isbn || '<span style="color:#999;font-style:italic">Auto-generated</span>'}
+                    </td>
+                    <td>
+                        <span class="${stockStatusClass}">
+                            ${stockStatusText}
+                        </span>
+                    </td>
+                    <td>${book.updated_at || 'N/A'}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-primary" onclick="openEditBookModal(${book.book_id})">✏️ Edit</button>
+                        <button class="btn btn-sm btn-warning" onclick="openStockModal(${book.book_id}, '${book.title.replace(/'/g, "\\'")}', ${book.stock_quantity})">📦 Stock</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteBook(${book.book_id})">🗑️ Delete</button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function getStockStatusClass(stock) {
+            const stockNum = parseInt(stock);
+            
+            if (stockNum === 0) {
+                return 'out-of-stock';
+            }
+            if (stockNum >= 1 && stockNum <= 10) {
+                return 'low-stock';
+            }
+            return 'in-stock';
+        }
+
+        function getStockStatusText(stock) {
+            const stockNum = parseInt(stock);
+            
+            if (stockNum === 0) {
+                return 'Out of Stock';
+            }
+            if (stockNum >= 1 && stockNum <= 10) {
+                return 'Low Stock';
+            }
+            return 'In Stock';
+        }
+
+        async function loadCategoryFilter() {
+            try {
+                const response = await fetch(API_ENDPOINTS.categories);
+                const data = await response.json();
+                
+                const categoryFilter = document.getElementById('categoryFilter');
+                categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+                
+                if (data.success) {
+                    currentCategories = data.categories || data.data || [];
+                    currentCategories.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.category_id;
+                        option.textContent = category.category_name;
+                        categoryFilter.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        function searchBooks() {
+            if (lastSearchTimeout) {
+                clearTimeout(lastSearchTimeout);
+            }
+            
+            lastSearchTimeout = setTimeout(async function() {
+                const searchTerm = document.getElementById('bookSearch').value.trim().toLowerCase();
+                
+                if (searchTerm.length < 2) {
+                    displayBookInventory(currentBooks);
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${API_ENDPOINTS.searchBook}?search=${encodeURIComponent(searchTerm)}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const searchResults = data.books || data.data || [];
+                        displayBookInventory(searchResults);
+                    } else {
+                        localSearchBooks(searchTerm);
+                    }
+                } catch (error) {
+                    console.error('Error searching books via API:', error);
+                    localSearchBooks(searchTerm);
+                }
+            }, 300);
+        }
+
+        function localSearchBooks(searchTerm) {
+            const filteredBooks = currentBooks.filter(book => {
+                const titleMatch = book.title && book.title.toLowerCase().includes(searchTerm);
+                const authorMatch = book.author && book.author.toLowerCase().includes(searchTerm);
+                const isbnMatch = book.isbn && book.isbn.toLowerCase().includes(searchTerm);
+                const categoryMatch = book.category_name && book.category_name.toLowerCase().includes(searchTerm);
+                
+                return titleMatch || authorMatch || isbnMatch || categoryMatch;
+            });
+            
+            displayBookInventory(filteredBooks);
+        }
+
+        function filterBooks() {
+            const categoryId = document.getElementById('categoryFilter').value;
+            if (categoryId === 'all') {
+                displayBookInventory(currentBooks);
             } else {
-                hourlyChartHTML = '<div style="text-align: center; padding: 40px; color: #666;">No sales data available for today</div>';
+                const filteredBooks = currentBooks.filter(book => book.category_id == categoryId);
+                displayBookInventory(filteredBooks);
+            }
+        }
+
+        function filterByStock() {
+            const stockFilter = document.getElementById('stockFilter').value;
+            
+            let filteredBooks = currentBooks || [];
+            
+            switch(stockFilter) {
+                case 'in_stock':
+                    filteredBooks = filteredBooks.filter(book => {
+                        const stock = parseInt(book.stock_quantity);
+                        return stock > 10;
+                    });
+                    break;
+                case 'low_stock':
+                    filteredBooks = filteredBooks.filter(book => {
+                        const stock = parseInt(book.stock_quantity);
+                        return stock >= 1 && stock <= 10;
+                    });
+                    break;
+                case 'out_of_stock':
+                    filteredBooks = filteredBooks.filter(book => {
+                        const stock = parseInt(book.stock_quantity);
+                        return stock === 0;
+                    });
+                    break;
+                case 'all':
+                default:
+                    break;
             }
             
-            chartContainer.innerHTML = hourlyChartHTML;
+            displayBookInventory(filteredBooks);
+        }
+
+        function loadAllBooks() {
+            document.getElementById('stockFilter').value = 'all';
+            document.getElementById('categoryFilter').value = 'all';
+            document.getElementById('bookSearch').value = '';
+            displayBookInventory(currentBooks);
+        }
+
+        function showLowStockBooks() {
+            document.getElementById('stockFilter').value = 'low_stock';
+            filterByStock();
+        }
+
+        function showOutOfStockBooks() {
+            document.getElementById('stockFilter').value = 'out_of_stock';
+            filterByStock();
+        }
+
+        // ============ BOOK MODAL FUNCTIONS ============
+        
+        function openAddBookModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Book';
+            document.getElementById('bookForm').reset();
+            document.getElementById('bookId').value = '';
+            
+            const isbnInput = document.getElementById('bookISBN');
+            isbnInput.readOnly = true;
+            isbnInput.classList.remove('isbn-generated');
+            
+            const newISBN = generateRandomISBN();
+            setGeneratedISBN(newISBN);
+            
+            document.getElementById('duplicateTitleWarning').style.display = 'none';
+            
+            const titleInput = document.getElementById('bookTitle');
+            titleInput.removeEventListener('input', checkDuplicateTitle);
+            titleInput.addEventListener('input', checkDuplicateTitle);
+            
+            loadCategoriesForModal();
+            document.getElementById('bookModal').style.display = 'flex';
+        }
+
+        async function openEditBookModal(bookId) {
+            try {
+                const response = await fetch(`${API_ENDPOINTS.bookDetail}?book_id=${bookId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const book = data.book || data.data;
+                    document.getElementById('modalTitle').textContent = 'Edit Book';
+                    document.getElementById('bookId').value = book.book_id;
+                    document.getElementById('bookTitle').value = book.title;
+                    document.getElementById('bookAuthor').value = book.author;
+                    document.getElementById('bookPrice').value = book.price;
+                    document.getElementById('bookStock').value = book.stock_quantity;
+                    
+                    const isbnInput = document.getElementById('bookISBN');
+                    if (book.isbn && book.isbn.trim() !== '') {
+                        isbnInput.value = book.isbn;
+                        isbnInput.readOnly = false;
+                        isbnInput.classList.remove('isbn-generated');
+                        
+                        const statusLabel = document.getElementById('isbnStatusLabel');
+                        statusLabel.textContent = 'Manual';
+                        statusLabel.style.background = '#f39c12';
+                    } else {
+                        const newISBN = generateRandomISBN();
+                        isbnInput.value = newISBN;
+                        isbnInput.readOnly = true;
+                        isbnInput.classList.add('isbn-generated');
+                        
+                        const statusLabel = document.getElementById('isbnStatusLabel');
+                        statusLabel.textContent = 'Auto-generated';
+                        statusLabel.style.background = '#3498db';
+                    }
+                    
+                    document.getElementById('bookDescription').value = book.description || '';
+                    document.getElementById('bookPublisher').value = book.publisher || '';
+                    document.getElementById('bookPublishDate').value = book.publish_date || '';
+                    
+                    await loadCategoriesForModal();
+                    document.getElementById('bookCategory').value = book.category_id;
+                    
+                    document.getElementById('duplicateTitleWarning').style.display = 'none';
+                    
+                    document.getElementById('bookModal').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Error loading book:', error);
+                showNotification('Error loading book data', 'error');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('bookModal').style.display = 'none';
+            const isbnInput = document.getElementById('bookISBN');
+            isbnInput.readOnly = true;
+            isbnInput.classList.remove('isbn-generated');
+            
+            const titleInput = document.getElementById('bookTitle');
+            titleInput.removeEventListener('input', checkDuplicateTitle);
+        }
+
+        function openStockModal(bookId, bookTitle, currentStock) {
+            document.getElementById('stockBookId').value = bookId;
+            document.getElementById('stockBookTitle').value = bookTitle;
+            document.getElementById('newStockQuantity').value = currentStock;
+            document.getElementById('stockModal').style.display = 'flex';
+        }
+
+        function closeStockModal() {
+            document.getElementById('stockModal').style.display = 'none';
+        }
+
+        // ============ DUPLICATE TITLE CHECK FUNCTION ============
+        
+        async function checkDuplicateTitle() {
+            const title = document.getElementById('bookTitle').value.trim();
+            const bookId = document.getElementById('bookId').value;
+            
+            if (!title || title.length < 2) {
+                document.getElementById('duplicateTitleWarning').style.display = 'none';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_ENDPOINTS.checkDuplicate}?title=${encodeURIComponent(title)}&book_id=${bookId || ''}`);
+                const data = await response.json();
+                
+                const warningDiv = document.getElementById('duplicateTitleWarning');
+                const warningText = document.getElementById('duplicateWarningText');
+                const saveButton = document.getElementById('saveBookBtn');
+                
+                if (data.success && data.duplicate) {
+                    if (data.book_id == bookId) {
+                        warningDiv.style.display = 'none';
+                        saveButton.disabled = false;
+                        saveButton.innerHTML = '💾 Save Book';
+                    } else {
+                        warningDiv.style.display = 'block';
+                        warningText.textContent = `A book titled "${title}" already exists in the database.`;
+                        saveButton.disabled = true;
+                        saveButton.innerHTML = '⚠️ Duplicate Title';
+                    }
+                } else {
+                    warningDiv.style.display = 'none';
+                    saveButton.disabled = false;
+                    saveButton.innerHTML = '💾 Save Book';
+                }
+            } catch (error) {
+                console.error('Error checking duplicate title:', error);
+                const warningDiv = document.getElementById('duplicateTitleWarning');
+                warningDiv.style.display = 'block';
+                document.getElementById('duplicateWarningText').textContent = 
+                    'Unable to verify title uniqueness. Please check manually.';
+            }
+        }
+
+        // ============ SAVE BOOK FUNCTION ============
+        
+        async function saveBook() {
+            const bookId = document.getElementById('bookId').value;
+            const isEditing = !!bookId;
+            
+            const bookData = {
+                title: document.getElementById('bookTitle').value.trim(),
+                author: document.getElementById('bookAuthor').value.trim(),
+                category_id: document.getElementById('bookCategory').value,
+                price: document.getElementById('bookPrice').value,
+                stock_quantity: document.getElementById('bookStock').value,
+                isbn: document.getElementById('bookISBN').value.trim(),
+                description: document.getElementById('bookDescription').value.trim(),
+                publisher: document.getElementById('bookPublisher').value.trim(),
+                publish_date: document.getElementById('bookPublishDate').value
+            };
+
+            if (!isEditing && (!bookData.isbn || bookData.isbn === '')) {
+                const newISBN = generateRandomISBN();
+                bookData.isbn = newISBN;
+                document.getElementById('bookISBN').value = newISBN;
+            }
+            
+            if (bookData.isbn && !isValidISBN(bookData.isbn)) {
+                showNotification('Invalid ISBN format. Please use format: 978-XXXXXXXXXXX (e.g., 978-1491950357)', 'error');
+                return;
+            }
+
+            if (isEditing) {
+                bookData.id = bookId;
+            }
+
+            const requiredFields = ['title', 'author', 'category_id', 'price', 'stock_quantity'];
+            const missingFields = requiredFields.filter(field => !bookData[field]);
+            
+            if (missingFields.length > 0) {
+                showNotification(`Please fill in all required fields: ${missingFields.join(', ')}`, 'error');
+                return;
+            }
+
+            if (!isEditing) {
+                try {
+                    const checkResponse = await fetch(`${API_ENDPOINTS.checkDuplicate}?title=${encodeURIComponent(bookData.title)}`);
+                    const checkData = await checkResponse.json();
+                    
+                    if (checkData.success && checkData.duplicate) {
+                        showNotification(`Cannot save: A book titled "${bookData.title}" already exists!`, 'error');
+                        return;
+                    }
+                } catch (error) {
+                    console.warn('Could not verify title uniqueness:', error);
+                }
+            }
+
+            const saveButton = document.querySelector('#bookModal .modal-footer .btn-primary');
+            const originalText = saveButton.textContent;
+            saveButton.innerHTML = '<span class="spinner"></span> Saving...';
+            saveButton.disabled = true;
+
+            try {
+                const response = await fetch(API_ENDPOINTS.saveBook, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    
+                    closeModal();
+                    
+                    setTimeout(() => {
+                        if (document.getElementById('book-inventory').classList.contains('active')) {
+                            loadBookInventoryData();
+                        }
+                        loadDashboardData();
+                    }, 500);
+                } else {
+                    if (result.error && result.error.toLowerCase().includes('duplicate') || 
+                        result.error.toLowerCase().includes('already exists')) {
+                        showNotification(`Cannot save: A book with this title already exists!`, 'error');
+                    } else {
+                        showNotification(`Error: ${result.error}`, 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Error saving book. Please try again.', 'error');
+            } finally {
+                saveButton.innerHTML = originalText;
+                saveButton.disabled = false;
+            }
+        }
+
+        async function loadCategoriesForModal() {
+            try {
+                const response = await fetch(API_ENDPOINTS.categories);
+                const data = await response.json();
+                
+                const categorySelect = document.getElementById('bookCategory');
+                categorySelect.innerHTML = '<option value="">Select Category</option>';
+                
+                if (data.success) {
+                    const categories = data.categories || data.data || [];
+                    categories.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.category_id;
+                        option.textContent = category.category_name;
+                        categorySelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        async function updateStock() {
+            const stockData = {
+                book_id: document.getElementById('stockBookId').value,
+                stock_quantity: document.getElementById('newStockQuantity').value
+            };
+
+            try {
+                const response = await fetch(API_ENDPOINTS.updateStock, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(stockData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('Stock updated successfully!', 'success');
+                    closeStockModal();
+                    loadSectionData('book-inventory');
+                    loadDashboardData();
+                } else {
+                    showNotification('Error updating stock: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Error updating stock. Please try again.', 'error');
+            }
+        }
+
+        async function deleteBook(bookId) {
+            if (confirm('Are you sure you want to delete this book?')) {
+                try {
+                    const response = await fetch(API_ENDPOINTS.deleteBook, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: bookId })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showNotification('Book deleted successfully!', 'success');
+                        loadSectionData('book-inventory');
+                        loadDashboardData();
+                    } else {
+                        showNotification('Error deleting book: ' + result.error, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification('Error deleting book. Please try again.', 'error');
+                }
+            }
+        }
+
+        // ============ CATEGORY FUNCTIONS ============
+        
+        async function loadCategoriesData() {
+            try {
+                const [categoriesResponse, booksResponse] = await Promise.all([
+                    fetch(API_ENDPOINTS.categories),
+                    fetch(API_ENDPOINTS.books)
+                ]);
+                
+                const categoriesData = await categoriesResponse.json();
+                const booksData = await booksResponse.json();
+                
+                if (booksData.success) {
+                    currentBooks = booksData.books || booksData.data || [];
+                }
+                
+                if (categoriesData.success) {
+                    const categories = categoriesData.categories || categoriesData.data || [];
+                    displayCategories(categories);
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                const categoriesTable = document.getElementById('categoriesTable');
+                categoriesTable.innerHTML = '<tr><td colspan="4" class="error">Error loading categories</td></tr>';
+            }
+        }
+
+        function displayCategories(categories) {
+            const categoriesTable = document.getElementById('categoriesTable');
+            
+            if (!categories || categories.length === 0) {
+                categoriesTable.innerHTML = '<tr><td colspan="4" class="loading">No categories found. Add your first category!</td></tr>';
+                return;
+            }
+            
+            categoriesTable.innerHTML = categories.map(category => {
+                const bookCount = currentBooks ? 
+                    currentBooks.filter(book => book.category_id == category.category_id).length : 0;
+                
+                return `
+                    <tr>
+                        <td>${category.category_id}</td>
+                        <td>
+                            <strong>${category.category_name}</strong>
+                            ${category.description ? `<div style="font-size: 0.9em; color: #666; margin-top: 4px;">${category.description}</div>` : ''}
+                        </td>
+                        <td>
+                            <span class="${bookCount > 0 ? 'in-stock' : 'out-of-stock'}" style="display: inline-block;">
+                                ${bookCount} books
+                            </span>
+                        </td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-warning" onclick="openEditCategoryModal(${category.category_id}, '${category.category_name.replace(/'/g, "\\'")}', '${(category.description || '').replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
+                                ✏️ Edit
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCategory(${category.category_id})" ${bookCount > 0 ? 'disabled title="Cannot delete category with books"' : ''}>
+                                🗑️ Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // ============ SALES ANALYTICS FUNCTIONS ============
@@ -1830,593 +3159,298 @@
             });
         }
 
-        // ============ COMBINED BOOK & INVENTORY FUNCTIONS ============
-
-        async function loadBookInventoryData() {
-            try {
-                const [booksResponse, categoriesResponse] = await Promise.all([
-                    fetch(API_ENDPOINTS.books),
-                    fetch(API_ENDPOINTS.categories)
-                ]);
-
-                const booksData = await booksResponse.json();
-                const categoriesData = await categoriesResponse.json();
-
-                if (booksData.success) {
-                    currentBooks = booksData.books || booksData.data || [];
-                    updateBookInventoryStats(currentBooks);
-                    displayBookInventory(currentBooks);
-                    document.getElementById('totalBookCount').textContent = currentBooks.length;
-                }
-
-                if (categoriesData.success) {
-                    currentCategories = categoriesData.categories || categoriesData.data || [];
-                    loadCategoryFilter();
-                }
-            } catch (error) {
-                console.error('Error loading book inventory:', error);
-                document.getElementById('booksInventoryTable').innerHTML = '<tr><td colspan="10" class="error">Error loading data</td></tr>';
-            }
-        }
-
-        function updateBookInventoryStats(books) {
-            const inStockCount = books.filter(book => {
-                const stock = parseInt(book.stock_quantity);
-                return stock > 10;
-            }).length;
-            
-            const lowStockCount = books.filter(book => {
-                const stock = parseInt(book.stock_quantity);
-                return stock >= 1 && stock <= 10;
-            }).length;
-            
-            const outOfStockCount = books.filter(book => {
-                const stock = parseInt(book.stock_quantity);
-                return stock === 0;
-            }).length;
-            
-            document.getElementById('inStockCount').textContent = inStockCount;
-            document.getElementById('inventoryLowStock').textContent = lowStockCount;
-            document.getElementById('inventoryOutOfStock').textContent = outOfStockCount;
-        }
-
-        function displayBookInventory(books) {
-            const tableBody = document.getElementById('booksInventoryTable');
-            
-            if (books.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="10" class="loading">No books found</td></tr>';
+        // ============ ADMIN MODAL FUNCTIONS ============
+        
+        async function openAddAdminModal() {
+            if (!isSuperAdmin) {
+                showNotification('Access denied. Super Admin only.', 'error');
                 return;
             }
-
-            tableBody.innerHTML = books.map(book => {
-                const stockStatusClass = getStockStatusClass(book.stock_quantity);
-                const stockStatusText = getStockStatusText(book.stock_quantity);
-                
-                return `
-                <tr>
-                    <td>${book.book_id}</td>
-                    <td><strong>${book.title}</strong></td>
-                    <td>${book.author}</td>
-                    <td>${book.category_name || 'N/A'}</td>
-                    <td>RM ${parseFloat(book.price).toFixed(2)}</td>
-                    <td>${book.stock_quantity}</td>
-                    <td style="font-family: 'Courier New', monospace;">
-                        ${book.isbn || '<span style="color:#999;font-style:italic">Auto-generated</span>'}
-                    </td>
-                    <td>
-                        <span class="${stockStatusClass}">
-                            ${stockStatusText}
-                        </span>
-                    </td>
-                    <td>${book.updated_at || 'N/A'}</td>
-                    <td class="action-buttons">
-                        <button class="btn btn-sm btn-primary" onclick="openEditBookModal(${book.book_id})">✏️ Edit</button>
-                        <button class="btn btn-sm btn-warning" onclick="openStockModal(${book.book_id}, '${book.title.replace(/'/g, "\\'")}', ${book.stock_quantity})">📦 Stock</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteBook(${book.book_id})">🗑️ Delete</button>
-                    </td>
-                </tr>
-                `;
-            }).join('');
-        }
-
-        function getStockStatusClass(stock) {
-            const stockNum = parseInt(stock);
             
-            if (stockNum === 0) {
-                return 'out-of-stock';
-            }
-            if (stockNum >= 1 && stockNum <= 10) {
-                return 'low-stock';
-            }
-            return 'in-stock';
-        }
-
-        function getStockStatusText(stock) {
-            const stockNum = parseInt(stock);
+            document.getElementById('adminModalTitle').textContent = 'Add New Admin';
+            document.getElementById('adminForm').reset();
+            document.getElementById('adminId').value = '';
             
-            if (stockNum === 0) {
-                return 'Out of Stock';
-            }
-            if (stockNum >= 1 && stockNum <= 10) {
-                return 'Low Stock';
-            }
-            return 'In Stock';
+            await loadPermissions();
+            
+            document.getElementById('adminModal').style.display = 'flex';
         }
 
-        async function loadCategoryFilter() {
+        async function loadPermissions() {
             try {
-                const response = await fetch(API_ENDPOINTS.categories);
+                const response = await fetch(API_ENDPOINTS.getPermissions);
                 const data = await response.json();
                 
-                const categoryFilter = document.getElementById('categoryFilter');
-                categoryFilter.innerHTML = '<option value="all">All Categories</option>';
-                
                 if (data.success) {
-                    currentCategories = data.categories || data.data || [];
-                    currentCategories.forEach(category => {
-                        const option = document.createElement('option');
-                        option.value = category.category_id;
-                        option.textContent = category.category_name;
-                        categoryFilter.appendChild(option);
-                    });
+                    currentPermissions = data.permissions || [];
+                    displayPermissions(currentPermissions);
                 }
             } catch (error) {
-                console.error('Error loading categories:', error);
+                console.error('Error loading permissions:', error);
+                document.getElementById('permissionsGrid').innerHTML = '<div class="error">Error loading permissions</div>';
             }
         }
 
-        // ============ SEARCH FUNCTIONS (FIXED) ============
-        
-        function searchBooks() {
-            if (lastSearchTimeout) {
-                clearTimeout(lastSearchTimeout);
+        function displayPermissions(permissions) {
+            const permissionsGrid = document.getElementById('permissionsGrid');
+            
+            if (!permissions || permissions.length === 0) {
+                permissionsGrid.innerHTML = '<div class="loading">No permissions defined</div>';
+                return;
             }
             
-            lastSearchTimeout = setTimeout(async function() {
-                const searchTerm = document.getElementById('bookSearch').value.trim().toLowerCase();
-                
-                if (searchTerm.length < 2) {
-                    displayBookInventory(currentBooks);
-                    return;
+            const groupedPermissions = {};
+            permissions.forEach(permission => {
+                if (!groupedPermissions[permission.category]) {
+                    groupedPermissions[permission.category] = [];
                 }
-                
-                try {
-                    const response = await fetch(`${API_ENDPOINTS.searchBook}?search=${encodeURIComponent(searchTerm)}`);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        const searchResults = data.books || data.data || [];
-                        displayBookInventory(searchResults);
-                    } else {
-                        // 如果API调用失败，使用本地搜索
-                        localSearchBooks(searchTerm);
-                    }
-                } catch (error) {
-                    console.error('Error searching books via API:', error);
-                    // 使用本地搜索作为后备
-                    localSearchBooks(searchTerm);
-                }
-            }, 300); // 300ms 防抖延迟
-        }
-
-        function localSearchBooks(searchTerm) {
-            const filteredBooks = currentBooks.filter(book => {
-                // 检查标题、作者、ISBN、分类名
-                const titleMatch = book.title && book.title.toLowerCase().includes(searchTerm);
-                const authorMatch = book.author && book.author.toLowerCase().includes(searchTerm);
-                const isbnMatch = book.isbn && book.isbn.toLowerCase().includes(searchTerm);
-                const categoryMatch = book.category_name && book.category_name.toLowerCase().includes(searchTerm);
-                
-                return titleMatch || authorMatch || isbnMatch || categoryMatch;
+                groupedPermissions[permission.category].push(permission);
             });
             
-            displayBookInventory(filteredBooks);
+            const html = Object.keys(groupedPermissions).map(category => `
+                <div class="permission-category">
+                    <h4>${category}</h4>
+                    ${groupedPermissions[category].map(perm => `
+                        <div class="permission-item">
+                            <input type="checkbox" 
+                                   id="perm_${perm.permission_key}" 
+                                   name="permissions" 
+                                   value="${perm.permission_key}"
+                                   checked>
+                            <label for="perm_${perm.permission_key}">${perm.description || perm.permission_key}</label>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+            
+            permissionsGrid.innerHTML = html;
         }
 
-        function filterBooks() {
-            const categoryId = document.getElementById('categoryFilter').value;
-            if (categoryId === 'all') {
-                displayBookInventory(currentBooks);
+        function togglePermissions() {
+            const role = document.getElementById('adminRole').value;
+            const permissionsSection = document.getElementById('permissionsSection');
+            
+            if (role === 'superadmin') {
+                permissionsSection.style.display = 'none';
+                document.querySelectorAll('#permissionsGrid input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = true;
+                    checkbox.disabled = true;
+                });
             } else {
-                const filteredBooks = currentBooks.filter(book => book.category_id == categoryId);
-                displayBookInventory(filteredBooks);
+                permissionsSection.style.display = 'block';
+                document.querySelectorAll('#permissionsGrid input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.disabled = false;
+                });
             }
         }
 
-        function filterByStock() {
-            const stockFilter = document.getElementById('stockFilter').value;
-            
-            let filteredBooks = currentBooks || [];
-            
-            switch(stockFilter) {
-                case 'in_stock':
-                    filteredBooks = filteredBooks.filter(book => {
-                        const stock = parseInt(book.stock_quantity);
-                        return stock > 10;
-                    });
-                    break;
-                case 'low_stock':
-                    filteredBooks = filteredBooks.filter(book => {
-                        const stock = parseInt(book.stock_quantity);
-                        return stock >= 1 && stock <= 10;
-                    });
-                    break;
-                case 'out_of_stock':
-                    filteredBooks = filteredBooks.filter(book => {
-                        const stock = parseInt(book.stock_quantity);
-                        return stock === 0;
-                    });
-                    break;
-                case 'all':
-                default:
-                    break;
-            }
-            
-            displayBookInventory(filteredBooks);
+        function closeAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
         }
 
-        function loadAllBooks() {
-            document.getElementById('stockFilter').value = 'all';
-            document.getElementById('categoryFilter').value = 'all';
-            document.getElementById('bookSearch').value = '';
-            displayBookInventory(currentBooks);
-        }
-
-        function showLowStockBooks() {
-            document.getElementById('stockFilter').value = 'low_stock';
-            filterByStock();
-        }
-
-        function showOutOfStockBooks() {
-            document.getElementById('stockFilter').value = 'out_of_stock';
-            filterByStock();
-        }
-
-        // ============ ORDER FUNCTIONS ============
-        
-        async function loadOrdersData() {
-            try {
-                const response = await fetch(API_ENDPOINTS.orders);
-                const data = await response.json();
-                
-                if (data.success) {
-                    currentOrders = data.orders || [];
-                    updateOrderStats(currentOrders);
-                    displayOrders(currentOrders);
-                } else {
-                    document.getElementById('ordersTable').innerHTML = '<tr><td colspan="7" class="error">Error loading orders</td></tr>';
-                }
-            } catch (error) {
-                console.error('Error loading orders:', error);
-                document.getElementById('ordersTable').innerHTML = '<tr><td colspan="7" class="error">Error loading orders</td></tr>';
-            }
-        }
-
-        function updateOrderStats(orders) {
-            const pending = orders.filter(order => order.status === 'pending').length;
-            const confirmed = orders.filter(order => order.status === 'confirmed').length;
-            const shipped = orders.filter(order => order.status === 'shipped').length;
-            const delivered = orders.filter(order => order.status === 'delivered').length;
-            
-            document.getElementById('pendingOrders').textContent = pending;
-            document.getElementById('confirmedOrders').textContent = confirmed;
-            document.getElementById('shippedOrders').textContent = shipped;
-            document.getElementById('deliveredOrders').textContent = delivered;
-        }
-
-        function displayOrders(orders) {
-            const ordersTable = document.getElementById('ordersTable');
-            
-            if (orders.length === 0) {
-                ordersTable.innerHTML = '<tr><td colspan="7" class="loading">No orders found</td></tr>';
-                return;
-            }
-
-            ordersTable.innerHTML = orders.map(order => {
-                const statusInfo = ORDER_STATUS_MAP[order.status] || { text: order.status, class: 'status-unknown' };
-                
-                return `
-                <tr>
-                    <td><strong>#${order.order_id}</strong></td>
-                    <td>
-                        <div><strong>${order.customer_name || 'Customer ' + order.customer_id}</strong></div>
-                        <div style="font-size: 0.8em; color: #666;">${order.contact_email || 'No email'}</div>
-                    </td>
-                    <td>${new Date(order.order_date).toLocaleDateString()}</td>
-                    <td>
-                        <div>${order.item_count || 0} items</div>
-                        <div style="font-size: 0.8em; color: #666;">${order.total_quantity || 0} total</div>
-                    </td>
-                    <td><strong>RM ${parseFloat(order.total_amount || 0).toFixed(2)}</strong></td>
-                    <td>
-                        <span class="order-status ${statusInfo.class}">
-                            ${statusInfo.text}
-                        </span>
-                    </td>
-                    <td class="action-buttons">
-                        <button class="btn btn-sm btn-primary" onclick="viewOrderDetails(${order.order_id})">
-                            👁️ View
-                        </button>
-                        <button class="btn btn-sm btn-warning" onclick="openUpdateOrderStatusModal(${order.order_id}, '${order.status}')">
-                            ✏️ Update
-                        </button>
-                    </td>
-                </tr>
-                `;
-            }).join('');
-        }
-
-        function filterOrders() {
-            const statusFilter = document.getElementById('orderStatusFilter').value;
-            
-            let filteredOrders = currentOrders || [];
-            
-            if (statusFilter !== 'all') {
-                filteredOrders = filteredOrders.filter(order => order.status === statusFilter);
-            }
-            
-            displayOrders(filteredOrders);
-        }
-
-        function searchOrders() {
-            if (lastSearchTimeout) {
-                clearTimeout(lastSearchTimeout);
-            }
-            
-            lastSearchTimeout = setTimeout(function() {
-                const searchTerm = document.getElementById('orderSearch').value.toLowerCase();
-                
-                if (searchTerm.length < 2) {
-                    displayOrders(currentOrders);
-                    return;
-                }
-                
-                const filteredOrders = (currentOrders || []).filter(order => 
-                    order.order_id.toString().includes(searchTerm) ||
-                    (order.customer_name && order.customer_name.toLowerCase().includes(searchTerm)) ||
-                    (order.contact_email && order.contact_email.toLowerCase().includes(searchTerm))
-                );
-                
-                displayOrders(filteredOrders);
-            }, 300);
-        }
-
-        function refreshOrders() {
-            loadOrdersData();
-        }
-
-        async function viewOrderDetails(orderId) {
-            try {
-                const response = await fetch(`${API_ENDPOINTS.orderDetail}?order_id=${orderId}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    showOrderDetailsModal(data.order);
-                } else {
-                    showNotification('Error loading order details: ' + (data.error || 'Unknown error'), 'error');
-                }
-            } catch (error) {
-                console.error('Error loading order details:', error);
-                showNotification('Error loading order details', 'error');
-            }
-        }
-
-        function showOrderDetailsModal(order) {
-            currentOrderId = order.order_id;
-            
-            document.getElementById('orderModalTitle').textContent = `Order #${order.order_id} Details`;
-            
-            const itemsHtml = order.items && order.items.length > 0 ? order.items.map(item => `
-                <div class="order-item" style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 8px;">
-                    <div style="font-weight: 600; margin-bottom: 5px;">${item.title || 'Unknown Book'}</div>
-                    <div style="display: flex; gap: 15px; font-size: 0.9em; color: #666;">
-                        <span>Qty: ${item.quantity || 0}</span>
-                        <span>Price: RM ${parseFloat(item.unit_price || 0).toFixed(2)}</span>
-                        <span>Subtotal: RM ${parseFloat(item.subtotal || 0).toFixed(2)}</span>
-                    </div>
-                </div>
-            `).join('') : '<div style="color: #666; font-style: italic;">No items found</div>';
-            
-            document.getElementById('orderModalBody').innerHTML = `
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div>
-                        <h4 style="color: var(--primary); margin-bottom: 10px;">Customer Information</h4>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                            <div style="margin-bottom: 8px;"><strong>Customer ID:</strong> ${order.customer_id || 'N/A'}</div>
-                            <div style="margin-bottom: 8px;"><strong>Email:</strong> ${order.contact_email || 'N/A'}</div>
-                            <div style="margin-bottom: 8px;"><strong>Phone:</strong> ${order.contact_phone || 'N/A'}</div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <h4 style="color: var(--primary); margin-bottom: 10px;">Order Information</h4>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                            <div style="margin-bottom: 8px;"><strong>Order Date:</strong> ${new Date(order.order_date).toLocaleString()}</div>
-                            <div style="margin-bottom: 8px;">
-                                <strong>Status:</strong> 
-                                <span class="order-status ${ORDER_STATUS_MAP[order.status]?.class || 'status-unknown'}">
-                                    ${ORDER_STATUS_MAP[order.status]?.text || order.status}
-                                </span>
-                            </div>
-                            <div style="margin-bottom: 8px;"><strong>Total Amount:</strong> RM ${parseFloat(order.total_amount || 0).toFixed(2)}</div>
-                        </div>
-                    </div>
-                    
-                    <div style="grid-column: 1 / -1;">
-                        <h4 style="color: var(--primary); margin-bottom: 10px;">Shipping Address</h4>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; white-space: pre-line;">
-                            ${order.shipping_address || 'No shipping address provided'}
-                        </div>
-                    </div>
-                    
-                    <div style="grid-column: 1 / -1;">
-                        <h4 style="color: var(--primary); margin-bottom: 10px;">Order Items (${order.items ? order.items.length : 0})</h4>
-                        <div style="max-height: 200px; overflow-y: auto;">
-                            ${itemsHtml}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('orderModalFooter').innerHTML = `
-                <button class="btn" onclick="closeOrderDetailsModal()">Close</button>
-                <button class="btn btn-warning" onclick="openUpdateOrderStatusModal(${order.order_id}, '${order.status}')">Update Status</button>
-            `;
-            
-            document.getElementById('orderDetailsModal').style.display = 'flex';
-        }
-
-        function closeOrderDetailsModal() {
-            document.getElementById('orderDetailsModal').style.display = 'none';
-            currentOrderId = null;
-        }
-
-        function openUpdateOrderStatusModal(orderId, currentStatus) {
-            currentOrderId = orderId;
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.id = 'updateStatusModal';
-            modal.style.display = 'flex';
-            
-            modal.innerHTML = `
-                <div class="modal-content" style="max-width: 500px;">
-                    <div class="modal-header">
-                        <h3>Update Order Status</h3>
-                        <button class="close" onclick="closeUpdateStatusModal()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="newOrderStatus">Select New Status:</label>
-                            <select id="newOrderStatus" class="form-control">
-                                <option value="pending" ${currentStatus === 'pending' ? 'selected' : ''}>⏳ Pending</option>
-                                <option value="confirmed" ${currentStatus === 'confirmed' ? 'selected' : ''}>✅ Confirmed</option>
-                                <option value="shipped" ${currentStatus === 'shipped' ? 'selected' : ''}>🚚 Shipped</option>
-                                <option value="delivered" ${currentStatus === 'delivered' ? 'selected' : ''}>📦 Delivered</option>
-                                <option value="cancelled" ${currentStatus === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn" onclick="closeUpdateStatusModal()">Cancel</button>
-                        <button class="btn btn-primary" onclick="updateOrderStatus()">Update Status</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        }
-
-        function closeUpdateStatusModal() {
-            const modal = document.getElementById('updateStatusModal');
-            if (modal) modal.remove();
-            currentOrderId = null;
-        }
-
-        async function updateOrderStatus() {
-            if (!currentOrderId) return;
-            
-            const newStatus = document.getElementById('newOrderStatus').value;
-            
-            if (!newStatus) {
-                showNotification('Please select a status', 'warning');
+        async function saveAdmin() {
+            if (!isSuperAdmin) {
+                showNotification('Access denied. Super Admin only.', 'error');
                 return;
             }
             
+            const adminData = {
+                username: document.getElementById('adminUsername').value.trim(),
+                email: document.getElementById('adminEmail').value.trim(),
+                role: document.getElementById('adminRole').value,
+                status: document.getElementById('adminStatus').value
+            };
+            
+            if (adminData.role === 'admin') {
+                const selectedPermissions = [];
+                document.querySelectorAll('#permissionsGrid input[type="checkbox"]:checked').forEach(checkbox => {
+                    selectedPermissions.push({
+                        permission_key: checkbox.value
+                    });
+                });
+                adminData.permissions = selectedPermissions;
+            }
+
+            if (!adminData.username) {
+                showNotification('Please enter a username', 'warning');
+                return;
+            }
+
+            const saveButton = document.querySelector('#adminModal .modal-footer .btn-primary');
+            const originalText = saveButton.textContent;
+            saveButton.innerHTML = '<span class="spinner"></span> Saving...';
+            saveButton.disabled = true;
+
             try {
-                const response = await fetch(API_ENDPOINTS.updateOrder, {
+                const response = await fetch(API_ENDPOINTS.saveAdmin, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        order_id: currentOrderId,
-                        status: newStatus
-                    })
+                    body: JSON.stringify(adminData)
                 });
                 
                 const result = await response.json();
                 
                 if (result.success) {
-                    showNotification('Order status updated successfully!', 'success');
-                    closeUpdateStatusModal();
-                    closeOrderDetailsModal();
-                    loadOrdersData();
+                    showNotification('Admin created successfully!', 'success');
+                    closeAdminModal();
+                    loadAdminManagementData();
+                    
+                    openSendPasswordModal(result.admin_id, adminData.username, adminData.email);
                 } else {
-                    showNotification('Error updating order status: ' + result.error, 'error');
+                    showNotification('Error creating admin: ' + result.error, 'error');
                 }
             } catch (error) {
-                console.error('Error updating order status:', error);
-                showNotification('Error updating order status', 'error');
+                console.error('Error creating admin:', error);
+                showNotification('Error creating admin. Please try again.', 'error');
+            } finally {
+                saveButton.innerHTML = originalText;
+                saveButton.disabled = false;
             }
         }
 
-        // ============ CATEGORY FUNCTIONS ============
-        
-        async function loadCategoriesData() {
-            try {
-                const [categoriesResponse, booksResponse] = await Promise.all([
-                    fetch(API_ENDPOINTS.categories),
-                    fetch(API_ENDPOINTS.books)
-                ]);
-                
-                const categoriesData = await categoriesResponse.json();
-                const booksData = await booksResponse.json();
-                
-                if (booksData.success) {
-                    currentBooks = booksData.books || booksData.data || [];
-                }
-                
-                if (categoriesData.success) {
-                    const categories = categoriesData.categories || categoriesData.data || [];
-                    displayCategories(categories);
-                }
-            } catch (error) {
-                console.error('Error loading categories:', error);
-                const categoriesTable = document.getElementById('categoriesTable');
-                categoriesTable.innerHTML = '<tr><td colspan="4" class="error">Error loading categories</td></tr>';
-            }
+        function closeAdminDetailsModal() {
+            document.getElementById('adminDetailsModal').style.display = 'none';
         }
 
-        function displayCategories(categories) {
-            const categoriesTable = document.getElementById('categoriesTable');
+        function closeSendPasswordModal() {
+            document.getElementById('sendPasswordModal').style.display = 'none';
+        }
+
+        async function viewAdminDetails(adminId) {
+            showNotification('View admin details not yet implemented', 'info');
+        }
+
+        function editAdmin() {
+            showNotification('Edit admin not yet implemented', 'info');
+        }
+
+        function deleteAdmin() {
+            showNotification('Delete admin not yet implemented', 'info');
+        }
+
+        function openSendPasswordModal(adminId, adminName, adminEmail) {
+            document.getElementById('passwordAdminId').value = adminId;
+            document.getElementById('passwordAdminName').value = adminName;
+            document.getElementById('passwordEmail').value = adminEmail || '';
+            document.getElementById('sendPasswordModal').style.display = 'flex';
+        }
+
+        async function sendPasswordEmail() {
+            const adminId = document.getElementById('passwordAdminId').value;
+            const email = document.getElementById('passwordEmail').value;
             
-            if (!categories || categories.length === 0) {
-                categoriesTable.innerHTML = '<tr><td colspan="4" class="loading">No categories found. Add your first category!</td></tr>';
+            if (!email || !validateEmail(email)) {
+                showNotification('Please enter a valid email address', 'warning');
                 return;
             }
             
-            categoriesTable.innerHTML = categories.map(category => {
-                const bookCount = currentBooks ? 
-                    currentBooks.filter(book => book.category_id == category.category_id).length : 0;
-                
-                return `
-                    <tr>
-                        <td>${category.category_id}</td>
-                        <td>
-                            <strong>${category.category_name}</strong>
-                            ${category.description ? `<div style="font-size: 0.9em; color: #666; margin-top: 4px;">${category.description}</div>` : ''}
-                        </td>
-                        <td>
-                            <span class="${bookCount > 0 ? 'in-stock' : 'out-of-stock'}" style="display: inline-block;">
-                                ${bookCount} books
-                            </span>
-                        </td>
-                        <td class="action-buttons">
-                            <button class="btn btn-sm btn-warning" onclick="openEditCategoryModal(${category.category_id}, '${category.category_name.replace(/'/g, "\\'")}', '${(category.description || '').replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
-                                ✏️ Edit
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteCategory(${category.category_id})" ${bookCount > 0 ? 'disabled title="Cannot delete category with books"' : ''}>
-                                🗑️ Delete
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            showNotification('Password email functionality not yet implemented', 'info');
         }
 
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // ============ ISBN FUNCTIONS ============
+        
+        function generateRandomISBN() {
+            const prefix = "978";
+            let middleDigits = "";
+            for (let i = 0; i < 10; i++) {
+                middleDigits += Math.floor(Math.random() * 10);
+            }
+            return `${prefix}-${middleDigits}`;
+        }
+
+        function isValidISBN(isbn) {
+            if (!isbn || typeof isbn !== 'string') return false;
+            const isbnPattern = /^978-\d{10}$/;
+            return isbnPattern.test(isbn);
+        }
+
+        function regenerateISBN() {
+            const newISBN = generateRandomISBN();
+            setGeneratedISBN(newISBN);
+            showNotification(`New ISBN generated: ${newISBN}`, 'info');
+        }
+
+        function setGeneratedISBN(isbn) {
+            let cleanISBN = String(isbn || '').trim();
+            
+            if (!isValidISBN(cleanISBN)) {
+                console.warn('ISBN format invalid, regenerating:', cleanISBN);
+                const newISBN = generateRandomISBN();
+                setGeneratedISBN(newISBN);
+                return;
+            }
+            
+            currentGeneratedISBN = cleanISBN;
+            const isbnInput = document.getElementById('bookISBN');
+            isbnInput.value = cleanISBN;
+            isbnInput.classList.add('isbn-generated');
+            
+            const statusLabel = document.getElementById('isbnStatusLabel');
+            if (statusLabel) {
+                statusLabel.textContent = 'Auto-generated';
+                statusLabel.style.background = '#3498db';
+            }
+        }
+
+        function formatISBN(rawISBN) {
+            if (isValidISBN(rawISBN)) {
+                return rawISBN;
+            }
+            
+            const cleanDigits = rawISBN.replace(/\D/g, '');
+            
+            if (cleanDigits.length !== 13) {
+                return rawISBN;
+            }
+            
+            return `${cleanDigits.substring(0, 3)}-${cleanDigits.substring(3, 13)}`;
+        }
+
+        // ============ NOTIFICATION FUNCTIONS ============
+        
+        function showNotification(message, type = 'info') {
+            const existingNotification = document.querySelector('.custom-notification');
+            if (existingNotification) existingNotification.remove();
+            
+            const notification = document.createElement('div');
+            notification.className = `custom-notification ${type}`;
+            notification.innerHTML = `
+                <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // ============ SALES OVERVIEW FUNCTIONS ============
+        
+        async function loadSalesOverview() {
+            try {
+                const response = await fetch(API_ENDPOINTS.salesOverview);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displaySalesOverview(data.data);
+                } else {
+                    console.error('Error loading sales overview:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading sales overview:', error);
+            }
+        }
+
+        // ============ CATEGORY MODAL FUNCTIONS ============
+        
         async function openAddCategoryModal() {
             const modalHTML = `
                 <div class="modal" id="addCategoryModal" style="display: flex;">
@@ -2615,374 +3649,21 @@
             }
         }
 
-        // ============ BOOK MODAL FUNCTIONS ============
-        
-        function openAddBookModal() {
-            document.getElementById('modalTitle').textContent = 'Add New Book';
-            document.getElementById('bookForm').reset();
-            document.getElementById('bookId').value = '';
-            
-            const isbnInput = document.getElementById('bookISBN');
-            isbnInput.readOnly = true;
-            isbnInput.classList.remove('isbn-generated');
-            
-            const newISBN = generateRandomISBN();
-            setGeneratedISBN(newISBN);
-            
-            // 隐藏重复标题警告
-            document.getElementById('duplicateTitleWarning').style.display = 'none';
-            
-            // 添加输入事件监听器检查重复
-            const titleInput = document.getElementById('bookTitle');
-            titleInput.removeEventListener('input', checkDuplicateTitle);
-            titleInput.addEventListener('input', checkDuplicateTitle);
-            
-            loadCategoriesForModal();
-            document.getElementById('bookModal').style.display = 'flex';
-        }
-
-        async function openEditBookModal(bookId) {
-            try {
-                const response = await fetch(`${API_ENDPOINTS.bookDetail}?book_id=${bookId}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    const book = data.book || data.data;
-                    document.getElementById('modalTitle').textContent = 'Edit Book';
-                    document.getElementById('bookId').value = book.book_id;
-                    document.getElementById('bookTitle').value = book.title;
-                    document.getElementById('bookAuthor').value = book.author;
-                    document.getElementById('bookPrice').value = book.price;
-                    document.getElementById('bookStock').value = book.stock_quantity;
-                    
-                    const isbnInput = document.getElementById('bookISBN');
-                    if (book.isbn && book.isbn.trim() !== '') {
-                        isbnInput.value = book.isbn;
-                        isbnInput.readOnly = false;
-                        isbnInput.classList.remove('isbn-generated');
-                        
-                        const statusLabel = document.getElementById('isbnStatusLabel');
-                        statusLabel.textContent = 'Manual';
-                        statusLabel.style.background = '#f39c12';
-                    } else {
-                        const newISBN = generateRandomISBN();
-                        isbnInput.value = newISBN;
-                        isbnInput.readOnly = true;
-                        isbnInput.classList.add('isbn-generated');
-                        
-                        const statusLabel = document.getElementById('isbnStatusLabel');
-                        statusLabel.textContent = 'Auto-generated';
-                        statusLabel.style.background = '#3498db';
-                    }
-                    
-                    document.getElementById('bookDescription').value = book.description || '';
-                    document.getElementById('bookPublisher').value = book.publisher || '';
-                    document.getElementById('bookPublishDate').value = book.publish_date || '';
-                    
-                    await loadCategoriesForModal();
-                    document.getElementById('bookCategory').value = book.category_id;
-                    
-                    // 隐藏重复标题警告（编辑模式通常不需要）
-                    document.getElementById('duplicateTitleWarning').style.display = 'none';
-                    
-                    document.getElementById('bookModal').style.display = 'flex';
-                }
-            } catch (error) {
-                console.error('Error loading book:', error);
-                showNotification('Error loading book data', 'error');
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('bookModal').style.display = 'none';
-            const isbnInput = document.getElementById('bookISBN');
-            isbnInput.readOnly = true;
-            isbnInput.classList.remove('isbn-generated');
-            
-            // 清除事件监听器
-            const titleInput = document.getElementById('bookTitle');
-            titleInput.removeEventListener('input', checkDuplicateTitle);
-        }
-
-        function openStockModal(bookId, bookTitle, currentStock) {
-            document.getElementById('stockBookId').value = bookId;
-            document.getElementById('stockBookTitle').value = bookTitle;
-            document.getElementById('newStockQuantity').value = currentStock;
-            document.getElementById('stockModal').style.display = 'flex';
-        }
-
-        function closeStockModal() {
-            document.getElementById('stockModal').style.display = 'none';
-        }
-
-        // ============ DUPLICATE TITLE CHECK FUNCTION ============
-        
-        async function checkDuplicateTitle() {
-            const title = document.getElementById('bookTitle').value.trim();
-            const bookId = document.getElementById('bookId').value;
-            
-            if (!title || title.length < 2) {
-                document.getElementById('duplicateTitleWarning').style.display = 'none';
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${API_ENDPOINTS.checkDuplicate}?title=${encodeURIComponent(title)}&book_id=${bookId || ''}`);
-                const data = await response.json();
-                
-                const warningDiv = document.getElementById('duplicateTitleWarning');
-                const warningText = document.getElementById('duplicateWarningText');
-                const saveButton = document.getElementById('saveBookBtn');
-                
-                if (data.success && data.duplicate) {
-                    // 检查是否是编辑自己的书
-                    if (data.book_id == bookId) {
-                        // 编辑自己的书，不是重复
-                        warningDiv.style.display = 'none';
-                        saveButton.disabled = false;
-                        saveButton.innerHTML = '💾 Save Book';
-                    } else {
-                        // 真正的重复
-                        warningDiv.style.display = 'block';
-                        warningText.textContent = `A book titled "${title}" already exists in the database.`;
-                        saveButton.disabled = true;
-                        saveButton.innerHTML = '⚠️ Duplicate Title';
-                    }
-                } else {
-                    warningDiv.style.display = 'none';
-                    saveButton.disabled = false;
-                    saveButton.innerHTML = '💾 Save Book';
-                }
-            } catch (error) {
-                console.error('Error checking duplicate title:', error);
-                // 出错时不阻止保存，但显示警告
-                const warningDiv = document.getElementById('duplicateTitleWarning');
-                warningDiv.style.display = 'block';
-                document.getElementById('duplicateWarningText').textContent = 
-                    'Unable to verify title uniqueness. Please check manually.';
-            }
-        }
-
-        // ============ SAVE BOOK FUNCTION (FIXED) ============
-        
-        async function saveBook() {
-            const bookId = document.getElementById('bookId').value;
-            const isEditing = !!bookId;
-            
-            const bookData = {
-                title: document.getElementById('bookTitle').value.trim(),
-                author: document.getElementById('bookAuthor').value.trim(),
-                category_id: document.getElementById('bookCategory').value,
-                price: document.getElementById('bookPrice').value,
-                stock_quantity: document.getElementById('bookStock').value,
-                isbn: document.getElementById('bookISBN').value.trim(),
-                description: document.getElementById('bookDescription').value.trim(),
-                publisher: document.getElementById('bookPublisher').value.trim(),
-                publish_date: document.getElementById('bookPublishDate').value
-            };
-
-            // 如果是新增书籍且ISBN为空，自动生成一个
-            if (!isEditing && (!bookData.isbn || bookData.isbn === '')) {
-                const newISBN = generateRandomISBN();
-                bookData.isbn = newISBN;
-                document.getElementById('bookISBN').value = newISBN;
-            }
-            
-            // 验证ISBN格式
-            if (bookData.isbn && !isValidISBN(bookData.isbn)) {
-                showNotification('Invalid ISBN format. Please use format: 978-XXXXXXXXXXX (e.g., 978-1491950357)', 'error');
-                return;
-            }
-
-            // 如果是编辑模式，添加book_id
-            if (isEditing) {
-                bookData.id = bookId;
-            }
-
-            // 验证必填字段
-            const requiredFields = ['title', 'author', 'category_id', 'price', 'stock_quantity'];
-            const missingFields = requiredFields.filter(field => !bookData[field]);
-            
-            if (missingFields.length > 0) {
-                showNotification(`Please fill in all required fields: ${missingFields.join(', ')}`, 'error');
-                return;
-            }
-
-            // 在保存前再次检查重复标题
-            if (!isEditing) {
-                try {
-                    const checkResponse = await fetch(`${API_ENDPOINTS.checkDuplicate}?title=${encodeURIComponent(bookData.title)}`);
-                    const checkData = await checkResponse.json();
-                    
-                    if (checkData.success && checkData.duplicate) {
-                        showNotification(`Cannot save: A book titled "${bookData.title}" already exists!`, 'error');
-                        return;
-                    }
-                } catch (error) {
-                    console.warn('Could not verify title uniqueness:', error);
-                    // 继续保存，让服务器端也做检查
-                }
-            }
-
-            // 显示保存中状态
-            const saveButton = document.querySelector('#bookModal .modal-footer .btn-primary');
-            const originalText = saveButton.textContent;
-            saveButton.innerHTML = '<span class="spinner"></span> Saving...';
-            saveButton.disabled = true;
-
-            try {
-                const response = await fetch(API_ENDPOINTS.saveBook, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(bookData)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification(result.message, 'success');
-                    
-                    closeModal();
-                    
-                    setTimeout(() => {
-                        if (document.getElementById('book-inventory').classList.contains('active')) {
-                            loadBookInventoryData();
-                        }
-                        loadDashboardData();
-                    }, 500);
-                } else {
-                    // 检查是否为重复错误
-                    if (result.error && result.error.toLowerCase().includes('duplicate') || 
-                        result.error.toLowerCase().includes('already exists')) {
-                        showNotification(`Cannot save: A book with this title already exists!`, 'error');
-                    } else {
-                        showNotification(`Error: ${result.error}`, 'error');
-                    }
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showNotification('Error saving book. Please try again.', 'error');
-            } finally {
-                saveButton.innerHTML = originalText;
-                saveButton.disabled = false;
-            }
-        }
-
-        async function loadCategoriesForModal() {
-            try {
-                const response = await fetch(API_ENDPOINTS.categories);
-                const data = await response.json();
-                
-                const categorySelect = document.getElementById('bookCategory');
-                categorySelect.innerHTML = '<option value="">Select Category</option>';
-                
-                if (data.success) {
-                    const categories = data.categories || data.data || [];
-                    categories.forEach(category => {
-                        const option = document.createElement('option');
-                        option.value = category.category_id;
-                        option.textContent = category.category_name;
-                        categorySelect.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading categories:', error);
-            }
-        }
-
-        async function updateStock() {
-            const stockData = {
-                book_id: document.getElementById('stockBookId').value,
-                stock_quantity: document.getElementById('newStockQuantity').value
-            };
-
-            try {
-                const response = await fetch(API_ENDPOINTS.updateStock, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(stockData)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification('Stock updated successfully!', 'success');
-                    closeStockModal();
-                    loadSectionData('book-inventory');
-                    loadDashboardData();
-                } else {
-                    showNotification('Error updating stock: ' + result.error, 'error');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showNotification('Error updating stock. Please try again.', 'error');
-            }
-        }
-
-        async function deleteBook(bookId) {
-            if (confirm('Are you sure you want to delete this book?')) {
-                try {
-                    const response = await fetch(API_ENDPOINTS.deleteBook, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: bookId })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        showNotification('Book deleted successfully!', 'success');
-                        loadSectionData('book-inventory');
-                        loadDashboardData();
-                    } else {
-                        showNotification('Error deleting book: ' + result.error, 'error');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    showNotification('Error deleting book. Please try again.', 'error');
-                }
-            }
-        }
-
-        function loadSettingsData() {
-            // Settings functionality can be implemented later
-        }
-
-        // ============ INITIALIZATION ============
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Admin panel initialized');
-            loadDashboardData();
-            loadSalesOverview();
-            
-            function updateClock() {
-                const now = new Date();
-                const timeString = now.toLocaleTimeString('en-US', { 
-                    hour: '2-digit', 
-                    minute: '2-digit'
-                });
-                const dateString = now.toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                });
-                document.getElementById('adminWelcome').textContent = `Welcome, Admin • ${dateString} ${timeString}`;
-            }
-            
-            updateClock();
-            setInterval(updateClock, 60000);
-        });
-
         // Close modal when clicking outside
         window.onclick = function(event) {
             const bookModal = document.getElementById('bookModal');
             const stockModal = document.getElementById('stockModal');
             const orderDetailsModal = document.getElementById('orderDetailsModal');
+            const adminModal = document.getElementById('adminModal');
+            const adminDetailsModal = document.getElementById('adminDetailsModal');
+            const sendPasswordModal = document.getElementById('sendPasswordModal');
             
             if (event.target === bookModal) closeModal();
             if (event.target === stockModal) closeStockModal();
             if (event.target === orderDetailsModal) closeOrderDetailsModal();
+            if (event.target === adminModal) closeAdminModal();
+            if (event.target === adminDetailsModal) closeAdminDetailsModal();
+            if (event.target === sendPasswordModal) closeSendPasswordModal();
         }
     </script>
 </body>

@@ -49,15 +49,22 @@ try {
     $customer = $customer_result->fetch_assoc();
     $customer_stmt->close();
     
-    // 获取客户的所有订单（包含支付信息）
+    // 修改：获取订单信息，使用正确的字段名
     $orders_sql = "SELECT 
-                    o.*,
-                    p.payment_method,
+                    o.order_id,
+                    o.order_date,
+                    o.total_amount,
+                    o.status,  -- 直接使用 status，而不是 order_status
+                    o.shipping_address,
+                    o.billing_address,
+                    o.contact_phone,
+                    o.contact_email,
+                    o.payment_method,
+                    p.payment_id,
                     p.payment_status,
                     p.amount AS payment_amount,
                     p.transaction_id,
-                    p.payment_date,
-                    p.created_at AS payment_created_at
+                    p.payment_date
                    FROM orders o
                    LEFT JOIN payments p ON o.order_id = p.order_id
                    WHERE o.customer_id = ? 
@@ -78,13 +85,18 @@ try {
             
             // 获取每个订单的订单项详情
             $items_sql = "SELECT 
-                            oi.*,
+                            oi.order_item_id,
+                            oi.book_id,
+                            oi.quantity,
+                            oi.unit_price,
                             b.title,
                             b.author,
                             b.cover_image,
-                            b.price AS original_price
+                            b.price AS original_price,
+                            c.category_name
                           FROM order_items oi
                           LEFT JOIN books b ON oi.book_id = b.book_id
+                          LEFT JOIN categories c ON b.category_id = c.category_id
                           WHERE oi.order_id = ?";
             $items_stmt = $conn->prepare($items_sql);
             $items_stmt->bind_param("i", $order_id);
@@ -101,38 +113,55 @@ try {
             $items_stmt->close();
             
             // 计算统计数据
-            if ($order['payment_status'] === 'completed') {
-                $total_spent += $order['total_amount'];
+            $payment_status = $order['payment_status'] ?? null;
+            if ($payment_status === 'completed' || $payment_status === 'success') {
+                $payment_amount = $order['payment_amount'] ?? $order['total_amount'];
+                $total_spent += floatval($payment_amount);
                 $completed_payments++;
             }
             
+            // 格式化订单状态显示 - 确保有默认值
+            $order_status = $order['status'] ?? 'pending';
+            $order['status'] = $order_status; // 确保有 status 字段
+            $order['status_display'] = formatOrderStatus($order_status);
+            $order['status_class'] = getStatusClass($order_status);
+            
             // 格式化支付状态显示
-            $order['payment_status_display'] = formatPaymentStatus($order['payment_status']);
+            $order['payment_status_display'] = formatPaymentStatus($payment_status);
             $order['payment_method_display'] = formatPaymentMethod($order['payment_method']);
             
             $order['items'] = $items;
-            $order['items_total'] = $order_items_total;
+            $order['item_count'] = count($items);
+            
+            // 格式化日期
+            if (isset($order['order_date'])) {
+                $order['order_date_formatted'] = date('Y-m-d H:i', strtotime($order['order_date']));
+            }
+            
             $orders[] = $order;
         }
     }
     
     $orders_stmt->close();
     
-    // 获取支付统计信息
-    $payment_stats_sql = "SELECT 
-                            COUNT(*) AS total_payments,
-                            SUM(CASE WHEN payment_status = 'completed' THEN amount ELSE 0 END) AS total_completed,
-                            SUM(CASE WHEN payment_status = 'pending' THEN 1 ELSE 0 END) AS pending_count,
-                            SUM(CASE WHEN payment_status = 'failed' THEN 1 ELSE 0 END) AS failed_count
-                          FROM payments p
-                          JOIN orders o ON p.order_id = o.order_id
-                          WHERE o.customer_id = ?";
+    // 获取订单状态统计
+    $status_stats_sql = "SELECT 
+                            status,
+                            COUNT(*) as count,
+                            SUM(total_amount) as total_amount
+                         FROM orders 
+                         WHERE customer_id = ?
+                         GROUP BY status";
     
-    $stats_stmt = $conn->prepare($payment_stats_sql);
+    $stats_stmt = $conn->prepare($status_stats_sql);
     $stats_stmt->bind_param("i", $customer_id);
     $stats_stmt->execute();
     $stats_result = $stats_stmt->get_result();
-    $payment_stats = $stats_result->fetch_assoc();
+    $status_stats = [];
+    
+    while ($row = $stats_result->fetch_assoc()) {
+        $status_stats[] = $row;
+    }
     $stats_stmt->close();
     
     echo json_encode([
@@ -152,12 +181,11 @@ try {
         ],
         'orders' => $orders,
         'order_count' => count($orders),
+        'status_stats' => $status_stats,
         'payment_stats' => [
             'total_spent' => $total_spent,
             'completed_payments' => $completed_payments,
-            'total_payments' => $payment_stats['total_payments'] ?? 0,
-            'pending_payments' => $payment_stats['pending_count'] ?? 0,
-            'failed_payments' => $payment_stats['failed_count'] ?? 0
+            'total_orders' => count($orders)
         ]
     ]);
     
@@ -170,26 +198,66 @@ try {
 
 $conn->close();
 
+// 辅助函数：格式化订单状态
+function formatOrderStatus($status) {
+    if (empty($status)) return 'Pending';
+    
+    $status_map = [
+        'pending' => 'Pending',
+        'confirmed' => 'Confirmed',
+        'processing' => 'Processing',
+        'shipped' => 'Shipped',
+        'delivered' => 'Delivered',
+        'cancelled' => 'Cancelled'
+    ];
+    
+    return $status_map[strtolower($status)] ?? ucfirst($status);
+}
+
+// 辅助函数：获取状态类名
+function getStatusClass($status) {
+    $status = strtolower($status);
+    $class_map = [
+        'confirmed' => 'status-confirmed',
+        'processing' => 'status-confirmed',
+        'shipped' => 'status-shipped',
+        'delivered' => 'status-delivered',
+        'cancelled' => 'status-cancelled'
+    ];
+    
+    return $class_map[$status] ?? 'status-Confirmed';
+}
+
 // 辅助函数：格式化支付状态
 function formatPaymentStatus($status) {
+    if (empty($status)) return 'Confirmed';
+
     $status_map = [
-        'pending' => 'pending',
         'completed' => 'completed',
+        'success' => 'completed',
         'failed' => 'failed',
         'refunded' => 'refunded'
     ];
+    
+    $status = strtolower($status);
     return $status_map[$status] ?? $status;
 }
 
 // 辅助函数：格式化支付方式
 function formatPaymentMethod($method) {
+    if (empty($method)) return 'Not Specified';
+    
     $method_map = [
-        'credit_card' => 'credit_card',
-        'debit_card' => 'debit_card',
-        'paypal' => 'paypal',
-        'bank_transfer' => 'bank_transfer',
-        'cash_on_delivery' => 'cash_on_delivery'
+        'card' => 'Credit Card',
+        'credit_card' => 'Credit Card',
+        'debit_card' => 'Debit Card',
+        'cod' => 'Cash on Delivery',
+        'cash_on_delivery' => 'Cash on Delivery',
+        'bank_transfer' => 'Bank Transfer',
+        'paypal' => 'PayPal'
     ];
-    return $method_map[$method] ?? $method;
+    
+    $method = strtolower($method);
+    return $method_map[$method] ?? ucwords(str_replace('_', ' ', $method));
 }
 ?>
