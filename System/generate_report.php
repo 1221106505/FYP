@@ -95,8 +95,11 @@ function generateReportData($type, $period, $customerId, $startDate = null, $end
         $customerAnalysis = getCustomerAnalysis($customerId, $startDate, $endDate);
     }
     
-    // Get customer list (for full report)
-    $customerList = getCustomerList($startDate, $endDate);
+    // 修改：只有当查看所有顾客时才获取顾客列表
+    $customerList = [];
+    if ($customerId === 'all') {
+        $customerList = getCustomerList($startDate, $endDate);
+    }
     
     $reportData = [
         'report_id' => 'SR-' . date('YmdHis') . '-' . rand(1000, 9999),
@@ -220,18 +223,21 @@ function getSummaryMetrics($startDate, $endDate, $customerId) {
         $summary['total_products_sold'] = $productsData['total_products_sold'] ?? 0;
     }
     
-    // New customers - 根据您的customer表结构，使用first_name和last_name组合
-    $sql = "SELECT COUNT(*) as new_customers 
-            FROM customer 
-            WHERE created_at BETWEEN ? AND ?";
-    
-    $stmt = $conn->prepare($sql);
-    if ($stmt) {
-        $stmt->bind_param('ss', $startDate, $endDate);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $newCustomers = $result->fetch_assoc() ?: [];
-        $summary['new_customers'] = $newCustomers['new_customers'] ?? 0;
+    // 修改：只有当查看所有顾客时才计算新顾客数量
+    $summary['new_customers'] = 0;
+    if ($customerId === 'all') {
+        $sql = "SELECT COUNT(*) as new_customers 
+                FROM customer 
+                WHERE created_at BETWEEN ? AND ?";
+        
+        $stmt = $conn->prepare($sql);
+        if ($stmt) {
+            $stmt->bind_param('ss', $startDate, $endDate);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $newCustomers = $result->fetch_assoc() ?: [];
+            $summary['new_customers'] = $newCustomers['new_customers'] ?? 0;
+        }
     }
     
     // Calculate daily average
@@ -625,8 +631,11 @@ function generateReportHTML($reportData, $reportType, $period, $customerId) {
         
         <div class="section">
             <h2>📋 Executive Summary</h2>
-            <div class="summary-grid">
-                <div class="summary-card">
+            <div class="summary-grid">';
+    
+    // 根据是否查看特定顾客调整显示的统计卡片
+    if ($customerId === 'all') {
+        $html .= '<div class="summary-card">
                     <div class="summary-value">RM ' . number_format($summary['total_revenue'] ?? 0, 2) . '</div>
                     <div class="summary-label">Total Revenue</div>
                 </div>
@@ -649,8 +658,36 @@ function generateReportHTML($reportData, $reportType, $period, $customerId) {
                 <div class="summary-card">
                     <div class="summary-value">' . ($summary['new_customers'] ?? 0) . '</div>
                     <div class="summary-label">New Customers</div>
+                </div>';
+    } else {
+        // 特定顾客的统计卡片
+        $html .= '<div class="summary-card">
+                    <div class="summary-value">RM ' . number_format($summary['total_revenue'] ?? 0, 2) . '</div>
+                    <div class="summary-label">Total Revenue</div>
                 </div>
-            </div>
+                <div class="summary-card">
+                    <div class="summary-value">' . ($summary['total_orders'] ?? 0) . '</div>
+                    <div class="summary-label">Total Orders</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value">RM ' . number_format($summary['average_order_value'] ?? 0, 2) . '</div>
+                    <div class="summary-label">Avg Order Value</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value">' . ($summary['total_products_sold'] ?? 0) . '</div>
+                    <div class="summary-label">Products Sold</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value">' . ($reportData['customer_analysis']['customer_lifetime_days'] ?? 0) . '</div>
+                    <div class="summary-label">Customer Lifetime (days)</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value">' . (isset($reportData['customer_analysis']['first_order_date']) ? date('M d, Y', strtotime($reportData['customer_analysis']['first_order_date'])) : 'N/A') . '</div>
+                    <div class="summary-label">First Order Date</div>
+                </div>';
+    }
+    
+    $html .= '</div>
             
             <h3>Key Metrics</h3>
             <table>
@@ -661,19 +698,23 @@ function generateReportHTML($reportData, $reportType, $period, $customerId) {
                 <tr>
                     <td>Daily Average Orders</td>
                     <td class="text-right">' . number_format($summary['daily_average_orders'] ?? 0, 1) . '</td>
-                </tr>
-                <tr>
+                </tr>';
+    
+    if ($customerId === 'all') {
+        $html .= '<tr>
                     <td>Best Performing Day</td>
                     <td class="text-right">' . ($summary['best_day'] ?? 'N/A') . ' (RM ' . number_format($summary['best_day_revenue'] ?? 0, 2) . ')</td>
-                </tr>
-                <tr>
+                </tr>';
+    }
+    
+    $html .= '<tr>
                     <td>Days in Period</td>
                     <td class="text-right">' . ($reportData['total_days'] ?? 0) . ' days</td>
                 </tr>
             </table>
         </div>';
     
-    // Sales Trend Table
+    // Sales Trend Table - 只有当有销售趋势数据时才显示
     if (!empty($salesTrend)) {
         $html .= '
         <div class="section">
@@ -684,9 +725,14 @@ function generateReportHTML($reportData, $reportType, $period, $customerId) {
                         <th>Date</th>
                         <th class="text-right">Orders</th>
                         <th class="text-right">Revenue (RM)</th>
-                        <th class="text-right">Items Sold</th>
-                        <th class="text-right">Customers</th>
-                    </tr>
+                        <th class="text-right">Items Sold</th>';
+        
+        // 只有当查看所有顾客时才显示顾客列
+        if ($customerId === 'all') {
+            $html .= '<th class="text-right">Customers</th>';
+        }
+        
+        $html .= '</tr>
                 </thead>
                 <tbody>';
         
@@ -706,9 +752,13 @@ function generateReportHTML($reportData, $reportType, $period, $customerId) {
                     <td>' . date('M d, Y', strtotime($day['date'])) . '</td>
                     <td class="text-right">' . $day['order_count'] . '</td>
                     <td class="text-right">' . number_format($day['daily_revenue'], 2) . '</td>
-                    <td class="text-right">' . $day['items_sold'] . '</td>
-                    <td class="text-right">' . $day['unique_customers'] . '</td>
-                </tr>';
+                    <td class="text-right">' . $day['items_sold'] . '</td>';
+            
+            if ($customerId === 'all') {
+                $html .= '<td class="text-right">' . $day['unique_customers'] . '</td>';
+            }
+            
+            $html .= '</tr>';
         }
         
         $html .= '
@@ -716,19 +766,23 @@ function generateReportHTML($reportData, $reportType, $period, $customerId) {
                     <td><strong>TOTAL</strong></td>
                     <td class="text-right"><strong>' . $totalOrders . '</strong></td>
                     <td class="text-right"><strong>RM ' . number_format($totalRevenue, 2) . '</strong></td>
-                    <td class="text-right"><strong>' . $totalItems . '</strong></td>
-                    <td class="text-right"><strong>' . $totalCustomers . '</strong></td>
-                </tr>
+                    <td class="text-right"><strong>' . $totalItems . '</strong></td>';
+        
+        if ($customerId === 'all') {
+            $html .= '<td class="text-right"><strong>' . $totalCustomers . '</strong></td>';
+        }
+        
+        $html .= '</tr>
             </tbody>
         </table>
         </div>';
     }
     
-    // Top Products Table
+    // Top Products Table - 只有当有产品销售数据时才显示
     if (!empty($topProducts)) {
         $html .= '
         <div class="section">
-            <h2>🔥 Top Selling Books (Top ' . count($topProducts) . ')</h2>
+            <h2>🔥 ' . ($customerId === 'all' ? 'Top Selling Books' : 'Books Purchased') . ' (Top ' . count($topProducts) . ')</h2>
             <table>
                 <thead>
                     <tr>
@@ -776,20 +830,24 @@ function generateReportHTML($reportData, $reportType, $period, $customerId) {
         </div>';
     }
     
-    // Category Performance Table
+    // Category Performance Table - 只有当有分类数据时才显示
     if (!empty($categories)) {
         $html .= '
         <div class="section">
-            <h2>🏷️ Revenue by Category</h2>
+            <h2>🏷️ ' . ($customerId === 'all' ? 'Revenue by Category' : 'Categories Purchased') . '</h2>
             <table>
                 <thead>
                     <tr>
                         <th>Category</th>
                         <th class="text-right">Orders</th>
                         <th class="text-right">Quantity</th>
-                        <th class="text-right">Revenue (RM)</th>
-                        <th class="text-right">% of Total</th>
-                        <th class="text-right">Unique Books</th>
+                        <th class="text-right">Revenue (RM)</th>';
+        
+        if ($customerId === 'all') {
+            $html .= '<th class="text-right">% of Total</th>';
+        }
+        
+        $html .= '<th class="text-right">Unique Books</th>
                     </tr>
                 </thead>
                 <tbody>';
@@ -800,16 +858,19 @@ function generateReportHTML($reportData, $reportType, $period, $customerId) {
         $totalUniqueBooks = array_sum(array_column($categories, 'unique_books'));
         
         foreach ($categories as $category) {
-            $percentage = $totalCategoryRevenue > 0 ? ($category['total_revenue'] / $totalCategoryRevenue * 100) : 0;
-            
             $html .= '
                 <tr>
                     <td>' . htmlspecialchars($category['category_name']) . '</td>
                     <td class="text-right">' . $category['order_count'] . '</td>
                     <td class="text-right">' . $category['total_quantity'] . '</td>
-                    <td class="text-right">' . number_format($category['total_revenue'], 2) . '</td>
-                    <td class="text-right">' . number_format($percentage, 1) . '%</td>
-                    <td class="text-right">' . $category['unique_books'] . '</td>
+                    <td class="text-right">' . number_format($category['total_revenue'], 2) . '</td>';
+            
+            if ($customerId === 'all') {
+                $percentage = $totalCategoryRevenue > 0 ? ($category['total_revenue'] / $totalCategoryRevenue * 100) : 0;
+                $html .= '<td class="text-right">' . number_format($percentage, 1) . '%</td>';
+            }
+            
+            $html .= '<td class="text-right">' . $category['unique_books'] . '</td>
                 </tr>';
         }
         
@@ -818,10 +879,50 @@ function generateReportHTML($reportData, $reportType, $period, $customerId) {
                     <td><strong>TOTAL</strong></td>
                     <td class="text-right"><strong>' . $totalCategoryOrders . '</strong></td>
                     <td class="text-right"><strong>' . $totalCategoryQuantity . '</strong></td>
-                    <td class="text-right"><strong>RM ' . number_format($totalCategoryRevenue, 2) . '</strong></td>
-                    <td class="text-right"><strong>100%</strong></td>
-                    <td class="text-right"><strong>' . $totalUniqueBooks . '</strong></td>
+                    <td class="text-right"><strong>RM ' . number_format($totalCategoryRevenue, 2) . '</strong></td>';
+        
+        if ($customerId === 'all') {
+            $html .= '<td class="text-right"><strong>100%</strong></td>';
+        }
+        
+        $html .= '<td class="text-right"><strong>' . $totalUniqueBooks . '</strong></td>
                 </tr>
+            </tbody>
+        </table>
+        </div>';
+    }
+    
+    // Customer List Table - 只有当查看所有顾客时才显示
+    if ($customerId === 'all' && !empty($reportData['customer_list'])) {
+        $html .= '
+        <div class="section">
+            <h2>👥 Top Customers</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th class="text-right">Orders</th>
+                        <th class="text-right">Total Spent (RM)</th>
+                        <th>Last Order</th>
+                    </tr>
+                </thead>
+                <tbody>';
+        
+        foreach ($reportData['customer_list'] as $customer) {
+            $html .= '
+                <tr>
+                    <td>' . $customer['customer_id'] . '</td>
+                    <td>' . htmlspecialchars($customer['name']) . '</td>
+                    <td>' . htmlspecialchars($customer['email']) . '</td>
+                    <td class="text-right">' . $customer['order_count'] . '</td>
+                    <td class="text-right">' . number_format($customer['total_spent'], 2) . '</td>
+                    <td>' . ($customer['last_order_date'] ? date('M d, Y', strtotime($customer['last_order_date'])) : 'N/A') . '</td>
+                </tr>';
+        }
+        
+        $html .= '
             </tbody>
         </table>
         </div>';
@@ -856,11 +957,21 @@ function generateReportHTML($reportData, $reportType, $period, $customerId) {
         $html .= '<tr>
                     <td>Email</td>
                     <td>' . htmlspecialchars($customer['email'] ?? '') . '</td>
-                </tr>
-                <tr>
-                    <td>Phone</td>
-                    <td>' . htmlspecialchars($customer['phone'] ?? '') . '</td>
                 </tr>';
+        
+        if (isset($customer['phone']) && $customer['phone']) {
+            $html .= '<tr>
+                    <td>Phone</td>
+                    <td>' . htmlspecialchars($customer['phone']) . '</td>
+                </tr>';
+        }
+        
+        if (isset($customer['address']) && $customer['address']) {
+            $html .= '<tr>
+                    <td>Address</td>
+                    <td>' . htmlspecialchars($customer['address']) . '</td>
+                </tr>';
+        }
         
         if (isset($customer['first_order_date']) && $customer['first_order_date']) {
             $html .= '<tr>
@@ -904,8 +1015,13 @@ function generateReportHTML($reportData, $reportType, $period, $customerId) {
     $html .= '
         <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666;">
             <p><strong>Virtual BookStore Management System</strong></p>
-            <p>Report ID: ' . $reportData['report_id'] . ' | Generated: ' . $reportData['generated_at'] . '</p>
-            <p>Confidential - For Internal Use Only</p>
+            <p>Report ID: ' . $reportData['report_id'] . ' | Generated: ' . $reportData['generated_at'] . '</p>';
+    
+    if ($customerId !== 'all') {
+        $html .= '<p><strong>Customer Specific Report</strong> - Data filtered for customer ID: ' . $customerId . '</p>';
+    }
+    
+    $html .= '<p>Confidential - For Internal Use Only</p>
         </div>
         
         <script>
