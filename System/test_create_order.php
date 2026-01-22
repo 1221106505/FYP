@@ -1,14 +1,30 @@
 <?php
+// check_tables.php
 header('Content-Type: application/json');
 
-// 禁用错误输出
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'Bookstore';
 
-// 测试JSON输出
+$conn = new mysqli($host, $username, $password, $database);
+
+if ($conn->connect_error) {
+    die(json_encode(['error' => 'Connection failed: ' . $conn->connect_error]));
+}
+
+// 获取所有表名
+$result = $conn->query("SHOW TABLES");
+$tables = [];
+while ($row = $result->fetch_array()) {
+    $tables[] = $row[0];
+}
+
 echo json_encode([
-    'success' => true,
-    'test' => 'API is working',
-    'timestamp' => time()
+    'database' => $database,
+    'tables' => $tables,
+    'count' => count($tables)
 ]);
+
+$conn->close();
 ?>

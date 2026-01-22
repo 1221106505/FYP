@@ -1146,11 +1146,12 @@
             <!-- Analytics Section -->
             <!-- 在 sales report 部分的 section-header 中添加按钮 -->
 <!-- 在 Sales Report 部分添加用户选择器 -->
+<!-- Sales Report Section -->
 <section id="analytics" class="content-section">
     <div class="section-header">
         <h2>📈 Sales Report</h2>
         <div class="analytics-controls">
-            <!-- 用户选择器 -->
+            <!-- 客户选择器 -->
             <select id="customerFilter" class="analytics-select" onchange="loadCustomerSalesReport()">
                 <option value="all">All Customers</option>
                 <!-- 动态加载客户列表 -->
@@ -1165,15 +1166,15 @@
                 <option value="custom">Custom Range</option>
             </select>
             
-            <!-- 自定义日期范围（默认隐藏） -->
-            <div id="customDateRange" style="display: none;">
-                <input type="date" id="startDate" class="analytics-select">
-                <span style="margin: 0 5px;">to</span>
-                <input type="date" id="endDate" class="analytics-select">
+            <!-- 自定义日期范围 -->
+            <div id="customDateRange" style="display: none; align-items: center; gap: 10px;">
+                <input type="date" id="startDate" class="analytics-select" style="width: 150px;">
+                <span style="color: #666;">to</span>
+                <input type="date" id="endDate" class="analytics-select" style="width: 150px;">
                 <button class="btn btn-sm btn-primary" onclick="applyCustomDateRange()">Apply</button>
             </div>
             
-            <!-- PDF 报告选项 -->
+            <!-- PDF 报告类型 -->
             <select id="pdfReportType" class="analytics-select">
                 <option value="full_report">Full Report</option>
                 <option value="summary">Executive Summary</option>
@@ -1193,9 +1194,16 @@
     </div>
     
     <!-- 客户信息显示 -->
-    <div id="customerInfo" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-        <h3 id="customerName"></h3>
-        <div id="customerDetails"></div>
+    <div id="customerInfo" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid var(--accent);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h3 id="customerName" style="color: var(--primary); margin-bottom: 10px;"></h3>
+                <div id="customerDetails" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;"></div>
+            </div>
+            <button class="btn btn-sm" onclick="closeCustomerInfo()" style="margin-top: -5px;">
+                <i>✕</i> Close
+            </button>
+        </div>
     </div>
     
     <!-- Summary Stats -->
@@ -1226,8 +1234,13 @@
     </div>
     
     <!-- Customer Details Table -->
-    <div class="table-container" id="customerOrdersTableContainer" style="display: none;">
-        <h3>📋 Customer Orders</h3>
+    <div class="table-container" id="customerOrdersTableContainer" style="display: none; margin-top: 25px;">
+        <div class="section-header" style="border-bottom: none; margin-bottom: 15px; padding-bottom: 0;">
+            <h3>📋 Customer Orders</h3>
+            <button class="btn btn-sm btn-primary" onclick="exportCustomerOrders()">
+                <i>📥</i> Export
+            </button>
+        </div>
         <table class="data-table">
             <thead>
                 <tr>
@@ -1246,32 +1259,7 @@
     </div>
 </section>
                 
-                <!-- Summary Stats -->
-                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 25px;" id="analyticsSummary">
-                    <!-- Will be populated by JavaScript -->
-                </div>
                 
-                <div class="chart-container">
-                    <h3>📊 Sales Trend</h3>
-                    <div class="chart-placeholder" id="salesTrendChart">
-                        Loading sales trend...
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <h3>🔥 Top Selling Books</h3>
-                    <div class="chart-placeholder" id="topBooksChart">
-                        Loading top books...
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <h3>🏷️ Revenue by Category</h3>
-                    <div class="chart-placeholder" id="categoryRevenueChart">
-                        Loading category revenue...
-                    </div>
-                </div>
-            </section>
 
             <!-- Admin Management Section -->
             <section id="admin-management" class="content-section">
@@ -1599,7 +1587,8 @@
         updateAdmin: 'edit_admin.php',
         deleteAdmin: 'delete_admin.php',
         sendPasswordEmail: 'send_password_email.php',
-        getPermissions: 'get_permissions.php'
+        getPermissions: 'get_permissions.php',
+        generatePDFReport: 'generate_report.php'
     };
 
     // Current state
@@ -2011,28 +2000,30 @@ async function loadAdminPermissions() {
     // ============ INITIALIZATION ============
     
     document.addEventListener('DOMContentLoaded', async function() {
-        console.log('Admin panel initialized');
-        
-        // Check current admin role
-        await checkAdminRole();
-        
-        // 初始化权限系统
-        await initializePermissionSystem();
-        
-        // Load initial data
-        loadDashboardData();
-        
-        // Update clock
-        updateClock();
-        setInterval(updateClock, 60000);
-        
-        // Set up navigation
-        setupNavigation();
-        
-        // Set up permissions listeners
-        setupPermissionsListeners();
-    });
-
+    console.log('Admin panel initialized');
+    
+    // Check current admin role
+    await checkAdminRole();
+    
+    // 初始化权限系统
+    await initializePermissionSystem();
+    
+    // Load initial data
+    loadDashboardData();
+    
+    // 加载客户下拉列表
+    await loadCustomerDropdown();
+    
+    // Update clock
+    updateClock();
+    setInterval(updateClock, 60000);
+    
+    // Set up navigation
+    setupNavigation();
+    
+    // Set up permissions listeners
+    setupPermissionsListeners();
+});
     async function checkAdminRole() {
         console.log('=== CHECKING ADMIN ROLE ===');
         
@@ -3327,27 +3318,133 @@ async function loadAdminPermissions() {
 
     // ============ SALES ANALYTICS FUNCTIONS ============
     
-    async function loadSalesAnalytics(period = '30days') {
-        // 检查权限
-        if (!hasPermission('view_analytics') && !isSuperAdmin) {
-            return;
+    // 修复方案：更新loadSalesAnalytics函数
+async function loadSalesAnalytics(period = '30days') {
+    // 检查权限
+    if (!hasPermission('view_analytics') && !isSuperAdmin) {
+        return;
+    }
+    
+    try {
+        // 添加时间周期参数
+        const params = new URLSearchParams({ period: period });
+        
+        // 如果是自定义日期范围
+        if (period === 'custom') {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (startDate && endDate) {
+                params.append('start_date', startDate);
+                params.append('end_date', endDate);
+            } else {
+                showNotification('Please select custom date range', 'warning');
+                return;
+            }
         }
         
-        try {
-            const response = await fetch(`${API_ENDPOINTS.salesAnalytics}?period=${period}`);
-            const data = await response.json();
-            
-            if (data.success) {
-                displaySalesAnalytics(data);
-            } else {
-                console.error('Error loading sales report:', data.error);
-                showAnalyticsError(data.error);
-            }
-        } catch (error) {
-            console.error('Error loading sales report:', error);
-            showAnalyticsError('Failed to load sales report');
+        const response = await fetch(`${API_ENDPOINTS.salesAnalytics}?${params}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            displaySalesAnalytics(data);
+        } else {
+            console.error('Error loading sales report:', data.error);
+            showAnalyticsError(data.error);
         }
+    } catch (error) {
+        console.error('Error loading sales report:', error);
+        showAnalyticsError('Failed to load sales report');
     }
+}
+// 新增：加载客户列表功能
+async function loadCustomerList() {
+    try {
+        const response = await fetch('get_customers.php');
+        const data = await response.json();
+        
+        if (data.success) {
+            const selectElement = document.getElementById('customerFilter');
+            selectElement.innerHTML = '<option value="all">All Customers</option>';
+            
+            data.customers.forEach(customer => {
+                const option = document.createElement('option');
+                option.value = customer.customer_id;
+                option.textContent = `${customer.name} (${customer.email})`;
+                selectElement.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading customers:', error);
+    }
+}
+
+// 新增：加载特定客户的销售报告
+async function loadCustomerSalesReport() {
+    const customerId = document.getElementById('customerFilter').value;
+    const period = document.getElementById('analyticsPeriod').value;
+    
+    if (customerId === 'all') {
+        loadSalesAnalytics(period);
+        return;
+    }
+    
+    try {
+        const params = new URLSearchParams({
+            customer_id: customerId,
+            period: period
+        });
+        
+        const response = await fetch(`get_customer_sales.php?${params}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            displayCustomerSalesReport(data);
+        }
+    } catch (error) {
+        console.error('Error loading customer sales report:', error);
+    }
+}
+
+// 新增：显示客户销售报告
+function displayCustomerSalesReport(data) {
+    const customerInfo = document.getElementById('customerInfo');
+    const customerOrdersTableContainer = document.getElementById('customerOrdersTableContainer');
+    
+    if (data.customer) {
+        customerInfo.style.display = 'block';
+        customerInfo.innerHTML = `
+            <h3>Customer: ${data.customer.name}</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">
+                <div><strong>Email:</strong> ${data.customer.email}</div>
+                <div><strong>Total Orders:</strong> ${data.customer.total_orders}</div>
+                <div><strong>Total Spent:</strong> RM ${data.customer.total_spent.toFixed(2)}</div>
+                <div><strong>Member Since:</strong> ${new Date(data.customer.created_at).toLocaleDateString()}</div>
+            </div>
+        `;
+    }
+    
+    if (data.orders && data.orders.length > 0) {
+        customerOrdersTableContainer.style.display = 'block';
+        const tableBody = document.getElementById('customerOrdersTable');
+        
+        tableBody.innerHTML = data.orders.map(order => `
+            <tr>
+                <td>#${order.order_id}</td>
+                <td>${new Date(order.order_date).toLocaleDateString()}</td>
+                <td>${order.items_count} items</td>
+                <td>RM ${parseFloat(order.total_amount).toFixed(2)}</td>
+                <td><span class="order-status ${ORDER_STATUS_MAP[order.status]?.class || 'status-confirmed'}">
+                    ${ORDER_STATUS_MAP[order.status]?.text || order.status}
+                </span></td>
+                <td>
+                    <button class="btn btn-sm btn-primary" onclick="viewOrderDetails(${order.order_id})">
+                        View
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+}
 
     function displaySalesAnalytics(data) {
         updateAnalyticsSummary(data.summary);
@@ -4859,576 +4956,81 @@ async function loadAdminPermissions() {
     }
 // ============ PDF REPORT FUNCTIONS ============
 
-function generatePDFReport() {
+// 改进的generatePDFReport函数
+// 在已有的JavaScript中添加PDF生成函数
+async function generatePDFReport() {
     const reportType = document.getElementById('pdfReportType').value;
     const period = document.getElementById('analyticsPeriod').value;
+    const customerId = document.getElementById('customerFilter').value;
     
-    // 创建打印窗口
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    showNotification('🔄 Generating report...', 'info');
     
-    // 构建打印内容
-    let printContent = buildPrintContent(reportType, period);
-    
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Sales Report - ${getPeriodText(period)} - ${getReportTypeText(reportType)}</title>
-            <style>
-                /* 打印样式 */
-                @media print {
-                    @page { margin: 1cm; }
-                    body { font-family: Arial, sans-serif; font-size: 12px; }
-                    .no-print { display: none !important; }
-                }
-                
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 20px;
-                    line-height: 1.6;
-                }
-                
-                .report-header {
-                    text-align: center;
-                    margin-bottom: 30px;
-                    border-bottom: 2px solid #333;
-                    padding-bottom: 15px;
-                }
-                
-                .report-title {
-                    font-size: 24px;
-                    font-weight: bold;
-                    color: #2c3e50;
-                    margin-bottom: 5px;
-                }
-                
-                .report-subtitle {
-                    font-size: 14px;
-                    color: #666;
-                }
-                
-                .report-date {
-                    margin-top: 10px;
-                    font-size: 12px;
-                    color: #999;
-                }
-                
-                .section {
-                    margin: 25px 0;
-                    page-break-inside: avoid;
-                }
-                
-                .section-title {
-                    background: #2c3e50;
-                    color: white;
-                    padding: 10px 15px;
-                    font-size: 16px;
-                    margin-bottom: 15px;
-                    border-radius: 4px;
-                }
-                
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin: 10px 0;
-                }
-                
-                th {
-                    background: #f5f5f5;
-                    border: 1px solid #ddd;
-                    padding: 10px;
-                    text-align: left;
-                    font-weight: bold;
-                }
-                
-                td {
-                    border: 1px solid #ddd;
-                    padding: 8px 10px;
-                }
-                
-                .stat-box {
-                    display: inline-block;
-                    background: #f8f9fa;
-                    border: 1px solid #ddd;
-                    border-radius: 5px;
-                    padding: 15px;
-                    margin: 10px;
-                    min-width: 150px;
-                    text-align: center;
-                }
-                
-                .stat-value {
-                    font-size: 24px;
-                    font-weight: bold;
-                    color: #2c3e50;
-                }
-                
-                .stat-label {
-                    font-size: 12px;
-                    color: #666;
-                    margin-top: 5px;
-                }
-                
-                .chart-container {
-                    margin: 20px 0;
-                    text-align: center;
-                }
-                
-                .chart-placeholder {
-                    height: 300px;
-                    border: 1px solid #ddd;
-                    background: #f9f9f9;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #666;
-                    margin: 15px 0;
-                }
-                
-                .footer {
-                    margin-top: 50px;
-                    padding-top: 20px;
-                    border-top: 1px solid #ddd;
-                    font-size: 11px;
-                    color: #999;
-                    text-align: center;
-                }
-            </style>
-        </head>
-        <body>
-            ${printContent}
-            
-            <script>
-                // 页面加载后自动打印
-                window.onload = function() {
-                    setTimeout(function() {
-                        window.print();
-                        // 打印后关闭窗口（可选）
-                        // setTimeout(function() { window.close(); }, 1000);
-                    }, 500);
-                };
-            <\/script>
-        </body>
-        </html>
-    `);
-    
-    printWindow.document.close();
-}
-
-function buildPrintContent(reportType, period) {
-    // 获取当前数据
-    const summary = getCurrentAnalyticsSummary();
-    const salesTrend = getCurrentSalesTrend();
-    const topBooks = getCurrentTopBooks();
-    const categoryRevenue = getCurrentCategoryRevenue();
-    
-    const periodText = getPeriodText(period);
-    const reportTypeText = getReportTypeText(reportType);
-    const currentDate = new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-    
-    let content = `
-        <div class="report-header">
-            <div class="report-title">Virtual BookStore Sales Report</div>
-            <div class="report-subtitle">${reportTypeText} - ${periodText}</div>
-            <div class="report-date">Generated on: ${currentDate}</div>
-        </div>
-    `;
-    
-    // 根据选择的报告类型构建内容
-    switch(reportType) {
-        case 'summary':
-            content += buildSummarySection(summary);
-            break;
-            
-        case 'sales_trend':
-            content += buildSalesTrendSection(salesTrend, periodText);
-            break;
-            
-        case 'top_books':
-            content += buildTopBooksSection(topBooks);
-            break;
-            
-        case 'category':
-            content += buildCategorySection(categoryRevenue);
-            break;
-            
-        case 'all':
-        default:
-            content += buildFullReport(summary, salesTrend, topBooks, categoryRevenue, periodText);
-            break;
-    }
-    
-    // 添加页脚
-    content += `
-        <div class="footer">
-            <p>Virtual BookStore Management System</p>
-            <p>Report ID: ${generateReportId()}</p>
-            <p>Confidential - For Internal Use Only</p>
-        </div>
-    `;
-    
-    return content;
-}
-
-function getCurrentAnalyticsSummary() {
-    // 从页面获取统计摘要数据
-    const summaryElements = document.querySelectorAll('#analyticsSummary .stat-card');
-    const summary = {};
-    
-    if (summaryElements.length >= 4) {
-        summary.total_orders = parseInt(summaryElements[0].querySelector('.stat-number').textContent) || 0;
-        summary.total_revenue = parseFloat(summaryElements[1].querySelector('.stat-number').textContent.replace('RM ', '')) || 0;
-        summary.total_customers = parseInt(summaryElements[2].querySelector('.stat-number').textContent) || 0;
-        summary.avg_order_value = parseFloat(summaryElements[3].querySelector('.stat-number').textContent.replace('RM ', '')) || 0;
-    }
-    
-    return summary;
-}
-
-function getCurrentSalesTrend() {
-    // 从图表中获取销售趋势数据
-    const chartContainer = document.getElementById('salesTrendChart');
-    const trendData = [];
-    
-    // 简单解析图表数据（实际实现需要更复杂的数据提取）
-    if (chartContainer) {
-        const trendBars = chartContainer.querySelectorAll('div[style*="background: linear-gradient(to top"]');
-        trendBars.forEach((bar, index) => {
-            const title = bar.getAttribute('title') || '';
-            const match = title.match(/RM (\d+\.?\d*)/);
-            if (match) {
-                trendData.push({
-                    date: `Day ${index + 1}`,
-                    total_revenue: parseFloat(match[1]),
-                    order_count: Math.floor(Math.random() * 20) + 5 // 示例数据
-                });
-            }
+    try {
+        const params = new URLSearchParams({
+            report_type: reportType,
+            period: period,
+            customer_id: customerId,
+            format: 'json'
         });
-    }
-    
-    return trendData;
-}
-
-function getCurrentTopBooks() {
-    // 从页面获取热销书籍数据
-    const topBooks = [];
-    const tableRows = document.querySelectorAll('#topBooksChart tbody tr');
-    
-    tableRows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        if (cells.length >= 4) {
-            const rank = cells[0].textContent.trim();
-            const titleCell = cells[1];
-            const revenueCell = cells[2];
-            const quantityCell = cells[3];
-            
-            const book = {
-                rank: parseInt(rank),
-                title: titleCell.querySelector('div[style*="font-weight: 500"]')?.textContent || '',
-                author: titleCell.querySelector('div[style*="font-size: 0.8rem"]')?.textContent?.replace('by ', '') || '',
-                category: titleCell.querySelector('div[style*="font-size: 0.7rem"]')?.textContent || '',
-                total_revenue: parseFloat(revenueCell.querySelector('div[style*="font-weight: bold"]')?.textContent?.replace('RM ', '')) || 0,
-                total_quantity: parseInt(quantityCell.querySelector('div[style*="font-weight: bold"]')?.textContent) || 0
-            };
-            
-            if (book.title) {
-                topBooks.push(book);
+        
+        // 如果是自定义日期范围
+        if (period === 'custom') {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (startDate && endDate) {
+                params.append('start_date', startDate);
+                params.append('end_date', endDate);
+            } else {
+                showNotification('Please select custom date range', 'warning');
+                return;
             }
         }
-    });
-    
-    return topBooks;
-}
-
-function getCurrentCategoryRevenue() {
-    // 从页面获取分类收入数据
-    const categories = [];
-    const categoryElements = document.querySelectorAll('#categoryRevenueChart div[style*="background: #f8f9fa; padding: 12px;"]');
-    
-    categoryElements.forEach(element => {
-        const nameElement = element.querySelector('div[style*="font-weight: bold"]');
-        const revenueElement = element.querySelector('div[style*="color: var(--success)"]');
         
-        if (nameElement && revenueElement) {
-            categories.push({
-                category_name: nameElement.textContent,
-                total_revenue: parseFloat(revenueElement.textContent.replace('RM ', '')) || 0,
-                order_count: Math.floor(Math.random() * 10) + 1 // 示例数据
+        const response = await fetch(`generate_report.php?${params}`);
+        const data = await response.json();
+        
+        if (data.success && data.html_content) {
+            // 在新窗口中打开HTML报告，供打印/保存为PDF
+            const printWindow = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+            printWindow.document.write(data.html_content);
+            printWindow.document.close();
+            
+            // 让用户手动点击打印
+            showNotification('✅ Report generated. Click "Print / Save as PDF" button in the new window.', 'success', 5000);
+        } else {
+            throw new Error(data.error || 'Failed to generate report');
+        }
+    } catch (error) {
+        console.error('Error generating report:', error);
+        showNotification('❌ Error: ' + error.message, 'error');
+    }
+}
+// 加载客户下拉列表
+async function loadCustomerDropdown() {
+    try {
+        const response = await fetch('get_customers_for_report.php');
+        const data = await response.json();
+        
+        if (data.success) {
+            const customerSelect = document.getElementById('customerFilter');
+            customerSelect.innerHTML = '<option value="all">All Customers</option>';
+            
+            data.customers.forEach(customer => {
+                const option = document.createElement('option');
+                option.value = customer.customer_id;
+                let displayText = customer.username;
+                if (customer.full_name && customer.full_name.trim()) {
+                    displayText += ' - ' + customer.full_name;
+                }
+                option.textContent = displayText;
+                customerSelect.appendChild(option);
             });
         }
-    });
-    
-    return categories;
+    } catch (error) {
+        console.error('Error loading customers:', error);
+    }
 }
 
-function buildSummarySection(summary) {
-    return `
-        <div class="section">
-            <div class="section-title">📊 Executive Summary</div>
-            <div style="text-align: center; margin: 20px 0;">
-                <div class="stat-box">
-                    <div class="stat-value">${summary.total_orders || 0}</div>
-                    <div class="stat-label">Total Orders</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">RM ${(summary.total_revenue || 0).toFixed(2)}</div>
-                    <div class="stat-label">Total Revenue</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">${summary.total_customers || 0}</div>
-                    <div class="stat-label">Customers</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">RM ${(summary.avg_order_value || 0).toFixed(2)}</div>
-                    <div class="stat-label">Avg Order Value</div>
-                </div>
-            </div>
-            
-            <div style="margin-top: 30px;">
-                <h3>Performance Overview</h3>
-                <p>This report summarizes the sales performance for the selected period. Key metrics include:</p>
-                <ul>
-                    <li><strong>Total Revenue:</strong> RM ${(summary.total_revenue || 0).toFixed(2)}</li>
-                    <li><strong>Order Volume:</strong> ${summary.total_orders || 0} orders</li>
-                    <li><strong>Customer Base:</strong> ${summary.total_customers || 0} customers</li>
-                    <li><strong>Average Order Value:</strong> RM ${(summary.avg_order_value || 0).toFixed(2)}</li>
-                </ul>
-            </div>
-        </div>
-    `;
-}
-
-function buildSalesTrendSection(salesTrend, periodText) {
-    let tableRows = '';
-    let totalRevenue = 0;
-    let totalOrders = 0;
-    
-    salesTrend.forEach(day => {
-        totalRevenue += day.total_revenue;
-        totalOrders += day.order_count;
-        tableRows += `
-            <tr>
-                <td>${day.date}</td>
-                <td>RM ${day.total_revenue.toFixed(2)}</td>
-                <td>${day.order_count}</td>
-                <td>RM ${(day.total_revenue / day.order_count || 0).toFixed(2)}</td>
-            </tr>
-        `;
-    });
-    
-    return `
-        <div class="section">
-            <div class="section-title">📈 Sales Trend Analysis</div>
-            <p><strong>Period:</strong> ${periodText}</p>
-            
-            <div class="chart-container">
-                <div class="chart-placeholder">
-                    Sales Trend Chart<br>
-                    (For detailed charts, please view in the admin panel)
-                </div>
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date/Period</th>
-                        <th>Revenue (RM)</th>
-                        <th>Orders</th>
-                        <th>Avg Revenue per Order</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                    <tr style="font-weight: bold; background: #f5f5f5;">
-                        <td>TOTAL</td>
-                        <td>RM ${totalRevenue.toFixed(2)}</td>
-                        <td>${totalOrders}</td>
-                        <td>RM ${(totalRevenue / totalOrders || 0).toFixed(2)}</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <div style="margin-top: 20px;">
-                <h4>Trend Analysis:</h4>
-                <p>• Average daily revenue: <strong>RM ${(totalRevenue / salesTrend.length).toFixed(2)}</strong></p>
-                <p>• Average daily orders: <strong>${(totalOrders / salesTrend.length).toFixed(1)}</strong></p>
-                <p>• Best performing day: <strong>Day ${salesTrend.reduce((max, day, idx) => day.total_revenue > max.value ? {index: idx, value: day.total_revenue} : max, {index: 0, value: 0}).index + 1}</strong></p>
-            </div>
-        </div>
-    `;
-}
-
-function buildTopBooksSection(topBooks) {
-    let tableRows = '';
-    let totalRevenue = 0;
-    let totalQuantity = 0;
-    
-    topBooks.forEach(book => {
-        totalRevenue += book.total_revenue;
-        totalQuantity += book.total_quantity;
-        tableRows += `
-            <tr>
-                <td>${book.rank}</td>
-                <td>
-                    <strong>${book.title}</strong><br>
-                    <small>by ${book.author}</small><br>
-                    <small style="color: #666;">${book.category}</small>
-                </td>
-                <td>RM ${book.total_revenue.toFixed(2)}</td>
-                <td>${book.total_quantity}</td>
-                <td>RM ${(book.total_revenue / book.total_quantity || 0).toFixed(2)}</td>
-            </tr>
-        `;
-    });
-    
-    return `
-        <div class="section">
-            <div class="section-title">🔥 Top Selling Books</div>
-            
-            <div class="chart-container">
-                <div class="chart-placeholder">
-                    Top Books Chart<br>
-                    (For detailed charts, please view in the admin panel)
-                </div>
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Book Details</th>
-                        <th>Revenue (RM)</th>
-                        <th>Quantity Sold</th>
-                        <th>Avg Price per Unit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                    <tr style="font-weight: bold; background: #f5f5f5;">
-                        <td colspan="2">TOTAL</td>
-                        <td>RM ${totalRevenue.toFixed(2)}</td>
-                        <td>${totalQuantity}</td>
-                        <td>RM ${(totalRevenue / totalQuantity || 0).toFixed(2)}</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <div style="margin-top: 20px;">
-                <h4>Top Performers Analysis:</h4>
-                <p>• Total revenue from top sellers: <strong>RM ${totalRevenue.toFixed(2)}</strong></p>
-                <p>• Total units sold: <strong>${totalQuantity}</strong></p>
-                <p>• Average price per unit: <strong>RM ${(totalRevenue / totalQuantity || 0).toFixed(2)}</strong></p>
-            </div>
-        </div>
-    `;
-}
-
-function buildCategorySection(categories) {
-    let tableRows = '';
-    let totalRevenue = 0;
-    let totalOrders = 0;
-    
-    categories.forEach(cat => {
-        totalRevenue += cat.total_revenue;
-        totalOrders += cat.order_count;
-        const percentage = totalRevenue > 0 ? ((cat.total_revenue / totalRevenue) * 100).toFixed(1) : 0;
-        
-        tableRows += `
-            <tr>
-                <td>${cat.category_name}</td>
-                <td>RM ${cat.total_revenue.toFixed(2)}</td>
-                <td>${percentage}%</td>
-                <td>${cat.order_count}</td>
-                <td>RM ${(cat.total_revenue / cat.order_count || 0).toFixed(2)}</td>
-            </tr>
-        `;
-    });
-    
-    return `
-        <div class="section">
-            <div class="section-title">🏷️ Revenue by Category</div>
-            
-            <div class="chart-container">
-                <div class="chart-placeholder">
-                    Category Revenue Chart<br>
-                    (For detailed charts, please view in the admin panel)
-                </div>
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Category</th>
-                        <th>Revenue (RM)</th>
-                        <th>% of Total</th>
-                        <th>Orders</th>
-                        <th>Avg Revenue per Order</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                    <tr style="font-weight: bold; background: #f5f5f5;">
-                        <td>TOTAL</td>
-                        <td>RM ${totalRevenue.toFixed(2)}</td>
-                        <td>100%</td>
-                        <td>${totalOrders}</td>
-                        <td>RM ${(totalRevenue / totalOrders || 0).toFixed(2)}</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <div style="margin-top: 20px;">
-                <h4>Category Performance:</h4>
-                ${categories.map((cat, idx) => {
-                    const percentage = totalRevenue > 0 ? ((cat.total_revenue / totalRevenue) * 100).toFixed(1) : 0;
-                    return `<p>• ${cat.category_name}: <strong>RM ${cat.total_revenue.toFixed(2)}</strong> (${percentage}% of total)</p>`;
-                }).join('')}
-            </div>
-        </div>
-    `;
-}
-
-function buildFullReport(summary, salesTrend, topBooks, categoryRevenue, periodText) {
-    return `
-        ${buildSummarySection(summary)}
-        ${buildSalesTrendSection(salesTrend, periodText)}
-        ${buildTopBooksSection(topBooks)}
-        ${buildCategorySection(categoryRevenue)}
-    `;
-}
-
-function getPeriodText(period) {
-    const texts = {
-        '7days': 'Last 7 Days',
-        '30days': 'Last 30 Days',
-        '90days': 'Last 90 Days',
-        'year': 'Last Year'
-    };
-    return texts[period] || period;
-}
-
-function getReportTypeText(reportType) {
-    const texts = {
-        'all': 'Full Report',
-        'summary': 'Executive Summary',
-        'sales_trend': 'Sales Trend Analysis',
-        'top_books': 'Top Selling Books',
-        'category': 'Category Revenue Analysis'
-    };
-    return texts[reportType] || reportType;
-}
-
-function generateReportId() {
-    const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 10000);
-    return `SR-${timestamp}-${random}`;
-}
     // Close modal when clicking outside
     window.onclick = function(event) {
         const bookModal = document.getElementById('bookModal');
