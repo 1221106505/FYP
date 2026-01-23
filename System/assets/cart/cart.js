@@ -7,6 +7,15 @@ const API_BASE = "../api/cart"; // adjust ONLY if your folder structure differs 
 let cartItems = [];
 let savedItems = [];
 
+// ✅ Keep selected items even after re-render / loadCart
+let selectedCartIds = new Set(
+  JSON.parse(localStorage.getItem("cart_selected_ids") || "[]").map(Number)
+);
+
+function saveSelected() {
+  localStorage.setItem("cart_selected_ids", JSON.stringify([...selectedCartIds]));
+}
+
 const TAX_RATE = 0.06;
 
 const SHIPPING_RULES = {
@@ -226,8 +235,15 @@ async function loadCart() {
     }
 
     cartItems = Array.isArray(data.cart) ? data.cart : [];
-    savedItems = Array.isArray(data.saved) ? data.saved : [];
-    render();
+savedItems = Array.isArray(data.saved) ? data.saved : [];
+
+// ✅ remove selected IDs that are no longer in cart
+const existing = new Set(cartItems.map(it => Number(it.cart_id)));
+selectedCartIds = new Set([...selectedCartIds].filter(id => existing.has(id)));
+saveSelected();
+
+render();
+ 
   } catch (err) {
     console.error(err);
     cartItems = [];
@@ -268,7 +284,12 @@ function renderList(containerId, items, isSaved) {
     el.insertAdjacentHTML("beforeend", `
       <div class="item" data-id="${item.cart_id}">
         ${isSaved ? "" : `
-          <input type="checkbox" class="rowCheck" data-id="${item.cart_id}" />
+          ${(() => {
+  const cid = Number(item.cart_id);
+  const checked = selectedCartIds.has(cid) ? "checked" : "";
+  return `<input type="checkbox" class="rowCheck" data-id="${cid}" ${checked} />`;
+})()}
+
         `}
 
         <div class="meta">
@@ -304,9 +325,15 @@ function renderList(containerId, items, isSaved) {
   // Only cart list has selection checkboxes
   if (!isSaved) {
     el.querySelectorAll(".rowCheck").forEach(cb => cb.addEventListener("change", () => {
+  const id = Number(cb.dataset.id);
+
+  if (cb.checked) selectedCartIds.add(id);
+  else selectedCartIds.delete(id);
+
+  saveSelected();
   updateSelectAllState();
   updateRemoveSelectedButton();
-  updateTotals(); // ✅ add this
+  updateTotals();
 }));
   }
 }
@@ -320,10 +347,19 @@ function getSelectedCartItems() {
 // -------------------- Selection --------------------
 function onSelectAll(e) {
   const checked = !!e.target.checked;
-  document.querySelectorAll(".rowCheck").forEach(cb => (cb.checked = checked));
+
+  document.querySelectorAll(".rowCheck").forEach(cb => {
+    cb.checked = checked;
+    const id = Number(cb.dataset.id);
+
+    if (checked) selectedCartIds.add(id);
+    else selectedCartIds.delete(id);
+  });
+
+  saveSelected();
   updateRemoveSelectedButton();
   updateSelectAllState();
-  updateTotals(); // ✅ add this
+  updateTotals();
 }
 
 function updateSelectAllState() {
@@ -343,9 +379,7 @@ function updateSelectAllState() {
 }
 
 function getSelectedIds() {
-  return Array.from(document.querySelectorAll(".rowCheck"))
-    .filter(cb => cb.checked)
-    .map(cb => Number(cb.dataset.id));
+  return [...selectedCartIds];
 }
 
 function updateRemoveSelectedButton() {
