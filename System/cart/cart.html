@@ -104,11 +104,49 @@
 <p class="tiny muted" id="deliveryEstimate"></p>
 
 <label class="field">
-  <span class="label">Delivery Address</span>
-  <textarea id="address" rows="3"
-    placeholder="Full address (Street, Area, City, State, Postcode)"
-    style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:14px; resize:vertical;"></textarea>
-  <span class="tiny muted" id="addressMsg"></span>
+  <span class="label">Recipient Name</span>
+  <input id="recipientName" type="text" placeholder="Full name (e.g. DK Palany)"
+    style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:14px;">
+  <span class="tiny muted" id="recipientMsg"></span>
+</label>
+
+<div class="two-col">
+  <label class="field">
+    <span class="label">Postcode</span>
+    <input id="postcode" type="text" inputmode="numeric" placeholder="e.g. 63000" maxlength="10"
+      style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:14px;">
+    <span class="tiny muted" id="postcodeMsg"></span>
+  </label>
+
+  <label class="field">
+    <span class="label">State</span>
+    <input id="state" type="text" placeholder="e.g. Selangor"
+      style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:14px;">
+    <span class="tiny muted" id="stateMsg"></span>
+  </label>
+</div>
+
+<div class="two-col">
+  <label class="field">
+    <span class="label">City</span>
+    <input id="city" type="text" placeholder="e.g. Cyberjaya"
+      style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:14px;">
+    <span class="tiny muted" id="cityMsg"></span>
+  </label>
+
+  <label class="field">
+    <span class="label">Area</span>
+    <input id="area" type="text" placeholder="e.g. Tamarind Square"
+      style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:14px;">
+    <span class="tiny muted" id="areaMsg"></span>
+  </label>
+</div>
+
+<label class="field">
+  <span class="label">Street / Address Line</span>
+  <input id="street" type="text" placeholder="Street name, unit no, building"
+    style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:14px;">
+  <span class="tiny muted" id="streetMsg"></span>
 </label>
 
       <div class="divider"></div>
@@ -120,13 +158,17 @@
 
       <div class="divider"></div>
 
-      <label class="field">
-        <span class="label">Payment Method</span>
-        <select id="paymentMethod" disabled>
-  <option value="card" selected>Card</option>
-</select>
-      
-      </label>
+   <label class="field">
+  <span class="label">Card Type</span>
+  <select id="cardType">
+    <option value="VISA" selected>VISA</option>
+    <option value="MASTERCARD">MASTERCARD</option>
+    <option value="CREDIT">CREDIT CARD</option>
+    <option value="DEBIT">DEBIT CARD</option>
+  </select>
+  <span class="tiny muted" id="cardTypeMsg"></span>
+</label>
+
 
       <!-- Secure Payment Details (Collapsible) -->
 <div class="secure-box">
@@ -174,6 +216,36 @@
     </aside>
   </section>
 </main>
+
+<!-- Payment Success Modal -->
+<div id="successModal" class="pmodal" aria-hidden="true">
+  <div class="pmodal-backdrop" onclick="closeSuccessModal()"></div>
+
+  <div class="pmodal-card" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+    <div class="pmodal-icon">
+      <svg viewBox="0 0 52 52" class="check">
+        <circle class="check-circle" cx="26" cy="26" r="25" fill="none"></circle>
+        <path class="check-mark" fill="none" d="M14 27 L22 35 L38 18"></path>
+      </svg>
+    </div>
+
+    <h3 id="pmTitle" class="pmodal-title">Payment Successful</h3>
+    <p class="pmodal-sub" id="successModalText">Your order has been placed.</p>
+
+    <div class="pmodal-chip">
+      <span>Order ID</span>
+      <strong id="successOrderId">—</strong>
+      <button type="button" class="pmodal-copy" onclick="copyOrderId()">Copy</button>
+    </div>
+
+    <div class="pmodal-actions">
+      <button type="button" class="btn ghost" onclick="goShop()">Continue Shopping</button>
+      <button type="button" class="btn" onclick="goOrders()">View Order History</button>
+    </div>
+
+    <button type="button" class="pmodal-x" aria-label="Close" onclick="closeSuccessModal()">✕</button>
+  </div>
+</div>
 
 <script src="../assets/cart/cart.js"></script>
 </body>

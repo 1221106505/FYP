@@ -7,6 +7,15 @@ const API_BASE = "../api/cart"; // adjust ONLY if your folder structure differs 
 let cartItems = [];
 let savedItems = [];
 
+// ✅ Keep selected items even after re-render / loadCart
+let selectedCartIds = new Set(
+  JSON.parse(localStorage.getItem("cart_selected_ids") || "[]").map(Number)
+);
+
+function saveSelected() {
+  localStorage.setItem("cart_selected_ids", JSON.stringify([...selectedCartIds]));
+}
+
 const TAX_RATE = 0.06;
 
 const SHIPPING_RULES = {
@@ -28,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("selectAll")?.addEventListener("change", onSelectAll);
   document.getElementById("btnRemoveSelected")?.addEventListener("click", removeSelected);
   document.getElementById("btnClearCart")?.addEventListener("click", clearCart);
-  document.getElementById("btnCheckout")?.addEventListener("click", checkout);
   document.getElementById("btnPayNow")?.addEventListener("click", payNow);
 
   // Shipping + Promo
@@ -54,18 +62,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Secure payment panel
   document.getElementById("togglePayment")?.addEventListener("click", togglePaymentPanel);
-  document.getElementById("paymentMethod")?.addEventListener("change", syncPaymentFields);
 
   // Card live validation
   document.getElementById("cardNumber")?.addEventListener("input", onCardNumberInput);
   document.getElementById("cardExpiry")?.addEventListener("input", onCardExpiryInput);
   document.getElementById("cardCvv")?.addEventListener("input", onCardCvvInput);
+    // Re-validate card number when user changes card type
+  document.getElementById("cardType")?.addEventListener("change", () => {
+    const el = document.getElementById("cardNumber");
+    if (el) onCardNumberInput({ target: el });
+  });
+
 
   syncPaymentFields();
  
 
   // Load cart
   loadCart();
+
 });
 
 // -------------------- UI Helpers --------------------
@@ -98,6 +112,57 @@ function escapeHtml(str) {
     '"': "&quot;",
     "'": "&#039;"
   }[s]));
+}
+
+function setRecipientMsg(msg, isError=false){
+  const el = document.getElementById("recipientMsg");
+  if(!el) return;
+  el.textContent = msg || "";
+  el.style.color = isError ? "#ef4444" : "#6b7280";
+}
+function setAddrMsg(id, msg, isError=false){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.textContent = msg || "";
+  el.style.color = isError ? "#ef4444" : "#6b7280";
+}
+
+function getRecipientName(){
+  return (document.getElementById("recipientName")?.value || "").trim();
+}
+
+function getAddressFields(){
+  return {
+    street: (document.getElementById("street")?.value || "").trim(),
+    area: (document.getElementById("area")?.value || "").trim(),
+    city: (document.getElementById("city")?.value || "").trim(),
+    state: (document.getElementById("state")?.value || "").trim(),
+    postcode: (document.getElementById("postcode")?.value || "").trim(),
+  };
+}
+
+function validateAddressFields(){
+  const recipient = getRecipientName();
+  const a = getAddressFields();
+  let ok = true;
+
+  if(recipient.length < 3){ setRecipientMsg("Please enter recipient full name.", true); ok=false; }
+  else setRecipientMsg("");
+
+  if(a.street.length < 5){ setAddrMsg("streetMsg","Please enter street/address line.", true); ok=false; }
+  else setAddrMsg("streetMsg","");
+
+  if(a.city.length < 2){ setAddrMsg("cityMsg","Please enter city.", true); ok=false; }
+  else setAddrMsg("cityMsg","");
+
+  if(a.state.length < 2){ setAddrMsg("stateMsg","Please enter state.", true); ok=false; }
+  else setAddrMsg("stateMsg","");
+
+  const pcDigits = a.postcode.replace(/\D/g,'');
+  if(pcDigits.length < 4){ setAddrMsg("postcodeMsg","Please enter a valid postcode.", true); ok=false; }
+  else setAddrMsg("postcodeMsg","");
+
+  return ok;
 }
 
 function normalizeCode(code) {
@@ -170,8 +235,15 @@ async function loadCart() {
     }
 
     cartItems = Array.isArray(data.cart) ? data.cart : [];
-    savedItems = Array.isArray(data.saved) ? data.saved : [];
-    render();
+savedItems = Array.isArray(data.saved) ? data.saved : [];
+
+// ✅ remove selected IDs that are no longer in cart
+const existing = new Set(cartItems.map(it => Number(it.cart_id)));
+selectedCartIds = new Set([...selectedCartIds].filter(id => existing.has(id)));
+saveSelected();
+
+render();
+ 
   } catch (err) {
     console.error(err);
     cartItems = [];
@@ -212,7 +284,12 @@ function renderList(containerId, items, isSaved) {
     el.insertAdjacentHTML("beforeend", `
       <div class="item" data-id="${item.cart_id}">
         ${isSaved ? "" : `
-          <input type="checkbox" class="rowCheck" data-id="${item.cart_id}" />
+          ${(() => {
+  const cid = Number(item.cart_id);
+  const checked = selectedCartIds.has(cid) ? "checked" : "";
+  return `<input type="checkbox" class="rowCheck" data-id="${cid}" ${checked} />`;
+})()}
+
         `}
 
         <div class="meta">
@@ -248,9 +325,15 @@ function renderList(containerId, items, isSaved) {
   // Only cart list has selection checkboxes
   if (!isSaved) {
     el.querySelectorAll(".rowCheck").forEach(cb => cb.addEventListener("change", () => {
+  const id = Number(cb.dataset.id);
+
+  if (cb.checked) selectedCartIds.add(id);
+  else selectedCartIds.delete(id);
+
+  saveSelected();
   updateSelectAllState();
   updateRemoveSelectedButton();
-  updateTotals(); // ✅ add this
+  updateTotals();
 }));
   }
 }
@@ -264,10 +347,19 @@ function getSelectedCartItems() {
 // -------------------- Selection --------------------
 function onSelectAll(e) {
   const checked = !!e.target.checked;
-  document.querySelectorAll(".rowCheck").forEach(cb => (cb.checked = checked));
+
+  document.querySelectorAll(".rowCheck").forEach(cb => {
+    cb.checked = checked;
+    const id = Number(cb.dataset.id);
+
+    if (checked) selectedCartIds.add(id);
+    else selectedCartIds.delete(id);
+  });
+
+  saveSelected();
   updateRemoveSelectedButton();
   updateSelectAllState();
-  updateTotals(); // ✅ add this
+  updateTotals();
 }
 
 function updateSelectAllState() {
@@ -287,9 +379,7 @@ function updateSelectAllState() {
 }
 
 function getSelectedIds() {
-  return Array.from(document.querySelectorAll(".rowCheck"))
-    .filter(cb => cb.checked)
-    .map(cb => Number(cb.dataset.id));
+  return [...selectedCartIds];
 }
 
 function updateRemoveSelectedButton() {
@@ -544,11 +634,24 @@ function onCardNumberInput(e) {
   e.target.value = formatted;
 
   const digits = digitsOnly(formatted);
-  if (digits.length === 0) { setFieldMsg("cardNumberMsg", ""); return; }
-  if (digits.length < 16) { setFieldMsg("cardNumberMsg", "Card number must be 16 digits.", true); return; }
+  const selectedType = document.getElementById("cardType")?.value || "VISA";
 
-  const ok = luhnCheck(digits);
-  setFieldMsg("cardNumberMsg", ok ? "Card number looks valid." : "Invalid card number (Luhn failed).", !ok);
+  if (digits.length === 0) {
+    setFieldMsg("cardNumberMsg", "");
+    const typeMsg = document.getElementById("cardTypeMsg");
+    if(typeMsg) typeMsg.textContent = "";
+    return;
+  }
+
+  const detected = detectNetwork(digits);
+  const typeMsg = document.getElementById("cardTypeMsg");
+  if(typeMsg){
+    typeMsg.textContent = detected ? `Detected: ${detected}` : "";
+    typeMsg.style.color = "#6b7280";
+  }
+
+  const v = validateBySelectedCardType(selectedType, digits);
+  setFieldMsg("cardNumberMsg", v.msg, !v.ok);
 }
 
 function onCardExpiryInput(e) {
@@ -583,6 +686,50 @@ function luhnCheck(numStr) {
     shouldDouble = !shouldDouble;
   }
   return sum % 10 === 0;
+}
+
+function inRange(num, a, b){ return num >= a && num <= b; }
+
+function detectNetwork(digits){
+  if(!digits) return "";
+  if(digits.startsWith("4")) return "VISA";
+
+  const first2 = parseInt(digits.slice(0,2),10);
+  const first4 = parseInt(digits.slice(0,4),10);
+  if(inRange(first2,51,55) || inRange(first4,2221,2720)) return "MASTERCARD";
+
+  const f2 = parseInt(digits.slice(0,2),10);
+  if(digits.startsWith("50") || inRange(f2,56,69)) return "DEBIT";
+
+  if(digits.startsWith("34") || digits.startsWith("37") || digits.startsWith("6011") || digits.startsWith("65"))
+    return "CREDIT";
+
+  return "CREDIT";
+}
+
+function validateBySelectedCardType(selected, digits){
+  if(digits.length < 13 || digits.length > 19) return { ok:false, msg:"Card number length must be 13–19 digits." };
+  if(!luhnCheck(digits)) return { ok:false, msg:"Invalid card number (Luhn check failed)." };
+
+  if(selected === "VISA"){
+    const ok = digits.startsWith("4") && (digits.length===13 || digits.length===16 || digits.length===19);
+    return { ok, msg: ok ? "VISA card validated." : "Selected VISA, but number must start with 4." };
+  }
+
+  if(selected === "MASTERCARD"){
+    const first2 = parseInt(digits.slice(0,2),10);
+    const first4 = parseInt(digits.slice(0,4),10);
+    const ok = digits.length===16 && (inRange(first2,51,55) || inRange(first4,2221,2720));
+    return { ok, msg: ok ? "MasterCard validated." : "Selected MasterCard, but prefix is not valid." };
+  }
+
+  if(selected === "DEBIT"){
+    const first2 = parseInt(digits.slice(0,2),10);
+    const ok = (digits.startsWith("50") || inRange(first2,56,69));
+    return { ok, msg: ok ? "Debit card validated." : "Selected Debit, but prefix is not valid." };
+  }
+
+  return { ok:true, msg:"Credit card validated." };
 }
 
 function validateExpiry(mmYY) {
@@ -630,11 +777,14 @@ function validatePaymentBeforeCheckout() {
   // Card
   const name = (document.getElementById("cardName")?.value || "").trim();
   const number = digitsOnly(document.getElementById("cardNumber")?.value || "");
+    const selectedType = document.getElementById("cardType")?.value || "VISA";
+  const cardTypeCheck = validateBySelectedCardType(selectedType, number);
+  if (!cardTypeCheck.ok) return (setPaymentError(cardTypeCheck.msg, true), { ok: false });
   const exp = (document.getElementById("cardExpiry")?.value || "").trim();
   const cvv = digitsOnly(document.getElementById("cardCvv")?.value || "");
 
   if (name.length < 3) return (setPaymentError("Please enter cardholder name.", true), { ok: false });
-  if (number.length !== 16 || !luhnCheck(number)) return (setPaymentError("Please enter a valid 16-digit card number.", true), { ok: false });
+  if (number.length < 13 || number.length > 19) return (setPaymentError("Card number length must be 13–19 digits.", true), { ok: false });
   if (!validateExpiry(exp)) return (setPaymentError("Please enter a valid expiry (MM/YY).", true), { ok: false });
   if (!(cvv.length === 3 || cvv.length === 4)) return (setPaymentError("Please enter a valid CVV (3 or 4 digits).", true), { ok: false });
 
@@ -696,90 +846,129 @@ function setAddressMsg(msg, isError = false) {
 async function payNow() {
   setPayMsg("");
 
-  if (cartItems.length === 0) {
-    const address = getAddressValue();
-if (address.length < 8) {
-  setAddressMsg("Please enter a valid delivery address.", true);
-  setPayMsg("Delivery address is required.", true);
+  const addr = getAddressFields();
+const allEmpty = !addr.street && !addr.area && !addr.city && !addr.state && !addr.postcode;
+
+if (allEmpty) {
+  setPayMsg("Please enter an address (at least something).", true);
   return;
 }
-setAddressMsg("");
+
+  // 2) Ensure cart has items (or you can check selected items if you want)
+  if (cartItems.length === 0) {
     setPayMsg("Your cart is empty.", true);
     return;
   }
 
-  // ✅ validate card input first
+  // 3) Validate card details
   const pay = validatePaymentBeforeCheckout();
   if (!pay.ok) return;
 
   setPayMsg("Processing payment...");
 
   try {
-    // Your HTML currently has no address field, so use a default
-    const payment_method = "Card";
-const address = getAddressValue();
+    // ✅ Map your UI card type to DB enum values
+    // orders.payment_method is enum like: credit_card / debit_card / etc
+    const selectedType = (document.getElementById("cardType")?.value || "CREDIT").toUpperCase();
+    const payment_method = (selectedType === "DEBIT") ? "debit_card" : "credit_card";
 
-    // ✅ Place order in backend (should clear cart server-side)
-    const data = await apiPost("cart_checkout.php", { payment_method, address });
+    const recipient_name = getRecipientName();
+    const addr = getAddressFields();
+
+const data = await apiPost("cart_checkout.php", {
+  payment_method,
+  recipient_name,
+  street: addr.street,
+  area: addr.area,
+  city: addr.city,
+  state: addr.state,
+  postcode: addr.postcode
+});
+
 
     if (!data || !data.success) {
       setPayMsg((data && data.error) ? data.error : "Checkout failed.", true);
       return;
     }
 
-    // ✅ IMPORTANT: Clear cart UI + reload from server
-    await loadCart(); // if backend cleared, UI becomes empty
+    await loadCart();
 
-    // ✅ EXTRA SAFETY: If backend didn’t clear, clear it manually
+    // Extra safety: if server didn’t clear cart
     if (cartItems.length > 0) {
       await apiPost("cart_clear.php", {});
       await loadCart();
     }
 
-    setPayMsg(`Payment successful ✅ Order ID: ${data.order_id}. Cart cleared.`);
+    setPayMsg("");
+openSuccessModal(data.order_id);
+
+// ✅ Popup
+alert(`✅ Payment Successful!\nYour Order ID is: ${data.order_id}`);
+    showPaymentSuccessPopup(data.order_id);
   } catch (err) {
     console.error(err);
-    setPayMsg("Payment success but clearing failed. Check Console (F12).", true);
+    setPayMsg("Payment failed. Check Console (F12).", true);
   }
 }
 
-// -------------------- Checkout --------------------
-async function checkout() {
-  setMsg("");
+// -------------------- Success Popup (Modal) --------------------
+function openSuccessModal(orderId){
+  const modal = document.getElementById("successModal");
+  const text = document.getElementById("successModalText");
+  const oid = document.getElementById("successOrderId");
 
-  if (cartItems.length === 0) {
-    setMsg("Your cart is empty.", true);
-    return;
+  if(text) text.textContent = "Your order has been placed successfully. Thank you for shopping with us!";
+  if(oid) oid.textContent = String(orderId);
+
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+
+  document.addEventListener("keydown", escCloseOnce);
+}
+
+function escCloseOnce(e){
+  if(e.key === "Escape"){
+    closeSuccessModal();
+    document.removeEventListener("keydown", escCloseOnce);
   }
+}
 
+function closeSuccessModal(){
+  const modal = document.getElementById("successModal");
+  if(!modal) return;
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+}
 
-  const payment_method = "Card";
-  const address = document.getElementById("address")?.value?.trim() || "";
+function copyOrderId(){
+  const oid = document.getElementById("successOrderId")?.textContent?.trim();
+  if(!oid) return;
 
-  if (address.length < 8) {
-    setMsg("Please enter a valid delivery address.", true);
-    return;
-  }
-
-  const pay = validatePaymentBeforeCheckout();
-  if (!pay.ok) return;
-
-  try {
-    const data = await apiPost("cart_checkout.php", { payment_method, address });
-
-    if (!data.success) {
-      setMsg(data.error || "Checkout failed.", true);
-      return;
+  navigator.clipboard.writeText(oid).then(() => {
+    const text = document.getElementById("successModalText");
+    if(text){
+      const old = text.textContent;
+      text.textContent = "Order ID copied ✅";
+      setTimeout(() => (text.textContent = old), 900);
     }
-
-    alert(`Order placed successfully! Order ID: ${data.order_id}`);
-    await loadCart();
-  } catch (err) {
-    console.error(err);
-    setMsg("Checkout failed. Check Console for exact API error.", true);
-  }
+  });
 }
 
+function goOrders(){
+  closeSuccessModal();
+  window.location.href = "../order_history.html";
+}
+
+function goShop(){
+  closeSuccessModal();
+  window.location.href = "../customer_view.html";
+}
+
+// expose for onclick used in HTML modal
+window.closeSuccessModal = closeSuccessModal;
+window.copyOrderId = copyOrderId;
+window.goOrders = goOrders;
+window.goShop = goShop;
 
 // -------------------- Expose for inline onclick --------------------
 window.setQty = setQty;
@@ -789,7 +978,6 @@ window.saveForLater = saveForLater;
 window.moveBack = moveBack;
 window.removeSelected = removeSelected;
 window.clearCart = clearCart;
-window.checkout = checkout;
 
 /*
 IMPORTANT NOTE (only if you get 404):
