@@ -35,7 +35,11 @@ if ($order_id <= 0) {
 
 try {
     // 获取订单基本信息
-    $sql = "SELECT * FROM orders WHERE order_id = ?";
+    $sql = "SELECT 
+                o.*,
+                o.recipient_name as recipient_name  -- 重命名为recipient_name
+            FROM orders o 
+            WHERE order_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
@@ -43,6 +47,9 @@ try {
     
     if ($result && $result->num_rows > 0) {
         $order = $result->fetch_assoc();
+        
+        // 确保recipient_name存在
+        $order['recipient_name'] = $order['recipient_name'] ?? $order['customer_name'] ?? 'Customer';
         
         // 获取订单项
         $items_sql = "SELECT 

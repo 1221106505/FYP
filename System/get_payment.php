@@ -4,8 +4,6 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS, HEAD');
 header('Access-Control-Allow-Headers: Content-Type');
 
-require_once '../include/database.php';
-
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -65,7 +63,7 @@ try {
     
     $stmt->close();
     
-    // 获取支付详情 - 仅查询存在的列
+    // 修复：移除不存在的 username 字段，使用 recipient_name
     $select_sql = "SELECT 
         p.payment_id, 
         p.order_id, 
@@ -80,10 +78,12 @@ try {
         o.order_date, 
         o.status as order_status,
         o.total_amount,
-        c.username, 
+        o.recipient_name,
+        c.recipient_name as customer_name,  -- 使用 recipient_name 而不是 username
         c.email,
         c.first_name,
-        c.last_name
+        c.last_name,
+        c.phone
     FROM payments p
     JOIN orders o ON p.order_id = o.order_id
     JOIN customer c ON p.customer_id = c.auto_id

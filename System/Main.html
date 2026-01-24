@@ -111,7 +111,7 @@
       gap: 8px;
     }
 
-    .btn-login, .btn-profile, .btn-logout, .btn-superadmin {
+    .btn-login, .btn-profile, .btn-logout, .btn-superadmin, .btn-admin {
       padding: 8px 16px;
       border: none;
       border-radius: 6px;
@@ -132,7 +132,12 @@
     }
 
     .btn-superadmin {
-      background: var(--superadmin);
+      background: linear-gradient(135deg, var(--superadmin), var(--superadmin-dark));
+      color: var(--white);
+    }
+
+    .btn-admin {
+      background: linear-gradient(135deg, var(--admin), var(--admin-dark));
       color: var(--white);
     }
 
@@ -141,7 +146,8 @@
       color: var(--white);
     }
 
-    .btn-login:hover, .btn-profile:hover, .btn-logout:hover, .btn-superadmin:hover {
+    .btn-login:hover, .btn-profile:hover, .btn-logout:hover, 
+    .btn-superadmin:hover, .btn-admin:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow);
     }
@@ -948,7 +954,7 @@
   <nav class="navbar">
     <div class="nav-container">
       <div class="nav-logo">
-         <i class="fas fa-book"></i>
+        <i class="fas fa-book"></i>
         <h2>Virtual BookStore</h2>
       </div>
       <div class="nav-user" id="userInfo">
@@ -1069,6 +1075,7 @@
               <li><a href="About.html">About Us</a></li>
               <li><a href="order_history.html">My Orders</a></li>
               <li><a id="adminFooterLink" class="hidden" href="admin_panel.html">Admin Panel</a></li>
+              <li><a id="superAdminFooterLink" class="hidden" href="superadmin_panel.html">Super Admin Panel</a></li>
             </ul>
           </div>
           
@@ -1130,13 +1137,19 @@
       console.log('Checking login status...');
       fetch(API_ENDPOINTS.checkLogin, {
         credentials: 'include',
-        headers: { 'Cache-Control': 'no-cache' }
+        headers: { 
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
       })
         .then(response => {
-          if (!response.ok) throw new Error('Network response was not ok');
+          if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+          }
           return response.json();
         })
         .then(data => {
+          console.log('Login status data:', data); // 调试信息
           updateUserInterface(data);
         })
         .catch(error => {
@@ -1151,6 +1164,7 @@
       const quickAccessSection = document.getElementById('quickAccessSection');
       const quickAccessGrid = document.getElementById('quickAccessGrid');
       const adminFooterLink = document.getElementById('adminFooterLink');
+      const superAdminFooterLink = document.getElementById('superAdminFooterLink');
       const welcomeMessage = document.getElementById('welcomeMessage');
       
       if (!userInfo) return;
@@ -1161,31 +1175,46 @@
         let isAdmin = false;
         let userTypeClass = '';
         
-        if (userData.user_type === 'admin') {
-          if (userData.role === 'superadmin') {
-            userTypeDisplay = '<span class="admin-badge superadmin">SUPER ADMIN</span>';
-            isSuperAdmin = true;
-            isAdmin = true;
-            userTypeClass = 'superadmin';
-          } else {
-            userTypeDisplay = '<span class="admin-badge admin">ADMIN</span>';
-            isAdmin = true;
-            userTypeClass = 'admin';
-          }
-        } else {
+        // 调试信息
+        console.log('User data for UI update:', userData);
+        
+        // 检测用户角色
+        // 方法1: 检查 role 字段
+        if (userData.role === 'superadmin' || userData.role === 'super_admin') {
+          userTypeDisplay = '<span class="admin-badge superadmin">SUPER ADMIN</span>';
+          isSuperAdmin = true;
+          isAdmin = true;
+          userTypeClass = 'superadmin';
+        } 
+        // 方法2: 检查 user_type 为 admin 且 is_superadmin 为 true
+        else if ((userData.user_type === 'admin' && userData.is_superadmin) ||
+                 (userData.user_type === 'admin' && userData.superadmin === '1')) {
+          userTypeDisplay = '<span class="admin-badge superadmin">SUPER ADMIN</span>';
+          isSuperAdmin = true;
+          isAdmin = true;
+          userTypeClass = 'superadmin';
+        }
+        // 方法3: 检查 user_type 为 admin
+        else if (userData.user_type === 'admin') {
+          userTypeDisplay = '<span class="admin-badge admin">ADMIN</span>';
+          isAdmin = true;
+          userTypeClass = 'admin';
+        } 
+        // 默认客户
+        else {
           userTypeDisplay = '<span class="admin-badge customer">CUSTOMER</span>';
           userTypeClass = 'customer';
         }
         
+        // 构建用户欢迎信息
         userInfo.innerHTML = `
           <div class="user-welcome ${userTypeClass}">
             <span>Welcome, ${userData.username} ${userTypeDisplay}</span>
             <div class="user-actions">
-              ${isAdmin ? 
-                (isSuperAdmin ? 
-                  `<a href="admin_panel.html"><button class="btn-superadmin">👑 Super Admin Panel</button></a>` : 
-                  `<a href="admin_panel.html"><button class="btn-profile">⚙️ Admin Panel</button></a>`
-                ) : ''}
+              ${isSuperAdmin ? 
+                `<a href="admin_panel.html"><button class="btn-superadmin">👑 Super Admin Panel</button></a>` : ''}
+              ${isAdmin && !isSuperAdmin ? 
+                `<a href="admin_panel.html"><button class="btn-admin">⚙️ Admin Panel</button></a>` : ''}
               <a href="user_profile.html"><button class="btn-profile">👤 Profile</button></a>
               <a href="logout.php"><button class="btn-logout">🚪 Logout</button></a>
             </div>
@@ -1194,17 +1223,26 @@
         
         // 显示/隐藏页脚管理员链接
         if (adminFooterLink) {
-          if (isAdmin) {
+          if (isAdmin && !isSuperAdmin) {
             adminFooterLink.classList.remove('hidden');
           } else {
             adminFooterLink.classList.add('hidden');
           }
         }
         
+        if (superAdminFooterLink) {
+          if (isSuperAdmin) {
+            superAdminFooterLink.classList.remove('hidden');
+          } else {
+            superAdminFooterLink.classList.add('hidden');
+          }
+        }
+        
+        // 显示快速访问区域
         if (quickAccessSection) quickAccessSection.classList.remove('hidden');
         
+        // 构建快速访问网格
         if (quickAccessGrid) {
-          // 为不同用户类型显示不同的快速访问选项
           let quickAccessHTML = '';
           
           if (isSuperAdmin) {
@@ -1214,6 +1252,7 @@
                 <h3>Super Admin Panel</h3>
                 <p>Full system control and management</p>
               </div>
+              
               <div class="action-card" onclick="location.href='customer_view.html'">
                 <div class="action-icon">🔍</div>
                 <h3>Browse Books</h3>
@@ -1223,11 +1262,6 @@
                 <div class="action-icon">🛒</div>
                 <h3>My Cart</h3>
                 <p>View and manage your shopping cart</p>
-              </div>
-              <div class="action-card" onclick="location.href='order_history.html'">
-                <div class="action-icon">📦</div>
-                <h3>My Orders</h3>
-                <p>Track and manage your orders</p>
               </div>
             `;
           } else if (isAdmin) {
@@ -1281,41 +1315,39 @@
           quickAccessGrid.innerHTML = quickAccessHTML;
         }
         
+        // 显示欢迎消息
         if (welcomeMessage) {
           let roleText = '';
           let icon = '';
+          let message = '';
           
           if (isSuperAdmin) {
             roleText = ' (Super Administrator)';
             icon = '👑';
+            message = 'Access the super admin panel for full system control.';
           } else if (isAdmin) {
             roleText = ' (Administrator)';
             icon = '🛡️';
+            message = 'Access the admin panel to manage the store.';
           } else {
             roleText = '';
             icon = '📚';
-          }
-          
-          let message = '';
-          if (isSuperAdmin) {
-            message = `Access the super admin panel for full system control. ${icon}`;
-          } else if (isAdmin) {
-            message = `Access the admin panel to manage the store. ${icon}`;
-          } else {
-            message = `Explore our latest book collections! ${icon}`;
+            message = 'Explore our latest book collections!';
           }
           
           welcomeMessage.innerHTML = `
             <h3>Welcome back, ${userData.username}${roleText}! 🎉</h3>
-            <p>Ready to continue your reading journey? ${message}</p>
+            <p>Ready to continue your reading journey? ${message} ${icon}</p>
           `;
           welcomeMessage.classList.remove('hidden');
           setTimeout(() => welcomeMessage.classList.add('hidden'), 5000);
         }
       } else {
+        // 未登录状态
         userInfo.innerHTML = `<a href="../Login/Login.html"><button class="btn-login">🔐 Login</button></a>`;
         if (quickAccessSection) quickAccessSection.classList.add('hidden');
         if (adminFooterLink) adminFooterLink.classList.add('hidden');
+        if (superAdminFooterLink) superAdminFooterLink.classList.add('hidden');
         if (welcomeMessage) welcomeMessage.classList.add('hidden');
       }
     }
@@ -1326,14 +1358,22 @@
       const loginSuccess = urlParams.get('login_success');
       const username = urlParams.get('username');
       const role = urlParams.get('role') || 'customer';
+      const userType = urlParams.get('user_type') || role;
       
       if (loginSuccess === '1' && username) {
-        updateUserInterface({ 
+        const userData = { 
           logged_in: true, 
-          username: decodeURIComponent(username), 
-          user_type: role === 'superadmin' ? 'admin' : role,
+          username: decodeURIComponent(username),
+          user_type: userType,
           role: role
-        });
+        };
+        
+        // 如果URL参数中有superadmin标记
+        if (urlParams.get('superadmin') === '1') {
+          userData.role = 'superadmin';
+        }
+        
+        updateUserInterface(userData);
       } else {
         updateUserInterface({ logged_in: false });
       }
@@ -1349,15 +1389,18 @@
       return newArray;
     }
 
-    // 加载随机畅销书籍 - 更新版，显示封面
+    // 加载随机畅销书籍
     function loadRandomBestsellers() {
       console.log('Loading random bestsellers with covers...');
       
       fetch(API_ENDPOINTS.books, {
-        headers: { 'Cache-Control': 'no-cache' }
+        headers: { 
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
       })
         .then(response => {
-          if (!response.ok) throw new Error('Failed to fetch books');
+          if (!response.ok) throw new Error('Failed to fetch books: ' + response.status);
           return response.json();
         })
         .then(data => {
@@ -1445,6 +1488,9 @@
         loadRandomBestsellers();
       }, 100);
     });
+
+    // 定期检查登录状态（每5分钟）
+    setInterval(checkLoginStatus, 300000);
 
     // 导出到全局作用域
     window.checkLoginStatus = checkLoginStatus;

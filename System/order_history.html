@@ -20,7 +20,6 @@
             --danger: #e74c3c;
             --pre-order: #3b82f6;
             --pre-order-dark: #1d4ed8;
-            --pending: #f59e0b;
             --processing: #3b82f6;
             --shipped: #8b5cf6;
             --delivered: #10b981;
@@ -183,10 +182,6 @@
             border-left-color: var(--pre-order);
         }
 
-        .stat-card:nth-child(4) {
-            border-left-color: var(--warning);
-        }
-
         .stat-icon {
             font-size: 2rem;
             margin-bottom: 15px;
@@ -200,10 +195,6 @@
 
         .stat-card:nth-child(3) .stat-icon {
             color: var(--pre-order);
-        }
-
-        .stat-card:nth-child(4) .stat-icon {
-            color: var(--warning);
         }
 
         .stat-value {
@@ -351,12 +342,6 @@
             letter-spacing: 0.5px;
         }
 
-        .status-pending {
-            background-color: rgba(245, 158, 11, 0.15);
-            color: var(--pending);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-
         .status-confirmed {
             background-color: rgba(59, 130, 246, 0.15);
             color: var(--processing);
@@ -391,28 +376,10 @@
             margin: 5px 0;
         }
 
-        .payment-pending {
-            background-color: rgba(245, 158, 11, 0.15);
-            color: var(--pending);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-
         .payment-completed {
             background-color: rgba(16, 185, 129, 0.15);
             color: var(--success);
             border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .payment-failed {
-            background-color: rgba(239, 68, 68, 0.15);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .payment-refunded {
-            background-color: rgba(148, 163, 184, 0.15);
-            color: var(--text-light);
-            border: 1px solid rgba(148, 163, 184, 0.3);
         }
 
         /* Order Details */
@@ -614,20 +581,8 @@
             background-color: white;
             border-radius: 8px;
             padding: 20px;
-            border-left: 4px solid var(--info);
+            border-left: 4px solid var(--success);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .payment-card.completed {
-            border-left-color: var(--success);
-        }
-
-        .payment-card.failed {
-            border-left-color: var(--danger);
-        }
-
-        .payment-card.refunded {
-            border-left-color: var(--text-light);
         }
 
         .payment-header {
@@ -675,6 +630,35 @@
             background-color: var(--secondary);
             padding: 5px 10px;
             border-radius: 4px;
+        }
+
+        /* Contact Info */
+        .contact-info {
+            background-color: var(--secondary);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .contact-info h5 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .contact-details {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: var(--text-light);
         }
 
         /* Login Prompt */
@@ -957,13 +941,6 @@
                 <div class="stat-value" id="completedPayments">0</div>
                 <div class="stat-label">Paid Orders</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="stat-value" id="pendingPayments">0</div>
-                <div class="stat-label">Pending Payments</div>
-            </div>
         </div>
 
         <!-- Filter Section -->
@@ -973,7 +950,6 @@
                 <div class="filter-controls">
                     <select id="statusFilter" class="filter-select" onchange="filterOrders()">
                         <option value="all">All Status</option>
-                        <option value="pending">⏳ Pending</option>
                         <option value="confirmed">✅ Confirmed</option>
                         <option value="shipped">🚚 Shipped</option>
                         <option value="delivered">📦 Delivered</option>
@@ -1024,7 +1000,7 @@
 
     <script>
         // ============================================
-        // JAVASCRIPT FUNCTIONALITY
+        // JAVASCRIPT FUNCTIONALITY - 简化版本，所有支付默认完成
         // ============================================
 
         // API endpoints
@@ -1076,7 +1052,7 @@
                     customerData = data;
                     
                     // 显示用户欢迎信息
-                    const username = data.username || data.first_name || 'User';
+                    const username = data.username || data.first_name || data.recipient_name || 'User';
                     document.getElementById('welcomeUser').textContent = username;
                     
                     currentCustomerId = data.user_id || data.auto_id;
@@ -1143,11 +1119,7 @@
                     filterOrders();
                     
                     // 更新统计信息
-                    if (data.payment_stats) {
-                        updatePaymentStats(data);
-                    } else {
-                        updateStats();
-                    }
+                    updatePaymentStats(data);
                     
                     document.getElementById('loadingState').classList.add('hidden');
                 } else {
@@ -1212,16 +1184,22 @@
                 const orderItems = order.items || [];
                 
                 // 获取收货人信息
-                const recipientName = getRecipientName(order);
-                const shippingAddress = getShippingAddress(order);
+                const recipientName = order.recipient_name || customerData?.recipient_name || customerData?.first_name || 'Customer';
+                
+                // 使用完整地址
+                const shippingAddress = order.full_address || order.shipping_address || 'Address not provided';
+                
+                // 获取联系方式
+                const contactPhone = order.contact_phone || customerData?.phone || '';
+                const contactEmail = order.contact_email || customerData?.email || '';
                 
                 // 订单商品列表HTML
                 const orderItemsHTML = orderItems.length > 0 ? orderItems.map(item => {
-                    const bookTitle = item.book_title || item.title || 'Unknown Book';
+                    const bookTitle = item.title || 'Unknown Book';
                     const author = item.author || 'Unknown Author';
                     const quantity = item.quantity || 0;
-                    const unitPrice = parseFloat(item.unit_price || item.price || 0).toFixed(2);
-                    const subtotal = parseFloat(item.subtotal || (quantity * parseFloat(unitPrice))).toFixed(2);
+                    const unitPrice = parseFloat(item.unit_price || 0).toFixed(2);
+                    const itemTotal = parseFloat(item.item_total || (quantity * parseFloat(unitPrice))).toFixed(2);
                     
                     return `
                     <div class="item-card">
@@ -1234,7 +1212,7 @@
                             <div class="item-meta">
                                 <span class="item-quantity">Qty: ${quantity}</span>
                                 <span class="item-price">RM ${unitPrice}</span>
-                                <span class="item-total">RM ${subtotal}</span>
+                                <span class="item-total">RM ${itemTotal}</span>
                             </div>
                         </div>
                     </div>
@@ -1246,12 +1224,20 @@
                     <div class="transaction-id">${escapeHtml(order.transaction_id)}</div>
                 ` : '';
                 
-                const notesHTML = order.notes ? `
-                    <div style="margin-top: 10px;">
-                        <strong>Notes:</strong>
-                        <div style="margin-top: 5px;">${escapeHtml(order.notes)}</div>
+                // 联系方式HTML
+                const contactInfoHTML = (contactPhone || contactEmail) ? `
+                    <div class="contact-info">
+                        <h5>Contact Information</h5>
+                        <div class="contact-details">
+                            ${contactPhone ? `<div class="contact-detail"><i class="fas fa-phone"></i> ${escapeHtml(contactPhone)}</div>` : ''}
+                            ${contactEmail ? `<div class="contact-detail"><i class="fas fa-envelope"></i> ${escapeHtml(contactEmail)}</div>` : ''}
+                        </div>
                     </div>
                 ` : '';
+                
+                // 支付金额 - 确保是数字
+                const paymentAmount = parseFloat(order.payment_amount || order.total_amount || 0).toFixed(2);
+                const totalAmount = parseFloat(order.total_amount || 0).toFixed(2);
                 
                 return `
                 <div class="order-card">
@@ -1279,19 +1265,20 @@
                                     <span class="recipient-name">${escapeHtml(recipientName)}</span>
                                     <div class="shipping-address">${escapeHtml(shippingAddress)}</div>
                                 </div>
+                                ${contactInfoHTML}
                             </div>
                         </div>
                         
                         <div class="detail-item">
                             <div class="detail-label">Payment Method</div>
                             <div class="detail-value">
-                                ${escapeHtml(order.payment_method_display || getPaymentMethodText(order.payment_method) || 'Not Specified')}
+                                ${escapeHtml(order.payment_method_display || getPaymentMethodText(order.payment_method) || 'Credit Card')}
                             </div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Payment Status</div>
-                            <div class="payment-badge ${getPaymentStatusClass(order.payment_status)}">
-                                ${escapeHtml(order.payment_status_display || order.payment_status || 'Pending')}
+                            <div class="payment-badge payment-completed">
+                                Completed
                             </div>
                         </div>
                     </div>
@@ -1307,28 +1294,27 @@
                     <!-- Order Total -->
                     <div class="order-total">
                         <span class="total-label">Total Amount:</span>
-                        <span class="total-value">RM ${parseFloat(order.total_amount || 0).toFixed(2)}</span>
+                        <span class="total-value">RM ${totalAmount}</span>
                     </div>
                     
                     <!-- Payment History -->
                     <div class="payment-history">
                         <h4>Payment Details</h4>
-                        <div class="payment-card ${order.payment_status || 'pending'}">
+                        <div class="payment-card">
                             <div class="payment-header">
                                 <div class="payment-method">
-                                    ${escapeHtml(order.payment_method_display || getPaymentMethodText(order.payment_method) || 'Payment Method')}
+                                    ${escapeHtml(order.payment_method_display || getPaymentMethodText(order.payment_method) || 'Credit Card')}
                                 </div>
                                 <div class="payment-date">
-                                    ${order.payment_date ? new Date(order.payment_date).toLocaleDateString() : 'Not Paid Yet'}
+                                    ${order.payment_date ? new Date(order.payment_date).toLocaleDateString() : new Date(order.order_date).toLocaleDateString()}
                                 </div>
                             </div>
                             <div class="payment-details">
                                 <div class="payment-amount">
-                                    RM ${parseFloat(order.payment_amount || order.total_amount || 0).toFixed(2)}
+                                    RM ${paymentAmount}
                                 </div>
                                 ${paymentInfoHTML}
                             </div>
-                            ${notesHTML}
                         </div>
                     </div>
                 </div>
@@ -1336,89 +1322,33 @@
             }).join('');
         }
 
-        // 获取收货人姓名
-        function getRecipientName(order) {
-            // 优先使用订单中的联系人信息
-            if (order.contact_name) {
-                return order.contact_name;
-            }
-            
-            // 其次使用客户信息
-            if (customerData) {
-                const firstName = customerData.first_name || '';
-                const lastName = customerData.last_name || '';
-                const username = customerData.username || '';
-                
-                if (firstName || lastName) {
-                    return `${firstName} ${lastName}`.trim();
-                }
-                
-                if (username) {
-                    return username;
-                }
-            }
-            
-            // 最后使用默认值
-            return 'Customer';
-        }
-
-        // 获取送货地址
-        function getShippingAddress(order) {
-            if (order.shipping_address) {
-                return order.shipping_address;
-            }
-            
-            // 如果地址不存在，尝试从客户信息中获取
-            if (customerData && customerData.address) {
-                return customerData.address;
-            }
-            
-            return 'Address not provided';
-        }
-
-        // 更新统计信息
-        function updateStats() {
-            if (allOrders.length === 0) {
-                document.getElementById('totalOrders').textContent = '0';
-                document.getElementById('totalSpent').textContent = 'RM 0.00';
-                document.getElementById('completedPayments').textContent = '0';
-                document.getElementById('pendingPayments').textContent = '0';
-                return;
-            }
-            
-            // 计算统计
-            const totalSpent = allOrders.reduce((sum, order) => sum + parseFloat(order.total_amount || 0), 0);
-            const completedPayments = allOrders.filter(order => order.payment_status === 'completed').length;
-            const pendingPayments = allOrders.filter(order => order.payment_status === 'pending').length;
-            
-            // 更新显示
-            document.getElementById('totalOrders').textContent = allOrders.length;
-            document.getElementById('totalSpent').textContent = `RM ${totalSpent.toFixed(2)}`;
-            document.getElementById('completedPayments').textContent = completedPayments;
-            document.getElementById('pendingPayments').textContent = pendingPayments;
-        }
-
-        // 更新支付统计信息
+        // 更新支付统计信息 - 简化版本（所有支付都是完成的）
         function updatePaymentStats(data) {
             const stats = data.payment_stats || {};
             
             // 总订单数
-            document.getElementById('totalOrders').textContent = data.order_count || allOrders.length;
+            const totalOrders = allOrders.length;
+            document.getElementById('totalOrders').textContent = totalOrders;
             
-            // 总消费额
-            const totalSpent = stats.total_spent || 
-                allOrders.reduce((sum, order) => sum + parseFloat(order.total_amount || 0), 0);
+            // 总消费额 - 所有订单都已完成支付
+            let totalSpent = 0;
+            if (stats.total_spent) {
+                // 如果是字符串，转换为数字
+                if (typeof stats.total_spent === 'string') {
+                    totalSpent = parseFloat(stats.total_spent) || 0;
+                } else {
+                    totalSpent = stats.total_spent || 0;
+                }
+            } else {
+                // 手动计算所有订单总额
+                totalSpent = allOrders.reduce((sum, order) => {
+                    return sum + parseFloat(order.total_amount || 0);
+                }, 0);
+            }
             document.getElementById('totalSpent').textContent = `RM ${totalSpent.toFixed(2)}`;
             
-            // 完成支付数
-            document.getElementById('completedPayments').textContent = 
-                stats.completed_payments || 
-                allOrders.filter(order => order.payment_status === 'completed').length;
-            
-            // 待支付数
-            document.getElementById('pendingPayments').textContent = 
-                stats.pending_payments || 
-                allOrders.filter(order => order.payment_status === 'pending').length;
+            // 所有订单都已完成支付
+            document.getElementById('completedPayments').textContent = totalOrders;
         }
 
         // 显示无订单
@@ -1482,7 +1412,7 @@
                 'delivered': 'status-delivered',
                 'cancelled': 'status-cancelled'
             };
-            return statusMap[status] || 'status-pending';
+            return statusMap[status] || 'status-confirmed';
         }
 
         function getStatusText(status) {
@@ -1492,29 +1422,72 @@
                 'delivered': 'Delivered',
                 'cancelled': 'Cancelled'
             };
-            return statusMap[status] || status;
+            return statusMap[status] || (status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Confirmed');
         }
 
         function getPaymentStatusClass(status) {
-            const statusMap = {
-                'completed': 'payment-completed',
-                'failed': 'payment-failed',
-                'refunded': 'payment-refunded'
-            };
-            return statusMap[status] || 'payment-completed';
+            // 所有支付都是完成的
+            return 'payment-completed';
         }
 
-        function getPaymentMethodText(method) {
-            const methodMap = {
-                'credit_card': 'Credit Card',
-                'debit_card': 'Debit Card',
-                'paypal': 'PayPal',
-                'bank_transfer': 'Bank Transfer',
-                'cash_on_delivery': 'Cash on Delivery',
-                'Card': 'Credit Card'
-            };
-            return methodMap[method] || (method ? method.replace('_', ' ').toUpperCase() : 'Not Specified');
-        }
+        // 修改支付方式格式化函数
+        // 修改支付方式格式化函数 - 确保 VISA 显示为 VISA
+function getPaymentMethodText(method) {
+    if (!method) return 'Credit Card';
+    
+    const upperMethod = method.toUpperCase().trim();
+    
+    // 精确匹配
+    const exactMatches = {
+        'VISA': 'VISA',
+        'MASTERCARD': 'MasterCard',
+        'MASTER CARD': 'MasterCard',
+        'CREDIT': 'Credit Card',
+        'DEBIT': 'Debit Card',
+        'CARD': 'Credit Card',
+        'CREDIT_CARD': 'Credit Card',
+        'DEBIT_CARD': 'Debit Card',
+        'PAYPAL': 'PayPal',
+        'BANK_TRANSFER': 'Bank Transfer',
+        'BANK TRANSFER': 'Bank Transfer',
+        'CASH_ON_DELIVERY': 'Cash on Delivery',
+        'CASH ON DELIVERY': 'Cash on Delivery',
+        'COD': 'Cash on Delivery'
+    };
+    
+    if (exactMatches[upperMethod]) {
+        return exactMatches[upperMethod];
+    }
+    
+    // 包含匹配
+    if (upperMethod.includes('VISA')) {
+        return 'VISA';
+    }
+    if (upperMethod.includes('MASTERCARD') || upperMethod.includes('MASTER')) {
+        return 'MasterCard';
+    }
+    if (upperMethod.includes('CREDIT')) {
+        return 'Credit Card';
+    }
+    if (upperMethod.includes('DEBIT')) {
+        return 'Debit Card';
+    }
+    if (upperMethod.includes('PAYPAL')) {
+        return 'PayPal';
+    }
+    if (upperMethod.includes('BANK')) {
+        return 'Bank Transfer';
+    }
+    if (upperMethod.includes('CASH') || upperMethod.includes('COD')) {
+        return 'Cash on Delivery';
+    }
+    
+    // 默认：尝试美化显示
+    const cleaned = method.replace(/_/g, ' ').toLowerCase();
+    return cleaned.split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
 
         function escapeHtml(text) {
             if (!text) return '';

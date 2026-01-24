@@ -4,7 +4,22 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-require_once '../include/database.php';
+// 直接连接数据库，因为您可能没有database.php文件
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'bookstore';
+
+$conn = new mysqli($host, $username, $password, $database);
+
+if ($conn->connect_error) {
+    die(json_encode([
+        'success' => false,
+        'error' => 'Database connection failed: ' . $conn->connect_error
+    ]));
+}
+
+$conn->set_charset("utf8mb4");
 
 try {
     // 获取日期范围参数
@@ -44,6 +59,7 @@ try {
     
     $status_stats = [];
     while ($row = $status_result->fetch_assoc()) {
+        $row['total_amount_formatted'] = number_format($row['total_amount'], 2);
         $status_stats[$row['payment_status']] = $row;
     }
     
@@ -54,6 +70,8 @@ try {
                         SUM(amount) as total_amount
                     FROM payments 
                     WHERE DATE(created_at) BETWEEN ? AND ?
+                    AND payment_method IS NOT NULL
+                    AND payment_method != ''
                     GROUP BY payment_method";
     
     $method_stmt = $conn->prepare($method_sql);
@@ -63,7 +81,9 @@ try {
     
     $method_stats = [];
     while ($row = $method_result->fetch_assoc()) {
-        $method_stats[$row['payment_method']] = $row;
+        $row['total_amount_formatted'] = number_format($row['total_amount'], 2);
+        $row['payment_method_display'] = formatPaymentMethod($row['payment_method']);
+        $method_stats[] = $row;
     }
     
     // 每日趋势
@@ -83,6 +103,8 @@ try {
     
     $daily_trends = [];
     while ($row = $daily_result->fetch_assoc()) {
+        $row['date_formatted'] = date('M d', strtotime($row['date']));
+        $row['daily_total_formatted'] = number_format($row['daily_total'], 2);
         $daily_trends[] = $row;
     }
     
@@ -93,12 +115,13 @@ try {
             'end_date' => $end_date
         ],
         'overall_stats' => [
-            'total_payments' => $overall_stats['total_payments'] ?? 0,
+            'total_payments' => intval($overall_stats['total_payments'] ?? 0),
             'total_amount' => floatval($overall_stats['total_amount'] ?? 0),
+            'total_amount_formatted' => number_format($overall_stats['total_amount'] ?? 0, 2),
             'average_amount' => floatval($overall_stats['average_amount'] ?? 0),
             'min_amount' => floatval($overall_stats['min_amount'] ?? 0),
             'max_amount' => floatval($overall_stats['max_amount'] ?? 0),
-            'unique_customers' => $overall_stats['unique_customers'] ?? 0
+            'unique_customers' => intval($overall_stats['unique_customers'] ?? 0)
         ],
         'status_stats' => $status_stats,
         'method_stats' => $method_stats,
@@ -118,4 +141,35 @@ try {
 }
 
 $conn->close();
+
+// 辅助函数：格式化支付方式
+function formatPaymentMethod($method) {
+    if (empty($method)) return 'Not Specified';
+    
+    $method_map = [
+        'card' => 'Credit Card',
+        'credit_card' => 'Credit Card',
+        'debit_card' => 'Debit Card',
+        'cod' => 'Cash on Delivery',
+        'cash_on_delivery' => 'Cash on Delivery',
+        'bank_transfer' => 'Bank Transfer',
+        'paypal' => 'PayPal',
+        'VISA' => 'VISA',
+        'MASTERCARD' => 'MasterCard',
+        'CREDIT' => 'Credit Card',
+        'DEBIT' => 'Debit Card',
+        'CARD' => 'Credit Card',
+        'PAYPAL' => 'PayPal',
+        'BANK_TRANSFER' => 'Bank Transfer',
+        'CASH_ON_DELIVERY' => 'Cash on Delivery'
+    ];
+    
+    $method_upper = strtoupper($method);
+    
+    if (isset($method_map[$method_upper])) {
+        return $method_map[$method_upper];
+    }
+    
+    return ucwords(strtolower(str_replace('_', ' ', $method)));
+}
 ?>
